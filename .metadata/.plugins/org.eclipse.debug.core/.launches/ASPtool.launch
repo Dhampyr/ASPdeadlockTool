@@ -8,6 +8,6 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.antlr.v4.runtime.misc.TestRig"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="asp.parser.ASP prog -gui /Users/vmastand/Desktop/prova.txt"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="asp.parser.ASP prog -gui src/input.txt"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ASPdeadlockTool"/>
 </launchConfiguration>
