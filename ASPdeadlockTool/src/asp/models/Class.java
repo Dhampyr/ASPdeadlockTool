@@ -5,13 +5,40 @@ import java.util.LinkedList;
 
 public class Class extends ComputationUnit {
 	
+	String className;
 	LinkedList<TypeBase> fields;
 	LinkedList<TypeBase> parameters; 
 	HashMap<String, Method> methods;
 	
+	
+	public Class(String className, 
+			     LinkedList<TypeBase> fields, 
+			     LinkedList<TypeBase> parameters, 
+			     HashMap<String, Method> methods)
+	{
+		this.className = className;
+		this.fields = fields;
+		this.parameters = parameters;
+		this.methods = methods;
+	}
+
+	
+	
+	
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	
 	public Method getMethodFromID (String methodName)
 	{
-		return methods.get(methodName);
+		if (methods.containsKey(methodName))
+			return methods.get(methodName);
+		else
+			return null;
 	}
 	
 	public HashMap<String, Method> getMethods()
@@ -28,14 +55,7 @@ public class Class extends ComputationUnit {
 	{
 		return parameters;
 	}
-	
-	public Class(LinkedList<TypeBase> fields, LinkedList<TypeBase> parameters, HashMap<String, Method> methods)
-	{
-		this.fields = fields;
-		this.parameters = parameters;
-		this.methods = methods;
-	}
-	
+		
 	public void setFields (LinkedList<TypeBase> fields )
 	{
 		this.fields = fields;

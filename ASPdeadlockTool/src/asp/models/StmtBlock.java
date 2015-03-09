@@ -14,6 +14,12 @@ public class StmtBlock extends ComputationUnit{
 		this.stmts = stmts;
 	}
 	
+	public StmtBlock()
+	{
+		this.varDec = null;
+		this.stmts = null;
+	}
+	
 	public HashMap<String, Variable> getVars()
 	{
 		return varDec;

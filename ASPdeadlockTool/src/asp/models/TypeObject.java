@@ -10,17 +10,17 @@ import java.util.List;
 public class TypeObject extends TypeBase implements IActualValue {
 	
 	//fields
-	String name; //the name of the object
-	List<TypeBase> fields; //the pairs <ID,TYPE> of record fields
+	String id; //the name of the object
+	String objClass;
 	
 	//accessors
-	public String getName(){return name;}
+	public String getID(){return id;}
 	
-	public List<TypeBase> getFields(){return fields;}
+	public String getObjClass(){return objClass;}
 	
 	//constructor
-	public TypeObject (String name, List<TypeBase> fields){
-		this.name = name;
-		this.fields = fields!=null?fields:new LinkedList<TypeBase>();
+	public TypeObject (String id, String objClass){
+		this.id = id;
+		this.objClass = objClass;
 	}
 }
