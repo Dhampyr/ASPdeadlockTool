@@ -4,14 +4,10 @@ package asp.models;
  * @author Vincenzo Mastandrea
  * Base class for variables . i.e. (x, y, n)
  */
-public class Variable extends Expression {
+public class Variable extends Element {
 	
-	protected String id; //the identity of the variable
+	protected String id;
 	
-	/**
-	 * Creates an expression representing a variable
-	 * @param id: the id of the variable
-	 */
 	public Variable(String id) {
 		this.id = id;
 	}

@@ -12,24 +12,26 @@ import java.util.LinkedList;
 }
 
 //TYPES
-elem returns [TypeBase t] 
-            : ID {$t= new Variable($ID.text);}
-            | THIS {$t= new TypeObject();};
+element returns [Element elem]
+ 			@init{Element elem = null;} 
+            : ID {$elem = new Variable($ID.text);}
+            | THIS {$elem = new TypeObject();};
 
 
 program returns [Program prog]
 				@init{HashMap<String, Class> classMap = new HashMap<>();
 					  StmtBlock main = new StmtBlock();}
-				:   (classDec {classMap.add($classDec.className,$classDec.classObj)})* 
+				:   (classDec {classMap.add($classDec.classObj.getClassName(),$classDec.classObj)})* 
 				    (body {main.setVarDec($body.varDec);
 				    	   main.setStmts($body.stmts);}) 
-				    {$prog = new Program(classMap, body)};
+				    {$prog = new Program(classMap, main)};
 
 classDec returns [Class classObj]
 				@init{LinkedList<TypeBase> fields = new LinkedList<>;
 					  LinkedList<TypeBase> parameters = new LinkedList<>; 
 					  HashMap<String, Method> methods = new LinkedList<>;}	
-				: 	CLASS className=ID LPAR (parDef{parameters.add()})* RPAR LCBRACK (varDec)* (methodDef)* RCBRACK
+				: 	CLASS className=ID LPAR (parDef{parameters.add($parDef.par)})* RPAR 
+				    LCBRACK (varDec{fields.add($varDec.var)})* (methodDef{methods.add($methodDef.getName,$methodDef.methodSign)})* RCBRACK
 				    {
 				    	 $classObj = new Class($className,
 				    	 					   fields, 
@@ -37,22 +39,38 @@ classDec returns [Class classObj]
 				    	 					   methods
 				    	 );
 				    };
+				    
+methodDef returns [Method methodSign]
+				  @init{LinkedList<TypeBase> parameters = new LinkedList<>(); 
+					    HashMap<String,Variable> varDec = new HashMap<>();
+						LinkedList<Statement> stmts = new LinkedList<>(); }	
+				  :	returnedType=type methodName=ID LPAR (parDef{parameters.add($parDef.par)})* RPAR {$methodSign = new Method($returnedType, $methodName, parameters) };
 
 
-methodSign	:	type ID LPAR (parDef)* RPAR;
-
-methodDef	:	methodSign body;
 
 
 body		:   LCBRACK (varDec)* (stmt)* RCBRACK;
 
-varDec		:	type var SEMI;
+varDec returns [TypeBase var]	
+     		:  t=type v=variable SEMI
+     		   { $var = $t.varType;
+     		   	 $var.setID($v.text);
+     		   };
 
-parDef		:	parDef COMMA parDef | type var;
+parDef	returns [LinkedList<TypeBase>]
+				@init{
+						LinkedList<TypeBase> pars = new LinkedList<>();
+						TypeBase par = null;
+					  }
+				: t=type v=variable{par = $t.varType; pars.add(par);}
+				     (COMMA t=type v=variable {par = $t.varType; pars.add(par);})*;
 
-type		:	ID;
+type returns [TypeBase varType] 
+            : ID   {$varType = new TypeObject($ID.text);}
+            | INT  {$varType = new TypeInt($INT.text);}
+            | BOOL {$varType = new TypeBool($BOOL.text);};
 
-var			:   ID;
+variable	:   ID;
 
 stmt		: SKIP SEMI
             | ID EQUALS exprse SEMI
@@ -64,12 +82,12 @@ stmtblock	: LCBRACK (stmt)* RCBRACK;
 		
 
 exprse		: expr 
-			| elem DOT ID LPAR (expr)* RPAR 
+			| element DOT ID LPAR (expr)* RPAR 
 			| NEW ID LPAR (expr)* RPAR 
 			| NEWACT ID LPAR (expr)* RPAR;
 
 expr		: val 
-			| elem 
+			| element 
 			| expra 
 			| exprb	;   
 
@@ -86,7 +104,7 @@ expra		: expra ('*'|'/') expra
     	
 exprb		: NOT exprb	
 			| exprb (OR | AND | EQUALS | DISTINCT | GT | LT | GEG | LEG) exprb    		
-    		| expra | val | elem  
+    		| expra | val | element  
     		| '(' exprb ')'
     		;
     	
@@ -129,7 +147,8 @@ NEWACT	: 'newActive' ;
 IF		: 'if'	  ;
 THEN	: 'then'  ;
 ELSE	: 'else'  ;
-
+INT		: 'int'	  ;
+BOOL	: 'bool'  ;
 
 fragment CHAR 	: 'a'..'z' |'A'..'Z' ;
 ID              : CHAR (CHAR | DIGIT)* ;
