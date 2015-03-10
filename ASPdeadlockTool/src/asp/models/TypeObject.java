@@ -12,4 +12,9 @@ public class TypeObject extends TypeBase implements IActualValue {
 	public TypeObject (String id, String objClass){
 		super(id, objClass);
 	}
+	
+	public TypeObject (String objClass){
+		super(objClass);
+	}
+	
 }

@@ -13,5 +13,10 @@ public class TypeBool extends TypeBase {
 		super(id, TYPE);
 		// TODO Auto-generated constructor stub
 	}
+	
+	public TypeBool() {
+		super(TYPE);
+		// TODO Auto-generated constructor stub
+	}
 
 }

@@ -1,5 +1,5 @@
 package asp.models;
 
-public class Element extends ComputationUnit{
+public class Element extends Expression{
 
 }

@@ -22,9 +22,6 @@ public class Class extends ComputationUnit {
 		this.methods = methods;
 	}
 
-	
-	
-	
 	public String getClassName() {
 		return className;
 	}
