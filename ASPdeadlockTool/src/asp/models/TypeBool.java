@@ -9,14 +9,8 @@ public class TypeBool extends TypeBase {
 	
 	private final static String TYPE = "Bool";	
 	
-	public TypeBool(String id) {
-		super(id, TYPE);
-		// TODO Auto-generated constructor stub
-	}
-	
 	public TypeBool() {
 		super(TYPE);
 		// TODO Auto-generated constructor stub
 	}
-
 }

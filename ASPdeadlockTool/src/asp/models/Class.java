@@ -1,24 +1,23 @@
 package asp.models;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class Class extends ComputationUnit {
 	
 	String className;
-	LinkedList<TypeBase> fields;
-	LinkedList<TypeBase> parameters; 
+	HashMap<TypeBase,Variable> fields;
+	HashMap<TypeBase,Variable> parameters; 
 	HashMap<String, Method> methods;
 	
 	
 	public Class(String className, 
-			     LinkedList<TypeBase> fields, 
-			     LinkedList<TypeBase> parameters, 
+				 HashMap<TypeBase,Variable> parameters, 
+				 HashMap<TypeBase,Variable> fields, 
 			     HashMap<String, Method> methods)
 	{
 		this.className = className;
-		this.fields = fields;
 		this.parameters = parameters;
+		this.fields = fields;
 		this.methods = methods;
 	}
 
@@ -43,22 +42,22 @@ public class Class extends ComputationUnit {
 		return methods;
 	}
 	
-	public LinkedList<TypeBase> getFields()
+	public HashMap<TypeBase,Variable> getFields()
 	{
 		return fields;
 	}
 	
-	public LinkedList<TypeBase> getParameters()
+	public HashMap<TypeBase,Variable> getParameters()
 	{
 		return parameters;
 	}
 		
-	public void setFields (LinkedList<TypeBase> fields )
+	public void setFields (HashMap<TypeBase,Variable>fields )
 	{
 		this.fields = fields;
 	}
 	
-	public void setParameters (LinkedList<TypeBase> parameters )
+	public void setParameters (HashMap<TypeBase,Variable> parameters )
 	{
 		this.parameters = parameters;
 	}

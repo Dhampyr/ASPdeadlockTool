@@ -1,30 +1,27 @@
 package asp.models;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class Method extends ComputationUnit{
 	
-	String returnedType;
+	TypeBase returnedType;
 	String methodName;
-	LinkedList<TypeBase> parameters; 
-	HashMap<String,Variable> varDec;
-	LinkedList<Statement> stmts; 
+	HashMap<TypeBase,Variable> parameters; 
+	StmtBlock body;
 	
-	public Method(String returnedType, String methodName, LinkedList<TypeBase> parameters, HashMap<String,Variable> varDec, LinkedList<Statement> stmts)
+	public Method(TypeBase returnedType, String methodName, HashMap<TypeBase,Variable> parameters, StmtBlock body)
 	{
 		this.returnedType = returnedType;
 		this.methodName = methodName;
 		this.parameters = parameters;
-		this.varDec = varDec;
-		this.stmts = stmts;
+		this.body = body;
 	}
 
-	public String getReturnedType() {
+	public TypeBase getReturnedType() {
 		return returnedType;
 	}
 
-	public void setReturnedType(String returnedType) {
+	public void setReturnedType(TypeBase returnedType) {
 		this.returnedType = returnedType;
 	}
 	
@@ -36,34 +33,23 @@ public class Method extends ComputationUnit{
 		this.methodName = methodName;
 	}
 	
-	public LinkedList<TypeBase> getParameters()
+	public HashMap<TypeBase,Variable> getParameters()
 	{
 		return parameters;
 	}
 	
-	public LinkedList<Statement> getStmts()
+	public StmtBlock getBody()
 	{
-		return stmts;
+		return body;
 	}
 	
-	public HashMap<String, Variable> getVar()
-	{
-		return varDec;
-	}
-	
-	public void setParameters(LinkedList<TypeBase> parameters)
+	public void setParameters(HashMap<TypeBase,Variable> parameters)
 	{
 		this.parameters = parameters;
 	}
 	
-	public void setVar(HashMap<String, Variable> varDec)
+	public void setBody(StmtBlock body)
 	{
-		this.varDec = varDec;
+		this.body = body;
 	}
-	
-	public void setStmts(LinkedList<Statement> stmts)
-	{
-		this.stmts = stmts;
-	}
-
 }

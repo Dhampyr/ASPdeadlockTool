@@ -3,24 +3,27 @@ package asp.models;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class StmtBlock extends ComputationUnit{
+public class StmtBlock extends Statement{
 	
-	HashMap<String,Variable> varDec;
+	private final static String STMTTYPE = "Block";
+	HashMap<TypeBase,Variable> varDec;
 	LinkedList<Statement> stmts; 
 		
-	public StmtBlock(HashMap<String,Variable> varDec, LinkedList<Statement> stmts)
+	public StmtBlock(HashMap<TypeBase,Variable> varDec, LinkedList<Statement> stmts)
 	{
+		super(STMTTYPE);
 		this.varDec = varDec;
 		this.stmts = stmts;
 	}
 	
 	public StmtBlock()
 	{
+		super(STMTTYPE);
 		this.varDec = null;
 		this.stmts = null;
 	}
 	
-	public HashMap<String, Variable> getVars()
+	public HashMap<TypeBase, Variable> getVars()
 	{
 		return varDec;
 	}
@@ -35,7 +38,7 @@ public class StmtBlock extends ComputationUnit{
 		this.stmts = stmts;
 	}
 	
-	public void setVarDec(HashMap<String, Variable> varDec)
+	public void setVarDec(HashMap<TypeBase, Variable> varDec)
 	{
 		this.varDec = varDec;
 	}

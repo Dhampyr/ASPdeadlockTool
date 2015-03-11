@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;asp.models.NewAcrive.java&apos; to &apos;NewActive.java&apos;&#x0A;- Original project: &apos;ASPdeadlockTool&apos;&#x0A;- Original element: &apos;asp.models.NewAcrive.java&apos;&#x0A;- Renamed element: &apos;asp.models.NewActive.java&apos;" description="Rename compilation unit &apos;NewAcrive.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;asp.models{NewAcrive.java" name="NewActive.java" references="false" stamp="1426087669345" version="1.0"/>
+</session>

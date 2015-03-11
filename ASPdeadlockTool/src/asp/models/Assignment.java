@@ -4,9 +4,9 @@ public class Assignment extends Statement {
 	
 	private final static String STMTTYPE = "Assignment";
 	Variable leftSide;
-	Expression rightSide;
+	ExpressionSideEffects rightSide;
 	
-	public Assignment(Variable leftSide, Expression rightSide) {
+	public Assignment(Variable leftSide, ExpressionSideEffects rightSide) {
 		super(STMTTYPE);
 		// TODO Auto-generated constructor stub
 		this.leftSide = leftSide;
@@ -18,7 +18,7 @@ public class Assignment extends Statement {
 		this.leftSide = leftSide;
 	}
 	
-	public void setRightSide(Expression rightSide)
+	public void setRightSide(ExpressionSideEffects rightSide)
 	{
 		this.rightSide = rightSide;
 	}
@@ -28,7 +28,7 @@ public class Assignment extends Statement {
 		return leftSide;
 	}
 	
-	public Expression getRightSide()
+	public ExpressionSideEffects getRightSide()
 	{
 		return rightSide;
 	}
