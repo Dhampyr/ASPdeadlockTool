@@ -10,7 +10,7 @@ public class MethodCall extends ExpressionSideEffects {
 	LinkedList<Expression> parameters;
 	Variable methodThis;
 	
-	public MethodCall(String methodName, LinkedList<Expression> parameters, Variable methodThis) {
+	public MethodCall(Variable methodThis, String methodName, LinkedList<Expression> parameters) {
 		super(EXPSETYPE);
 		// TODO Auto-generated constructor stub
 		this.methodName = methodName;

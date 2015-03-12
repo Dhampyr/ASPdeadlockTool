@@ -1,0 +1,11 @@
+package asp.models;
+
+public class Element extends Expression{
+
+	public Element() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+}

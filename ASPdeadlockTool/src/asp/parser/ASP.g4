@@ -49,7 +49,8 @@ expr		: val
 			| expra 
 			| exprb	;   
 
-elem		: ID | THIS;
+elem		: ID 
+			| THIS;
 
 val			: NULL | NUMBER | TRUE | FALSE;
 

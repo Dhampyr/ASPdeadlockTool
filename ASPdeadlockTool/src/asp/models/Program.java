@@ -15,7 +15,7 @@ public class Program extends ComputationUnit {
 	StmtBlock mainFunction;
 	
 	//setter
-	public Program(StmtBlock mainFunction, HashMap<String, Class> classSpec)
+	public Program(HashMap<String, Class> classSpec, StmtBlock mainFunction)
 	{
 		this.classSpec = classSpec;
 		this.mainFunction = mainFunction;

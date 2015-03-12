@@ -10,8 +10,6 @@ public class ExpressionIntValue extends ExpressionValue {
 	 * @param value: an integer value
 	 */
 	public ExpressionIntValue(int value){
-		//TODO: we may need some kind of verification
-		//if(value.matches("(BOT|TOP|PART)"))
 		super(value);		
 	}
 	

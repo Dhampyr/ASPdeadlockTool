@@ -3,11 +3,11 @@ package asp.models;
 public class IfThenElse extends Statement{
 	
 	private final static String STMTTYPE = "ITE";
-	ExpressionBoolValue condition;
-	StmtBlock trueSide;
-	StmtBlock falseSide;
+	Expression condition;
+	Statement trueSide;
+	Statement falseSide;
 	
-	public IfThenElse(ExpressionBoolValue condition, StmtBlock trueSide, StmtBlock falseSide) {
+	public IfThenElse(Expression condition, Statement trueSide, Statement falseSide) {
 		super(STMTTYPE);
 		// TODO Auto-generated constructor stub
 		this.condition = condition;
@@ -15,32 +15,32 @@ public class IfThenElse extends Statement{
 		this.falseSide = falseSide;
 	}
 	
-	public void setCondition(ExpressionBoolValue condition)
+	public void setCondition(Expression condition)
 	{
 		this.condition = condition;
 	}
 	
-	public void setTrueSide(StmtBlock trueSide)
+	public void setTrueSide(Statement trueSide)
 	{
 		this.trueSide = trueSide;
 	}
 	
-	public void setFalseSide(StmtBlock falseSide)
+	public void setFalseSide(Statement falseSide)
 	{
 		this.falseSide = falseSide;
 	}
 	
-	public ExpressionBoolValue getCondition()
+	public Expression getCondition()
 	{
 		return condition;
 	}
 	
-	public StmtBlock getTrueSide()
+	public Statement getTrueSide()
 	{
 		return trueSide;
 	}
 	
-	public StmtBlock getFalseSide()
+	public Statement getFalseSide()
 	{
 		return falseSide;
 	}

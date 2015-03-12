@@ -5,7 +5,20 @@ package asp.models;
  * Represents the types used in a program. 
  */
 
+public abstract class TypeBase{
+	
+	String type;
+	
+	public TypeBase(String type)
+	{
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
+	}
 
-public abstract class TypeBase {
-
+	public void setType(String type) {
+		this.type = type;
+	}
 }
