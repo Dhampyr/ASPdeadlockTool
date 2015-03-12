@@ -10,17 +10,11 @@ import asp.models.*;
 import asp.models.Class;
 import java.util.HashMap;
 import java.util.LinkedList; 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 }
 program returns [Program prog]
-				@init{ try {PrintWriter writer = new PrintWriter("log.txt", "UTF-8");} 
-					   catch (FileNotFoundException | UnsupportedEncodingException e) {e.printStackTrace();}
-					   HashMap<String, Class> classMap = new HashMap<>();}
+				@init{HashMap<String, Class> classMap = new HashMap<>();}
 				:   (classDec {classMap.put($classDec.classObj.getClassName(),$classDec.classObj);})* main=body  
-				    {$prog = new Program(classMap, $main.stb);
-				    };
+				    {$prog = new Program(classMap, $main.stb);};
 				    
 				    
 
@@ -34,6 +28,7 @@ classDec returns [Class classObj]
 				    	 					    $fields.vars,
 				    	 					    methods
 				    	 					   );
+				    	  System.out.println("Creata Classe!"); 
 				    };
 				    
 methodDef returns [Method methodSign]
