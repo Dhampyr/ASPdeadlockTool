@@ -1,6 +1,14 @@
 // Generated from ASPgrammar.g4 by ANTLR 4.4
 package asp.parser;
 
+import asp.models.*;
+import asp.models.Class;
+import java.util.HashMap;
+import java.util.LinkedList; 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 

@@ -5,6 +5,9 @@ import asp.models.*;
 import asp.models.Class;
 import java.util.HashMap;
 import java.util.LinkedList; 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -103,7 +106,9 @@ public class ASPgrammarParser extends Parser {
 	public final ProgramContext program() throws RecognitionException {
 		ProgramContext _localctx = new ProgramContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_program);
-		HashMap<String, Class> classMap = new HashMap<>();
+		 try {PrintWriter writer = new PrintWriter("log.txt", "UTF-8");} 
+							   catch (FileNotFoundException | UnsupportedEncodingException e) {e.printStackTrace();}
+							   HashMap<String, Class> classMap = new HashMap<>();
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -124,6 +129,7 @@ public class ASPgrammarParser extends Parser {
 			}
 			setState(44); ((ProgramContext)_localctx).main = body();
 			((ProgramContext)_localctx).prog =  new Program(classMap, ((ProgramContext)_localctx).main.stb);
+							    
 			}
 		}
 		catch (RecognitionException re) {

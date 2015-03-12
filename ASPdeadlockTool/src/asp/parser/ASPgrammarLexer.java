@@ -5,6 +5,9 @@ import asp.models.*;
 import asp.models.Class;
 import java.util.HashMap;
 import java.util.LinkedList; 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
