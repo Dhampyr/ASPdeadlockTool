@@ -1,5 +1,5 @@
 package asp.models;
 
-public class ComputationUnit {
+public class ComputationUnit extends Model{
 
 }

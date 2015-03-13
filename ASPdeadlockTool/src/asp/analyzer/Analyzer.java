@@ -9,7 +9,7 @@ import java.io.PrintStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import asp.models.Program;
+import asp.models.Model;
 import asp.parser.ASPgrammarLexer;
 import asp.parser.ASPgrammarParser;
 
@@ -26,7 +26,7 @@ public class Analyzer {
 		//parser.setBuildParseTree(false);
 		FileOutputStream f = new FileOutputStream("src/log.txt"); 
 	    System.setOut(new PrintStream(f));
-	    Program program = parser.program().prog;
+	    Model program = parser.program().prog;
 		
 		
 		

@@ -3,9 +3,9 @@
  */
 package deadlock.analyser.inference;
 
-import abs.frontend.ast.*;
-import abs.frontend.typechecker.*;
-import abs.frontend.typechecker.KindedName.Kind;
+//import abs.frontend.ast.*;
+//import abs.frontend.typechecker.*;
+//import abs.frontend.typechecker.KindedName.Kind;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,9 +17,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import asp.models.Program;
+import asp.models.Class;
 import choco.kernel.common.util.tools.ArrayUtils;
+
 import com.gzoumix.semisolver.constraint.Constraint;
 import com.gzoumix.semisolver.term.*;
+
 import deadlock.analyser.AnalyserLog;
 import deadlock.analyser.factory.*;
 import deadlock.analyser.generation.*;
@@ -38,18 +42,18 @@ public class ContractInference {
 
   private AnalyserLog _log;
   private Factory _df;
-  private Map<InterfaceDecl, ClassDecl> _intertoclass;
-  private Model _model;
+//  private Map<InterfaceDecl, ClassDecl> _intertoclass;
+  private Program _prog;
   private TypingEnvironment _env;
   private GroupName _a;
-  private ClassDecl _cd;  
+  private Class _cd;  
 
 
-  public ContractInference(AnalyserLog log, Factory df, Model m) {
+  public ContractInference(AnalyserLog log, Factory df, Program p) {
     _log   = log;
     _df    = df;
-    _intertoclass = null;
-    _model = m;
+//    _intertoclass = null;
+    _prog = p;
     _env = new TypingEnvironment();
     _a = null;
     _cd = null;
@@ -60,7 +64,7 @@ public class ContractInference {
   /* Helper function */
   /************************************/
   // create a record instance of the particular class, living in the cog a
-  public RecordPresent createInstance(ClassDecl cd, GroupName a) {
+  public RecordPresent createInstance(Class cd, GroupName a) {
     LinkedList<RecordField> l = new LinkedList<RecordField>();
     for (ParamDecl f : cd.getParams()) {
       RecordVariable X = _df.newRecordVariable();

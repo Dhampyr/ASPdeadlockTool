@@ -11,11 +11,11 @@ import java.util.HashMap;
  */
 public class Program extends ComputationUnit {
 	
-	HashMap<String, Class> classSpec;
+	HashMap<String, ClassDecl> classSpec;
 	StmtBlock mainFunction;
 	
 	//setter
-	public Program(HashMap<String, Class> classSpec, StmtBlock mainFunction)
+	public Program(HashMap<String, ClassDecl> classSpec, StmtBlock mainFunction)
 	{
 		this.classSpec = classSpec;
 		this.mainFunction = mainFunction;
@@ -28,12 +28,12 @@ public class Program extends ComputationUnit {
 		return mainFunction;
 	}
 	
-	public Class getClassDef(String id)
+	public ClassDecl getClassDef(String id)
 	{
 		return classSpec.get(id);
 	}
 	
-	public HashMap<String, Class> getClasses()
+	public HashMap<String, ClassDecl> getClasses()
 	{
 		return classSpec;
 	}

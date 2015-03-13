@@ -7,23 +7,22 @@ grammar ASPgrammar;
  
 @header{
 import asp.models.*;
-import asp.models.Class;
 import java.util.HashMap;
 import java.util.LinkedList; 
 }
 program returns [Program prog]
-				@init{HashMap<String, Class> classMap = new HashMap<>();}
+				@init{HashMap<String, ClassDecl> classMap = new HashMap<>();}
 				:   (classDec {classMap.put($classDec.classObj.getClassName(),$classDec.classObj);})* main=body  
 				    {$prog = new Program(classMap, $main.stb);};
 				    
 				    
 
-classDec returns [Class classObj]
+classDec returns [ClassDecl classObj]
 				@init{HashMap<String, Method> methods = new HashMap<>();}
 				: 	CLASS className=ID LPAR (parameters=parDef) RPAR 
 				    LCBRACK fields=varDec (method=methodDef {methods.put($method.methodSign.getMethodName(),$method.methodSign);})* RCBRACK
 				    {
-				    	 $classObj = new Class( $className.text,
+				    	 $classObj = new ClassDecl( $className.text,
 				    	 					    $parameters.pars, 
 				    	 					    $fields.vars,
 				    	 					    methods

@@ -2,7 +2,6 @@
 package asp.parser;
 
 import asp.models.*;
-import asp.models.Class;
 import java.util.HashMap;
 import java.util.LinkedList; 
 
@@ -103,7 +102,7 @@ public class ASPgrammarParser extends Parser {
 	public final ProgramContext program() throws RecognitionException {
 		ProgramContext _localctx = new ProgramContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_program);
-		HashMap<String, Class> classMap = new HashMap<>();
+		HashMap<String, ClassDecl> classMap = new HashMap<>();
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -138,7 +137,7 @@ public class ASPgrammarParser extends Parser {
 	}
 
 	public static class ClassDecContext extends ParserRuleContext {
-		public Class classObj;
+		public ClassDecl classObj;
 		public Token className;
 		public ParDefContext parameters;
 		public VarDecContext fields;
@@ -213,7 +212,7 @@ public class ASPgrammarParser extends Parser {
 			}
 			setState(62); match(RCBRACK);
 
-							    	 ((ClassDecContext)_localctx).classObj =  new Class( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
+							    	 ((ClassDecContext)_localctx).classObj =  new ClassDecl( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
 							    	 					    ((ClassDecContext)_localctx).parameters.pars, 
 							    	 					    ((ClassDecContext)_localctx).fields.vars,
 							    	 					    methods
