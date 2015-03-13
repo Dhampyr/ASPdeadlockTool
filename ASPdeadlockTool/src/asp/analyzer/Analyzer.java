@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import asp.models.Program;
 import asp.parser.ASPgrammarLexer;
 import asp.parser.ASPgrammarParser;
-import asp.parser.ASPgrammarParser.ProgramContext;
 
 
 public class Analyzer {

@@ -218,7 +218,6 @@ public class ASPgrammarParser extends Parser {
 							    	 					    ((ClassDecContext)_localctx).fields.vars,
 							    	 					    methods
 							    	 					   );
-							    	  System.out.println("Creata Classe!"); 
 							    
 			}
 		}

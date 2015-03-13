@@ -28,7 +28,6 @@ classDec returns [Class classObj]
 				    	 					    $fields.vars,
 				    	 					    methods
 				    	 					   );
-				    	  System.out.println("Creata Classe!"); 
 				    };
 				    
 methodDef returns [Method methodSign]
