@@ -18,11 +18,28 @@ program returns [Program prog]
 				    
 
 classDec returns [ClassDecl classObj]
-				@init{HashMap<String, Method> methods = new HashMap<>();}
+				@init{HashMap<String, LinkedList<Method>> methods = new HashMap<>();
+					  LinkedList<Method> methodList = null;}
 				: 	CLASS className=ID LPAR (parameters=parDef) RPAR 
-				    LCBRACK fields=varDec (method=methodDef {methods.put($method.methodSign.getMethodName(),$method.methodSign);})* RCBRACK
-				    {
-				    	 $classObj = new ClassDecl( $className.text,
+				    LCBRACK fields=varDec (method=methodDef {  if (methods.containsValue($method.methodSign.getMethodName()))
+				    	                                       {
+				    	                                       	  LinkedList<Method> list = methods.get($method.methodSign.getMethodName());
+				    	                                       	  for (Method m : list)
+				    	                                       	  { 
+				    	                                       	  	if (m.isEqual($method.methodSign))
+				    	                                       	  	   System.out.println("Errore!");
+				    	                                       	  	else
+				    													methods.get($method.methodSign.getMethodName()).add($method.methodSign);
+				    											  }
+				    										   }
+				    										   else
+				    										   {  methodList = new LinkedList<>();
+				    										   	  methodList.add($method.methodSign); 
+				    	                                          methods.put($method.methodSign.getMethodName(),methodList);
+				    	                                       }
+				    	                                     })* RCBRACK
+				    { 
+				    	$classObj = new ClassDecl( $className.text,
 				    	 					    $parameters.pars, 
 				    	 					    $fields.vars,
 				    	 					    methods
@@ -30,8 +47,8 @@ classDec returns [ClassDecl classObj]
 				    };
 				    
 methodDef returns [Method methodSign]
-				  @init{HashMap<TypeBase,Variable> parameters = new HashMap<>(); 
-					    HashMap<String,Variable> varDec = new HashMap<>();
+				  @init{HashMap<Integer,Declaration> parameters = new HashMap<>(); 
+					    HashMap<String,Declaration> varDec = new HashMap<>();
 						LinkedList<Statement> stmts = new LinkedList<>(); }	
 				  :	returnedType=type methodName=ID LPAR (p=parDef) RPAR b=body
 				    {$methodSign = new Method($returnedType.varType, $methodName.text, $p.pars,$b.stb); }
@@ -40,20 +57,32 @@ methodDef returns [Method methodSign]
 
 body returns [StmtBlock stb]
 			 @init{LinkedList<Statement> stmts = new LinkedList<>();
-				  	HashMap<TypeBase,Variable> vars = null;}
+				  	HashMap<String,Declaration> vars = null;}
 			 : LCBRACK (v=varDec {vars=$v.vars;}) (st=stmt {stmts.add($st.s);})* RCBRACK {$stb = new StmtBlock(vars,stmts);}
 			 ;
 
-varDec returns [HashMap<TypeBase,Variable> vars]
+varDec returns [HashMap<String,Declaration> vars]
 			   @init{ $vars = new HashMap<>();
-			   		  TypeBase type = null; }		
+			   		  TypeBase type = null; 
+			   		  Variable var = null; }		
      		:  (t=type v=variable SEMI  { type = $t.varType;
-     								      $vars.put(type,$v.var);}    )*;
+     									  var = $v.var;
+     									  Declaration dec = new Declaration(type,var);
+     								      $vars.put(var.getName(),dec);}    )*;
 
-parDef returns [HashMap<TypeBase,Variable> pars]
-				@init{$pars = new HashMap<>();}
-				: (t=type v=variable {$pars.put($t.varType,$v.var);})?
-				  ( COMMA t1=type v1=variable {$pars.put($t1.varType,$v1.var);}   )*;
+parDef returns [HashMap<Integer,Declaration> pars]
+				@init{$pars = new HashMap<>();
+					  TypeBase type = null; 
+			   		  Variable var = null; 
+			   		  int parIndex = 0;}
+				: (t=type v=variable { type = $t.varType;
+     								   var = $v.var;
+     								   Declaration dec = new Declaration(type,var);
+									   $pars.put((Integer) parIndex,dec); })?
+				  ( COMMA t1=type v1=variable {type = $t1.varType;
+     								   		   var = $v1.var;
+     								   		   Declaration dec = new Declaration(type,var);
+				  							   $pars.put((Integer) (parIndex +1),dec);}   )*;
 
 type returns [TypeBase varType] 
             : ID   {$varType = new TypeObject($ID.text);}

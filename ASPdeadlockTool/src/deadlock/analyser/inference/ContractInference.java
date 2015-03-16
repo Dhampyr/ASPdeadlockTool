@@ -17,8 +17,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import asp.models.Program;
-import asp.models.Class;
+import asp.models.*;
+import asp.models.Declaration;
+import asp.models.Variable;
 import choco.kernel.common.util.tools.ArrayUtils;
 
 import com.gzoumix.semisolver.constraint.Constraint;
@@ -42,18 +43,18 @@ public class ContractInference {
 
   private AnalyserLog _log;
   private Factory _df;
-//  private Map<InterfaceDecl, ClassDecl> _intertoclass;
-  private Program _prog;
+//private Map<InterfaceDecl, ClassDecl> _intertoclass;
+  private Model _model;
   private TypingEnvironment _env;
   private GroupName _a;
-  private Class _cd;  
+  private ClassDecl _cd;  
 
 
-  public ContractInference(AnalyserLog log, Factory df, Program p) {
+  public ContractInference(AnalyserLog log, Factory df, Model m) {
     _log   = log;
     _df    = df;
-//    _intertoclass = null;
-    _prog = p;
+//  _intertoclass = null;
+    _model = m;
     _env = new TypingEnvironment();
     _a = null;
     _cd = null;
@@ -64,25 +65,41 @@ public class ContractInference {
   /* Helper function */
   /************************************/
   // create a record instance of the particular class, living in the cog a
-  public RecordPresent createInstance(Class cd, GroupName a) {
+  public RecordPresent createInstance(ClassDecl cd, GroupName a) {
     LinkedList<RecordField> l = new LinkedList<RecordField>();
-    for (ParamDecl f : cd.getParams()) {
-      RecordVariable X = _df.newRecordVariable();
-      l.add(_df.newRecordField(f.getName(), X));
+/*----------------------------------------------------*/
+    for (String name: cd.getParameters().keySet()){
+    	Declaration dec = cd.getParameters().get(name);
+    	Variable f = dec.getVar();
+        RecordVariable X = _df.newRecordVariable();
+        l.add(_df.newRecordField(f.getName(), X));
+    } 
+//  for (ParamDecl f : cd.getParams()) {
+//      RecordVariable X = _df.newRecordVariable();
+//      l.add(_df.newRecordField(f.getName(), X));
+//  }
+/*----------------------------------------------------*/    
+/*----------------------------------------------------*/
+    for (String name: cd.getFields().keySet()){
+    	Declaration dec = cd.getFields().get(name);
+    	Variable f = dec.getVar();
+    	l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
     }
-    for (FieldDecl f : cd.getFields()) {
-      l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
-    }
+//  for (FieldDecl f : cd.getFields()) {
+//    l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
+//  }
+/*----------------------------------------------------*/
     return _df.newRecordPresent(a, l);
   }
-     
-  private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {
-    ClassDecl cl;
-    if (t.isInterfaceType()) { cl = _intertoclass.get(((InterfaceType) t).getDecl()); }
-    else { cl = clthis; }
-    if (cl == null) { _log.logError("Class retrival failed!!!"); } // should NEVER occur
-    return this.createInstance(cl, a);
-  }
+
+//private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {  
+//  ClassDecl cl;
+//  if (t.isInterfaceType()) { cl = _intertoclass.get(((InterfaceType) t).getDecl()); }
+//  else { cl = clthis; }
+//  if (cl == null) { _log.logError("Class retrival failed!!!"); } // should NEVER occur
+//  return this.createInstance(cl, a);
+//}
+
 
 
   /************************************/
@@ -154,6 +171,11 @@ public class ContractInference {
   // method declaration
   public void computeEnvironment(ClassDecl cd, String moduleName) {
     // Methods
+	for (String name: cd.get.keySet()){
+	    	Declaration dec = cd.getFields().get(name);
+	    	Variable f = dec.getVar();
+	    	l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
+	 }
     for (MethodImpl m : cd.getMethods()) {
       _log.logNormal("Generating initial environment for the method \"" + cd.getName() + "." + m.getMethodSig().getName() + "\"");
       // 1. Record of "this"

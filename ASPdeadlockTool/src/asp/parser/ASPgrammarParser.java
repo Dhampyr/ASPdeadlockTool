@@ -182,7 +182,8 @@ public class ASPgrammarParser extends Parser {
 	public final ClassDecContext classDec() throws RecognitionException {
 		ClassDecContext _localctx = new ClassDecContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_classDec);
-		HashMap<String, Method> methods = new HashMap<>();
+		HashMap<String, LinkedList<Method>> methods = new HashMap<>();
+							  LinkedList<Method> methodList = null;
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -203,7 +204,23 @@ public class ASPgrammarParser extends Parser {
 				{
 				{
 				setState(54); ((ClassDecContext)_localctx).method = methodDef();
-				methods.put(((ClassDecContext)_localctx).method.methodSign.getMethodName(),((ClassDecContext)_localctx).method.methodSign);
+				  if (methods.containsValue(((ClassDecContext)_localctx).method.methodSign.getMethodName()))
+								    	                                       {
+								    	                                       	  LinkedList<Method> list = methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName());
+								    	                                       	  for (Method m : list)
+								    	                                       	  { 
+								    	                                       	  	if (m.isEqual(((ClassDecContext)_localctx).method.methodSign))
+								    	                                       	  	   System.out.println("Errore!");
+								    	                                       	  	else
+								    													methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName()).add(((ClassDecContext)_localctx).method.methodSign);
+								    											  }
+								    										   }
+								    										   else
+								    										   {  methodList = new LinkedList<>();
+								    										   	  methodList.add(((ClassDecContext)_localctx).method.methodSign); 
+								    	                                          methods.put(((ClassDecContext)_localctx).method.methodSign.getMethodName(),methodList);
+								    	                                       }
+								    	                                     
 				}
 				}
 				setState(61);
@@ -211,8 +228,8 @@ public class ASPgrammarParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(62); match(RCBRACK);
-
-							    	 ((ClassDecContext)_localctx).classObj =  new ClassDecl( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
+			 
+							    	((ClassDecContext)_localctx).classObj =  new ClassDecl( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
 							    	 					    ((ClassDecContext)_localctx).parameters.pars, 
 							    	 					    ((ClassDecContext)_localctx).fields.vars,
 							    	 					    methods
@@ -271,8 +288,8 @@ public class ASPgrammarParser extends Parser {
 	public final MethodDefContext methodDef() throws RecognitionException {
 		MethodDefContext _localctx = new MethodDefContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_methodDef);
-		HashMap<TypeBase,Variable> parameters = new HashMap<>(); 
-							    HashMap<String,Variable> varDec = new HashMap<>();
+		HashMap<Integer,Declaration> parameters = new HashMap<>(); 
+							    HashMap<String,Declaration> varDec = new HashMap<>();
 								LinkedList<Statement> stmts = new LinkedList<>(); 
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -337,7 +354,7 @@ public class ASPgrammarParser extends Parser {
 		BodyContext _localctx = new BodyContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_body);
 		LinkedList<Statement> stmts = new LinkedList<>();
-						  	HashMap<TypeBase,Variable> vars = null;
+						  	HashMap<String,Declaration> vars = null;
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -377,7 +394,7 @@ public class ASPgrammarParser extends Parser {
 	}
 
 	public static class VarDecContext extends ParserRuleContext {
-		public HashMap<TypeBase,Variable> vars;
+		public HashMap<String,Declaration> vars;
 		public TypeContext t;
 		public VariableContext v;
 		public List<TerminalNode> SEMI() { return getTokens(ASPgrammarParser.SEMI); }
@@ -420,6 +437,7 @@ public class ASPgrammarParser extends Parser {
 		enterRule(_localctx, 8, RULE_varDec);
 		 ((VarDecContext)_localctx).vars =  new HashMap<>();
 					   		  TypeBase type = null; 
+					   		  Variable var = null; 
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
@@ -435,7 +453,9 @@ public class ASPgrammarParser extends Parser {
 					setState(89); ((VarDecContext)_localctx).v = variable();
 					setState(90); match(SEMI);
 					 type = ((VarDecContext)_localctx).t.varType;
-					     								      _localctx.vars.put(type,((VarDecContext)_localctx).v.var);
+					     									  var = ((VarDecContext)_localctx).v.var;
+					     									  Declaration dec = new Declaration(type,var);
+					     								      _localctx.vars.put(var.getName(),dec);
 					}
 					} 
 				}
@@ -457,7 +477,7 @@ public class ASPgrammarParser extends Parser {
 	}
 
 	public static class ParDefContext extends ParserRuleContext {
-		public HashMap<TypeBase,Variable> pars;
+		public HashMap<Integer,Declaration> pars;
 		public TypeContext t;
 		public VariableContext v;
 		public TypeContext t1;
@@ -501,6 +521,9 @@ public class ASPgrammarParser extends Parser {
 		ParDefContext _localctx = new ParDefContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_parDef);
 		((ParDefContext)_localctx).pars =  new HashMap<>();
+							  TypeBase type = null; 
+					   		  Variable var = null; 
+					   		  int parIndex = 0;
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -511,7 +534,10 @@ public class ASPgrammarParser extends Parser {
 				{
 				setState(98); ((ParDefContext)_localctx).t = type();
 				setState(99); ((ParDefContext)_localctx).v = variable();
-				_localctx.pars.put(((ParDefContext)_localctx).t.varType,((ParDefContext)_localctx).v.var);
+				 type = ((ParDefContext)_localctx).t.varType;
+				     								   var = ((ParDefContext)_localctx).v.var;
+				     								   Declaration dec = new Declaration(type,var);
+													   _localctx.pars.put((Integer) parIndex,dec); 
 				}
 			}
 
@@ -524,7 +550,10 @@ public class ASPgrammarParser extends Parser {
 				setState(104); match(COMMA);
 				setState(105); ((ParDefContext)_localctx).t1 = type();
 				setState(106); ((ParDefContext)_localctx).v1 = variable();
-				_localctx.pars.put(((ParDefContext)_localctx).t1.varType,((ParDefContext)_localctx).v1.var);
+				type = ((ParDefContext)_localctx).t1.varType;
+				     								   		   var = ((ParDefContext)_localctx).v1.var;
+				     								   		   Declaration dec = new Declaration(type,var);
+								  							   _localctx.pars.put((Integer) (parIndex +1),dec);
 				}
 				}
 				setState(113);

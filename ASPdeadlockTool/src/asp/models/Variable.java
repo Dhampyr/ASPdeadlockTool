@@ -6,12 +6,12 @@ package asp.models;
  */
 public class Variable extends Element {
 	
-	protected String id;
+	protected String name;
 	
-	public Variable(String id) {
-		this.id = id;
+	public Variable(String name) {
+		this.name = name;
 	}
 	
-	public String getId(){return id;}
+	public String getName(){return name;}
 
 }

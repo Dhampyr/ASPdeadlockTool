@@ -27,9 +27,5 @@ public class Analyzer {
 		FileOutputStream f = new FileOutputStream("src/log.txt"); 
 	    System.setOut(new PrintStream(f));
 	    Model program = parser.program().prog;
-		
-		
-		
 	}
-
 }

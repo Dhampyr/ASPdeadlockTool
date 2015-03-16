@@ -28,13 +28,17 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.PrintStream;
 
+import asp.models.Model;
 import asp.models.Program;
 import asp.models.Class;
 import deadlock.analyser.factory.*;
+
 import com.gzoumix.semisolver.term.*;
+
 import deadlock.analyser.generation.*;
 import deadlock.analyser.inference.ContractInference;
 import deadlock.analyser.detection.*;
+
 import com.gzoumix.semisolver.constraint.*;
 import com.gzoumix.semisolver.substitution.*;
 
@@ -43,10 +47,10 @@ public class Analyser {
   private static int FixPoint1_0 = 1;
   private static int FixPoint2_0 = 2;
     
-  public void deadlockAnalysis(Program m, boolean verbose, int nbIteration, int fixPointVersion, PrintStream out) {
+public void deadlockAnalysis(Model m, boolean verbose, int nbIteration, int fixPointVersion, PrintStream out) {
       
-    Variable.varCounter =0;
-    Long totalTimeInMs = 0L;
+	Variable.varCounter =0;
+	Long totalTimeInMs = 0L;
       
       
     

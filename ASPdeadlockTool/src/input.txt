@@ -20,8 +20,14 @@ class CpxSched (I u) {
      h = z.m3();
      w = h + 1;
    }
-
-  Unit m3(){ }
+   
+   Unit m2(I z) {
+   }
+   
+   Unit m2() {
+   }
+   
+   Unit m3(){ }
 
 }
 

@@ -6,10 +6,10 @@ import java.util.LinkedList;
 public class StmtBlock extends Statement{
 	
 	private final static String STMTTYPE = "Block";
-	HashMap<TypeBase,Variable> varDec;
+	HashMap<String,Declaration> varDec;
 	LinkedList<Statement> stmts; 
 		
-	public StmtBlock(HashMap<TypeBase,Variable> varDec, LinkedList<Statement> stmts)
+	public StmtBlock(HashMap<String,Declaration> varDec, LinkedList<Statement> stmts)
 	{
 		super(STMTTYPE);
 		this.varDec = varDec;
@@ -23,7 +23,7 @@ public class StmtBlock extends Statement{
 		this.stmts = null;
 	}
 	
-	public HashMap<TypeBase, Variable> getVars()
+	public HashMap<String,Declaration> getVars()
 	{
 		return varDec;
 	}
@@ -38,7 +38,7 @@ public class StmtBlock extends Statement{
 		this.stmts = stmts;
 	}
 	
-	public void setVarDec(HashMap<TypeBase, Variable> varDec)
+	public void setVarDec(HashMap<String,Declaration> varDec)
 	{
 		this.varDec = varDec;
 	}
