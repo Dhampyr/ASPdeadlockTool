@@ -2,8 +2,8 @@ package asp.models;
 
 public class ExpressionUnaryOperation extends Expression {
 	
-	protected Expression operand;
-	protected String op;
+	private Expression operand;
+	private String op;
 	
 	/**
 	 * Creates a new binary operation

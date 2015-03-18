@@ -1,39 +1,35 @@
 class CpxSched (I u) {
-  Unit m1(I y) {
-     Unit h;
-     Unit g;
-     g = newActive Unit();
-     if (g) then h = y.m2(u);
+  Int m1(I y) {
+     Int h = 0;
+     Int g = 0;
+     if (g == 1) h = y.m2(u);
      else g = u.m2(y);
-     if (g) then {h = y.m2(u); h = y.m2(u);} 
+     if (g == 2) {h = y.m2(u); h = y.m2(u);} 
      else g = u.m2(y);
      return g;
   }
   
-  Unit m2(I z) {
-     Unit h;
-     Unit w;
-     h = newActive Unit();
-     if ((g = 1) && (h = 5)) then {h = y.m2(u); h = y.m2(u);} 
-     if (g) then {h = y.m2(u); h = y.m2(u);} 
-     else {g = u.m2(y); g = u.m2(y);}
+  Int m2(I z) {
+     Int h = 0;
+     Int w = 0;
+     Int g = 0;
+     I y;
+     y = new CpxSched(null);
+     if ((g == 1) && (h == 5)) {h = y.m2(u); h = y.m2(u);} 
+     if (g == 2) {h = y.m2(u); h = y.m2(u);} 
+     else {g = y.m2(y); g = y.m2(y);}
      h = z.m3();
      w = h + 1;
+     return w;
    }
    
-   Unit m2(I z) {
-   }
-   
-   Unit m2() {
-   }
-   
-   Unit m3(){ }
+   Int m3(){ return 10; }
 
 }
 
 { I x; I y; I z;
-Unit w ;
+Int w = 0 ;
 x = new CpxSched(null);
 y = new CpxSched(x);
-z = newActive CpxSched(null);
+z = new CpxSched(null);
 w = y.m1(z);}

@@ -8,7 +8,6 @@ package deadlock.analyser.inference;
 //import abs.frontend.typechecker.KindedName.Kind;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +19,7 @@ import java.util.Set;
 import asp.models.*;
 import asp.models.Declaration;
 import asp.models.Variable;
+import asp.models.Method;
 import choco.kernel.common.util.tools.ArrayUtils;
 
 import com.gzoumix.semisolver.constraint.Constraint;
@@ -68,7 +68,7 @@ public class ContractInference {
   public RecordPresent createInstance(ClassDecl cd, GroupName a) {
     LinkedList<RecordField> l = new LinkedList<RecordField>();
 /*----------------------------------------------------*/
-    for (String name: cd.getParameters().keySet()){
+    for (Integer name: cd.getParameters().keySet()){
     	Declaration dec = cd.getParameters().get(name);
     	Variable f = dec.getVar();
         RecordVariable X = _df.newRecordVariable();
@@ -92,6 +92,12 @@ public class ContractInference {
     return _df.newRecordPresent(a, l);
   }
 
+  
+/************************************/  
+/* 			    WHY?				*/
+/*----------------------------------*/ 
+/* t.isInterfaceType() = false ever */  
+/************************************/
 //private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {  
 //  ClassDecl cl;
 //  if (t.isInterfaceType()) { cl = _intertoclass.get(((InterfaceType) t).getDecl()); }
@@ -167,83 +173,173 @@ public class ContractInference {
       }
     }
   }
-
-  // method declaration
-  public void computeEnvironment(ClassDecl cd, String moduleName) {
-    // Methods
-	for (String name: cd.get.keySet()){
-	    	Declaration dec = cd.getFields().get(name);
-	    	Variable f = dec.getVar();
-	    	l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
-	 }
-    for (MethodImpl m : cd.getMethods()) {
-      _log.logNormal("Generating initial environment for the method \"" + cd.getName() + "." + m.getMethodSig().getName() + "\"");
-      // 1. Record of "this"
-      IRecord rthis = createInstance(cd, _df.newGroupName());
-      // 2. Simple variables for the method parameters
-      LinkedList<IRecord> rparam = new LinkedList<IRecord>();
-      for (ParamDecl p : m.getMethodSig().getParams()) {
-        rparam.add(_df.newRecordVariable());
-      }
-      // 3. Simple variable for the return object (or datatype)
-      RecordVariable rres = _df.newRecordVariable();
-      // 4. Finalize
-      MethodInterface mIntf = _df.newMethodInterface(rthis, rparam, rres);
-      _env.putMethod(moduleName, cd.getName(), m.getMethodSig().getName(), mIntf);
-    }
-    // 2. init
-    MethodInterface mi = _df.newMethodInterface(createInstance(cd, _df.newGroupName()), new LinkedList<IRecord>(), _df.newRecordVariable());
-    _env.putMethod(moduleName, cd.getName(), _initName, mi);
-  }
-
-
-  // functions declaration
-  public void computeEnvironment(FunctionDecl decl, String moduleName) {
-    String name = decl.getName();
   
-    // 1. type parameters
-    HashMap<String, RecordVariable> typeParameterMap = new HashMap<>();
-    if(decl instanceof ParametricFunctionDecl){
-      for(TypeParameterDecl args : ((ParametricFunctionDecl) decl).getTypeParameterList()){
-        typeParameterMap.put(args.getName(), _df.newRecordVariable());   
-      }
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
+//method declaration
+public void computeEnvironment(ClassDecl cd, String moduleName) {
+  // Methods
+	LinkedList<Method> methods = cd.getMethodList();
+   	for (Method m : methods) {
+    _log.logNormal("Generating initial environment for the method \"" + cd.getClassName() + "." + m.getMethodName() + "\"");
+    // 1. Record of "this"
+    IRecord rthis = createInstance(cd, _df.newGroupName());
+    // 2. Simple variables for the method parameters
+    LinkedList<IRecord> rparam = new LinkedList<IRecord>();
+    for (Integer p : m.getParameters().keySet()) {
+      rparam.add(_df.newRecordVariable());
     }
-
-    // 2. parameters, result record, and put the resulting Function Interface in the typing environment
-    List<Term> l = new LinkedList();
-    for(ParamDecl pd : decl.getParamList()){
-      Access a = pd.getAccess(); // get the type of the parameter
-      if(a instanceof TypeUse) { l.add(expandArgs((TypeUse)a, typeParameterMap)); }
-      else { _log.logError("unable to retrieve the type of the parameter \"" + pd.getName() + "\" of Function \"" + moduleName + "." + name + "\""); return;} // should never occur            
-    }
-    _env.putFunction(moduleName, name, new FunctionInterface(l, expandArgs(decl.getTypeUse(), typeParameterMap)));
+    // 3. Simple variable for the return object (or datatype)
+    RecordVariable rres = _df.newRecordVariable();
+    // 4. Finalize
+    MethodInterface mIntf = _df.newMethodInterface(rthis, rparam, rres);
+    _env.putMethod(moduleName, cd.getClassName(), m.getMethodName(), mIntf);
   }
-    
-  private Term expandArgs(TypeUse arg, HashMap<String, RecordVariable> map){
-    if(arg instanceof DataTypeUse) { // datatype
-      java.util.List<Term> l = new LinkedList<>();
-      if(arg instanceof ParametricDataTypeUse) { // it is recursive
-        for(TypeUse subarg : ((ParametricDataTypeUse)arg).getParamList()) {
-          l.add(this.expandArgs(subarg, map));                   
-        }
-      }
-      return _df.newTerm(arg.getName(), l);
-    } else if(arg instanceof InterfaceTypeUse) {
-      ClassDecl c = _intertoclass.get(((InterfaceTypeUse)arg).getDecl());
-      return createInstance(c, _df.newGroupName());
-    } else if(arg instanceof TypeParameterUse) { // we have a variable
-      return map.get(((TypeParameterUse)arg).getName());
-    }
+  // 2. init
+  MethodInterface mi = _df.newMethodInterface(createInstance(cd, _df.newGroupName()), new LinkedList<IRecord>(), _df.newRecordVariable());
+  _env.putMethod(moduleName, cd.getClassName(), _initName, mi);
+}
+  
+//  // method declaration
+//  public void computeEnvironment(ClassDecl cd, String moduleName) {
+//    // Methods
+//	for (MethodImpl m : cd.getMethods()) {
+//      _log.logNormal("Generating initial environment for the method \"" + cd.getName() + "." + m.getMethodSig().getName() + "\"");
+//      // 1. Record of "this"
+//      IRecord rthis = createInstance(cd, _df.newGroupName());
+//      // 2. Simple variables for the method parameters
+//      LinkedList<IRecord> rparam = new LinkedList<IRecord>();
+//      for (ParamDecl p : m.getMethodSig().getParams()) {
+//        rparam.add(_df.newRecordVariable());
+//      }
+//      // 3. Simple variable for the return object (or datatype)
+//      RecordVariable rres = _df.newRecordVariable();
+//      // 4. Finalize
+//      MethodInterface mIntf = _df.newMethodInterface(rthis, rparam, rres);
+//      _env.putMethod(moduleName, cd.getName(), m.getMethodSig().getName(), mIntf);
+//    }
+//    // 2. init
+//    MethodInterface mi = _df.newMethodInterface(createInstance(cd, _df.newGroupName()), new LinkedList<IRecord>(), _df.newRecordVariable());
+//    _env.putMethod(moduleName, cd.getName(), _initName, mi);
+//  }
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
 
-    // Should never occur...
-    _log.logError("Unknown error in method expandArgs of deadlock analysis");
-    return null;
+
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
+
+// functions declaration
+public void computeEnvironment(FunctionDecl decl, String moduleName) {
+String name = decl.getName();
+
+// 1. type parameters
+HashMap<String, RecordVariable> typeParameterMap = new HashMap<>();
+if(decl instanceof ParametricFunctionDecl){
+  for(TypeParameterDecl args : ((ParametricFunctionDecl) decl).getTypeParameterList()){
+    typeParameterMap.put(args.getName(), _df.newRecordVariable());   
   }
+}
+
+// 2. parameters, result record, and put the resulting Function Interface in the typing environment
+List<Term> l = new LinkedList();
+for(ParamDecl pd : decl.getParamList()){
+  Access a = pd.getAccess(); // get the type of the parameter
+  if(a instanceof TypeUse) { l.add(expandArgs((TypeUse)a, typeParameterMap)); }
+  else { _log.logError("unable to retrieve the type of the parameter \"" + pd.getName() + "\" of Function \"" + moduleName + "." + name + "\""); return;} // should never occur            
+}
+_env.putFunction(moduleName, name, new FunctionInterface(l, expandArgs(decl.getTypeUse(), typeParameterMap)));
+}
 
 
+//  // functions declaration
+//  public void computeEnvironment(FunctionDecl decl, String moduleName) {
+//    String name = decl.getName();
+//  
+//    // 1. type parameters
+//    HashMap<String, RecordVariable> typeParameterMap = new HashMap<>();
+//    if(decl instanceof ParametricFunctionDecl){
+//      for(TypeParameterDecl args : ((ParametricFunctionDecl) decl).getTypeParameterList()){
+//        typeParameterMap.put(args.getName(), _df.newRecordVariable());   
+//      }
+//    }
+//
+//    // 2. parameters, result record, and put the resulting Function Interface in the typing environment
+//    List<Term> l = new LinkedList();
+//    for(ParamDecl pd : decl.getParamList()){
+//      Access a = pd.getAccess(); // get the type of the parameter
+//      if(a instanceof TypeUse) { l.add(expandArgs((TypeUse)a, typeParameterMap)); }
+//      else { _log.logError("unable to retrieve the type of the parameter \"" + pd.getName() + "\" of Function \"" + moduleName + "." + name + "\""); return;} // should never occur            
+//    }
+//    _env.putFunction(moduleName, name, new FunctionInterface(l, expandArgs(decl.getTypeUse(), typeParameterMap)));
+//  }
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
+
+
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
+
+
+private Term expandArgs(TypeBase arg, HashMap<String, RecordVariable> map){
+if(arg instanceof DataTypeUse) { // datatype
+java.util.List<Term> l = new LinkedList<>();
+if(arg instanceof ParametricDataTypeUse) { // it is recursive
+  for(TypeUse subarg : ((ParametricDataTypeUse)arg).getParamList()) {
+    l.add(this.expandArgs(subarg, map));                   
+  }
+}
+return _df.newTerm(arg.getName(), l);
+} else if(arg instanceof InterfaceTypeUse) {
+ClassDecl c = _intertoclass.get(((InterfaceTypeUse)arg).getDecl());
+return createInstance(c, _df.newGroupName());
+} else if(arg instanceof TypeParameterUse) { // we have a variable
+return map.get(((TypeParameterUse)arg).getName());
+}
+
+// Should never occur...
+_log.logError("Unknown error in method expandArgs of deadlock analysis");
+return null;
+}
+
+//  private Term expandArgs(TypeUse arg, HashMap<String, RecordVariable> map){
+//    if(arg instanceof DataTypeUse) { // datatype
+//      java.util.List<Term> l = new LinkedList<>();
+//      if(arg instanceof ParametricDataTypeUse) { // it is recursive
+//        for(TypeUse subarg : ((ParametricDataTypeUse)arg).getParamList()) {
+//          l.add(this.expandArgs(subarg, map));                   
+//        }
+//      }
+//      return _df.newTerm(arg.getName(), l);
+//    } else if(arg instanceof InterfaceTypeUse) {
+//      ClassDecl c = _intertoclass.get(((InterfaceTypeUse)arg).getDecl());
+//      return createInstance(c, _df.newGroupName());
+//    } else if(arg instanceof TypeParameterUse) { // we have a variable
+//      return map.get(((TypeParameterUse)arg).getName());
+//    }
+//
+//    // Should never occur...
+//    _log.logError("Unknown error in method expandArgs of deadlock analysis");
+//    return null;
+//  }
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
+
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/
   // datatype declaration
   public void computeEnvironment(DataTypeDecl decl, String moduleName) { // TODO
   }
+
+//  // datatype declaration
+//  public void computeEnvironment(DataTypeDecl decl, String moduleName) { // TODO }
+
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/  
 
     /************************************/
     /* TYPE INFERENCE */
@@ -271,26 +367,54 @@ public class ContractInference {
     // 1. Model, Compilation Units (files), Classes and methods
     // ////////////////////////////////////////////////////////////////////////////
 
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/ 
+
   public ResultInference typeInference() {
-    ResultInference res = new ResultInference();
+	    ResultInference res = new ResultInference();
 
-    _log.logDebug("Initial Environment:\n" + _env.toString());
+	    _log.logDebug("Initial Environment:\n" + _env.toString());
 
-    // 1. methods
-    for (CompilationUnit cu : _model.getCompilationUnits()) { res.add(typeInference(cu)); }
-    // 2. main
-/*    _a = _df.newGroupName();
-    ResultInferenceStmt resMain = typeInference(_model.getMainBlock());
+	    // 1. methods
+	    for (CompilationUnit cu : _model.getCompilationUnits()) { res.add(typeInference(cu)); }
+	    // 2. main
+	/*    _a = _df.newGroupName();
+	    ResultInferenceStmt resMain = typeInference(_model.getMainBlock());
 
-    res.add(resMain.getConstraint());
-    Contract co = _df.newContractEmpty();
-    for(TypingEnvironment te : resMain.getEnvironment())
-      co = _df.newContractUnion(_model.getMainBlock(), co, _df.newContract(te.unsync(_model.getMainBlock())));
-    res.setMain(resMain.getContract(), co); */
-        
-    return res;
-  }
+	    res.add(resMain.getConstraint());
+	    Contract co = _df.newContractEmpty();
+	    for(TypingEnvironment te : resMain.getEnvironment())
+	      co = _df.newContractUnion(_model.getMainBlock(), co, _df.newContract(te.unsync(_model.getMainBlock())));
+	    res.setMain(resMain.getContract(), co); */
+	        
+	    return res;
+	  }  
+  
+  
+  
+//  public ResultInference typeInference() {
+//    ResultInference res = new ResultInference();
+//
+//    _log.logDebug("Initial Environment:\n" + _env.toString());
+//
+//    // 1. methods
+//    for (CompilationUnit cu : _model.getCompilationUnits()) { res.add(typeInference(cu)); }
+//    // 2. main
+///*    _a = _df.newGroupName();
+//    ResultInferenceStmt resMain = typeInference(_model.getMainBlock());
+//
+//    res.add(resMain.getConstraint());
+//    Contract co = _df.newContractEmpty();
+//    for(TypingEnvironment te : resMain.getEnvironment())
+//      co = _df.newContractUnion(_model.getMainBlock(), co, _df.newContract(te.unsync(_model.getMainBlock())));
+//    res.setMain(resMain.getContract(), co); */
+//        
+//    return res;
+//  }
+/*-----------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------*/ 
 
+  
   public ResultInference typeInference(CompilationUnit cu) {
     ResultInference res = new ResultInference();
     _log.logDebug("Contract Inference for the file \"" + cu.getName() + "\"");
@@ -339,7 +463,7 @@ public class ContractInference {
 
   public ResultInference typeInference(ClassDecl cd) {
     ResultInference res = new ResultInference();
-    _log.logDebug("Contract Inference for the class \"" + cd.getName() + "\"");
+    _log.logDebug("Contract Inference for the class \"" + cd.getClassName() + "\"");
     _log.beginIndent();
 
     _cd = cd;

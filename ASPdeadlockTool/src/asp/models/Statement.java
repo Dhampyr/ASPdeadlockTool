@@ -1,8 +1,8 @@
 package asp.models;
 
-public class Statement extends ComputationUnit {
+public class Statement extends CompilationUnit {
 	
-	String stmtType;
+	private String stmtType;
 	
 	public Statement(String stmtType)
 	{
@@ -17,6 +17,11 @@ public class Statement extends ComputationUnit {
 	public void setType(String stmtType)
 	{
 		this.stmtType = stmtType;
+	}
+	
+	public String toString()
+	{
+		return stmtType;
 	}
 		
 }

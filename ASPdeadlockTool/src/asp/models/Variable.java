@@ -6,7 +6,7 @@ package asp.models;
  */
 public class Variable extends Element {
 	
-	protected String name;
+	private String name;
 	
 	public Variable(String name) {
 		this.name = name;

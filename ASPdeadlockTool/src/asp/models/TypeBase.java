@@ -7,7 +7,7 @@ package asp.models;
 
 public abstract class TypeBase{
 	
-	String type;
+	private String type;
 	
 	public TypeBase(String type)
 	{
@@ -20,5 +20,10 @@ public abstract class TypeBase{
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String toString()
+	{
+		return type;
 	}
 }

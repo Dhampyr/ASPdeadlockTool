@@ -4,7 +4,7 @@ public class ExpressionSideEffects extends Statement {
 
 	private final static String STMTTYPE = "Assignment";
 
-	String expseType; 
+	private String expseType; 
 	
 	public ExpressionSideEffects(String expseType) {
 		super(STMTTYPE);

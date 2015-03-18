@@ -21,30 +21,29 @@ classDec returns [ClassDecl classObj]
 				@init{HashMap<String, LinkedList<Method>> methods = new HashMap<>();
 					  LinkedList<Method> methodList = null;}
 				: 	CLASS className=ID LPAR (parameters=parDef) RPAR 
-				    LCBRACK fields=varDec (method=methodDef {  if (methods.containsValue($method.methodSign.getMethodName()))
-				    	                                       {
-				    	                                       	  LinkedList<Method> list = methods.get($method.methodSign.getMethodName());
-				    	                                       	  for (Method m : list)
-				    	                                       	  { 
-				    	                                       	  	if (m.isEqual($method.methodSign))
-				    	                                       	  	   System.out.println("Errore!");
-				    	                                       	  	else
-				    													methods.get($method.methodSign.getMethodName()).add($method.methodSign);
-				    											  }
-				    										   }
-				    										   else
-				    										   {  methodList = new LinkedList<>();
-				    										   	  methodList.add($method.methodSign); 
-				    	                                          methods.put($method.methodSign.getMethodName(),methodList);
-				    	                                       }
+				    LCBRACK fields=varDeclaration (method=methodDef {if (methods.containsKey($method.methodSign.getMethodName()))
+				    	                                      	     { LinkedList<Method> list = methods.get($method.methodSign.getMethodName());
+				    	                                       	  	   if ($method.methodSign.isIn(list))
+				    	                                       	  	   { System.out.println("The method "+ $method.methodSign.getMethodName() +  
+				    	                                       	  		 		             " has been defined more than once! Rename it");
+				    	                                       	  		 System.exit(0); }   
+				    	                                       	  		else
+				    	                                       	  		{ $method.methodSign.setID(methods.get($method.methodSign.getMethodName()).size());
+																    	  methods.get($method.methodSign.getMethodName()).add($method.methodSign);
+																  		}
+ 					    										     }
+					    										   	 else
+					    										   	 {  methodList = new LinkedList<>();
+					    										   	    $method.methodSign.setID(0);
+					    										   	    methodList.add($method.methodSign); 
+					    	                                            methods.put($method.methodSign.getMethodName(),methodList);
+					    	                                       	  }
 				    	                                     })* RCBRACK
-				    { 
-				    	$classObj = new ClassDecl( $className.text,
-				    	 					    $parameters.pars, 
-				    	 					    $fields.vars,
-				    	 					    methods
-				    	 					   );
-				    };
+				    { $classObj = new ClassDecl( $className.text,
+				    	    				     $parameters.pars, 
+				    	 					     $fields.vars,
+				    	 					     methods
+				    	 					   );};
 				    
 methodDef returns [Method methodSign]
 				  @init{HashMap<Integer,Declaration> parameters = new HashMap<>(); 
@@ -58,17 +57,31 @@ methodDef returns [Method methodSign]
 body returns [StmtBlock stb]
 			 @init{LinkedList<Statement> stmts = new LinkedList<>();
 				  	HashMap<String,Declaration> vars = null;}
-			 : LCBRACK (v=varDec {vars=$v.vars;}) (st=stmt {stmts.add($st.s);})* RCBRACK {$stb = new StmtBlock(vars,stmts);}
+			 : LCBRACK (v=varDeclaration {vars=$v.vars;}) (st=stmt {stmts.add($st.s);})* RCBRACK {$stb = new StmtBlock(vars,stmts);}
 			 ;
+
+
+varDeclaration returns [HashMap<String,Declaration> vars] 
+				       @init{ $vars = new HashMap<>();}
+		               : (v=varDec {$vars = $v.vars;})*;
 
 varDec returns [HashMap<String,Declaration> vars]
 			   @init{ $vars = new HashMap<>();
 			   		  TypeBase type = null; 
 			   		  Variable var = null; }		
-     		:  (t=type v=variable SEMI  { type = $t.varType;
-     									  var = $v.var;
-     									  Declaration dec = new Declaration(type,var);
-     								      $vars.put(var.getName(),dec);}    )*;
+     		: (t=objType v=variable SEMI  { type = $t.varType;
+     									    var = $v.var;
+     									    Declaration dec = new Declaration(type,var);
+     								        $vars.put(var.getName(),dec);} ) 
+     		| (t1=intType v=variable ASSIGN NUMBER SEMI  { type = $t1.varType;
+     									  				   var = $v.var;
+     									  				   Declaration dec = new Declaration(type,var);
+     								      				   $vars.put(var.getName(),dec);} )
+     		| (t2=boolType v=variable ASSIGN (TRUE | FALSE) SEMI  { type = $t2.varType;
+     									  				  		    var = $v.var;
+     									  				  		    Declaration dec = new Declaration(type,var);
+     								      				  		    $vars.put(var.getName(),dec);} )
+     		;
 
 parDef returns [HashMap<Integer,Declaration> pars]
 				@init{$pars = new HashMap<>();
@@ -85,9 +98,20 @@ parDef returns [HashMap<Integer,Declaration> pars]
 				  							   $pars.put((Integer) (parIndex +1),dec);}   )*;
 
 type returns [TypeBase varType] 
-            : ID   {$varType = new TypeObject($ID.text);}
-            | INT  {$varType = new TypeInt();}
-            | BOOL {$varType = new TypeBool();};
+            : t=intType   {$varType = $t.varType;}
+            | t1=boolType {$varType = $t1.varType;}
+            | t2=objType  {$varType = $t2.varType;};
+            
+intType returns [TypeBase varType] 
+            : INT  {$varType = new TypeInt();};
+            
+boolType returns [TypeBase varType] 
+            : BOOL {$varType = new TypeBool();};
+            
+
+objType returns [TypeBase varType] 
+            : ID   {$varType = new TypeObject($ID.text);};
+            
 
 variable returns [Variable var]	
 				 :   v=ID {$var = new Variable($v.text);};
@@ -99,9 +123,9 @@ stmt returns [Statement s]
 					Statement stTrue = null;
 					Statement stFalse = null; }
      		: SKIP SEMI {$s = new Skip();}
-            | l=ID {var = new Variable($l.text);} EQUALS r=expressionSideEffect {exprse = $r.exprse;} SEMI {$s = new Assignment(var,exprse);} 
+            | l=ID {var = new Variable($l.text);} ASSIGN r=expressionSideEffect {exprse = $r.exprse;} SEMI {$s = new Assignment(var,exprse);} 
             | IF LPAR (guard=booleanExpression {cond = $guard.exprBool;}) RPAR  
-              THEN (trueSideS=stmt {stTrue = $trueSideS.s;}| trueSideSB=stmtblock {stTrue = $trueSideSB.stb;})   
+              (trueSideS=stmt {stTrue = $trueSideS.s;}| trueSideSB=stmtblock {stTrue = $trueSideSB.stb;})   
               (ELSE (falseSideS=stmt {stFalse = $falseSideS.s;}| falseSideSB=stmtblock {stFalse = $falseSideSB.stb;}) )? 
               {$s = new IfThenElse(cond,stTrue,stFalse);}
             | RETURN e=expression SEMI {$s = new Return($e.expr);}
@@ -185,7 +209,8 @@ GT      : '>' 	;
 LT      : '<' 	; 
 GEG     : '>='	;
 LEG     : '<=' 	;
-EQUALS  : '='	;
+ASSIGN	: '='	;
+EQUALS  : '=='	;
 DISTINCT: '!='	;
 NOT     : '!' 	;
 SKIP    : 'skip';
@@ -194,8 +219,8 @@ COLON   : ':'	;
 SEMI    : ';'	;
 DOT     : '.'	;
 NULL    : 'null';
-TRUE    : 'true';
-FALSE   : 'false' ;
+TRUE    : 'True';
+FALSE   : 'False' ;
 CLASS	: 'class' ;
 RETURN	: 'return';
 THIS	: 'this'  ;
@@ -204,8 +229,8 @@ NEWACT	: 'newActive' ;
 IF		: 'if'	  ;
 THEN	: 'then'  ;
 ELSE	: 'else'  ;
-INT		: 'int'	  ;
-BOOL	: 'bool'  ;
+INT		: 'Int'	  ;
+BOOL	: 'Bool'  ;
 
 fragment CHAR 	: 'a'..'z' |'A'..'Z' ;
 ID              : CHAR (CHAR | DIGIT)* ;

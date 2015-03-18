@@ -3,7 +3,7 @@ package asp.models;
 public class Return extends Statement{
 
 	private final static String STMTTYPE = "Return";
-	Expression returnedExp;
+	private Expression returnedExp;
 	
 	public Return(Expression returnedExp) {
 		super(STMTTYPE);

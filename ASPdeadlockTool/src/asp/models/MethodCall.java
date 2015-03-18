@@ -6,9 +6,9 @@ public class MethodCall extends ExpressionSideEffects {
 	
 	private final static String EXPSETYPE = "MethodCall";
 	
-	String methodName;
-	LinkedList<Expression> parameters;
-	Variable methodThis;
+	private String methodName;
+	private LinkedList<Expression> parameters;
+	private Variable methodThis;
 	
 	public MethodCall(Variable methodThis, String methodName, LinkedList<Expression> parameters) {
 		super(EXPSETYPE);

@@ -46,6 +46,18 @@ public class ASPgrammarBaseListener implements ASPgrammarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIntType(@NotNull ASPgrammarParser.IntTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntType(@NotNull ASPgrammarParser.IntTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterProgram(@NotNull ASPgrammarParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -118,6 +130,18 @@ public class ASPgrammarBaseListener implements ASPgrammarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVarDeclaration(@NotNull ASPgrammarParser.VarDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVarDeclaration(@NotNull ASPgrammarParser.VarDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterParDef(@NotNull ASPgrammarParser.ParDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -125,6 +149,18 @@ public class ASPgrammarBaseListener implements ASPgrammarListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParDef(@NotNull ASPgrammarParser.ParDefContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBoolType(@NotNull ASPgrammarParser.BoolTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBoolType(@NotNull ASPgrammarParser.BoolTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -185,6 +221,18 @@ public class ASPgrammarBaseListener implements ASPgrammarListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitVarDec(@NotNull ASPgrammarParser.VarDecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterObjType(@NotNull ASPgrammarParser.ObjTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitObjType(@NotNull ASPgrammarParser.ObjTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

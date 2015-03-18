@@ -5,11 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import asp.models.Model;
+import asp.models.Program;
 import asp.parser.ASPgrammarLexer;
 import asp.parser.ASPgrammarParser;
 
@@ -26,6 +28,7 @@ public class Analyzer {
 		//parser.setBuildParseTree(false);
 		FileOutputStream f = new FileOutputStream("src/log.txt"); 
 	    System.setOut(new PrintStream(f));
-	    Model program = parser.program().prog;
+	    Program program = parser.program().prog;
+	    program.print();
 	}
 }

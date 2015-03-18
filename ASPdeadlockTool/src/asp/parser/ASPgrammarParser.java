@@ -23,29 +23,30 @@ public class ASPgrammarParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		LPAR=1, RPAR=2, RSBRACK=3, LSBRACK=4, RCBRACK=5, LCBRACK=6, PLUS=7, MINUS=8, 
-		MULT=9, DIV=10, AND=11, OR=12, GT=13, LT=14, GEG=15, LEG=16, EQUALS=17, 
-		DISTINCT=18, NOT=19, SKIP=20, COMMA=21, COLON=22, SEMI=23, DOT=24, NULL=25, 
-		TRUE=26, FALSE=27, CLASS=28, RETURN=29, THIS=30, NEW=31, NEWACT=32, IF=33, 
-		THEN=34, ELSE=35, INT=36, BOOL=37, ID=38, NUMBER=39, WS=40, LINECOMENTS=41, 
-		BLOCKCOMENTS=42;
+		MULT=9, DIV=10, AND=11, OR=12, GT=13, LT=14, GEG=15, LEG=16, ASSIGN=17, 
+		EQUALS=18, DISTINCT=19, NOT=20, SKIP=21, COMMA=22, COLON=23, SEMI=24, 
+		DOT=25, NULL=26, TRUE=27, FALSE=28, CLASS=29, RETURN=30, THIS=31, NEW=32, 
+		NEWACT=33, IF=34, THEN=35, ELSE=36, INT=37, BOOL=38, ID=39, NUMBER=40, 
+		WS=41, LINECOMENTS=42, BLOCKCOMENTS=43;
 	public static final String[] tokenNames = {
 		"<INVALID>", "'('", "')'", "']'", "'['", "'}'", "'{'", "'+'", "'-'", "'*'", 
-		"'/'", "'&&'", "'||'", "'>'", "'<'", "'>='", "'<='", "'='", "'!='", "'!'", 
-		"'skip'", "','", "':'", "';'", "'.'", "'null'", "'true'", "'false'", "'class'", 
-		"'return'", "'this'", "'new'", "'newActive'", "'if'", "'then'", "'else'", 
-		"'int'", "'bool'", "ID", "NUMBER", "WS", "LINECOMENTS", "BLOCKCOMENTS"
+		"'/'", "'&&'", "'||'", "'>'", "'<'", "'>='", "'<='", "'='", "'=='", "'!='", 
+		"'!'", "'skip'", "','", "':'", "';'", "'.'", "'null'", "'True'", "'False'", 
+		"'class'", "'return'", "'this'", "'new'", "'newActive'", "'if'", "'then'", 
+		"'else'", "'Int'", "'Bool'", "ID", "NUMBER", "WS", "LINECOMENTS", "BLOCKCOMENTS"
 	};
 	public static final int
 		RULE_program = 0, RULE_classDec = 1, RULE_methodDef = 2, RULE_body = 3, 
-		RULE_varDec = 4, RULE_parDef = 5, RULE_type = 6, RULE_variable = 7, RULE_stmt = 8, 
-		RULE_stmtblock = 9, RULE_expressionSideEffect = 10, RULE_expression = 11, 
-		RULE_arithmeticExpression = 12, RULE_booleanExpression = 13, RULE_value = 14, 
-		RULE_element = 15, RULE_lcbrak = 16, RULE_rcbrak = 17;
+		RULE_varDeclaration = 4, RULE_varDec = 5, RULE_parDef = 6, RULE_type = 7, 
+		RULE_intType = 8, RULE_boolType = 9, RULE_objType = 10, RULE_variable = 11, 
+		RULE_stmt = 12, RULE_stmtblock = 13, RULE_expressionSideEffect = 14, RULE_expression = 15, 
+		RULE_arithmeticExpression = 16, RULE_booleanExpression = 17, RULE_value = 18, 
+		RULE_element = 19, RULE_lcbrak = 20, RULE_rcbrak = 21;
 	public static final String[] ruleNames = {
-		"program", "classDec", "methodDef", "body", "varDec", "parDef", "type", 
-		"variable", "stmt", "stmtblock", "expressionSideEffect", "expression", 
-		"arithmeticExpression", "booleanExpression", "value", "element", "lcbrak", 
-		"rcbrak"
+		"program", "classDec", "methodDef", "body", "varDeclaration", "varDec", 
+		"parDef", "type", "intType", "boolType", "objType", "variable", "stmt", 
+		"stmtblock", "expressionSideEffect", "expression", "arithmeticExpression", 
+		"booleanExpression", "value", "element", "lcbrak", "rcbrak"
 	};
 
 	@Override
@@ -107,21 +108,21 @@ public class ASPgrammarParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(41);
+			setState(49);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==CLASS) {
 				{
 				{
-				setState(36); ((ProgramContext)_localctx).classDec = classDec();
+				setState(44); ((ProgramContext)_localctx).classDec = classDec();
 				classMap.put(((ProgramContext)_localctx).classDec.classObj.getClassName(),((ProgramContext)_localctx).classDec.classObj);
 				}
 				}
-				setState(43);
+				setState(51);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(44); ((ProgramContext)_localctx).main = body();
+			setState(52); ((ProgramContext)_localctx).main = body();
 			((ProgramContext)_localctx).prog =  new Program(classMap, ((ProgramContext)_localctx).main.stb);
 			}
 		}
@@ -140,15 +141,15 @@ public class ASPgrammarParser extends Parser {
 		public ClassDecl classObj;
 		public Token className;
 		public ParDefContext parameters;
-		public VarDecContext fields;
+		public VarDeclarationContext fields;
 		public MethodDefContext method;
 		public TerminalNode LCBRACK() { return getToken(ASPgrammarParser.LCBRACK, 0); }
 		public TerminalNode ID() { return getToken(ASPgrammarParser.ID, 0); }
-		public VarDecContext varDec() {
-			return getRuleContext(VarDecContext.class,0);
-		}
 		public List<MethodDefContext> methodDef() {
 			return getRuleContexts(MethodDefContext.class);
+		}
+		public VarDeclarationContext varDeclaration() {
+			return getRuleContext(VarDeclarationContext.class,0);
 		}
 		public ParDefContext parDef() {
 			return getRuleContext(ParDefContext.class,0);
@@ -188,53 +189,52 @@ public class ASPgrammarParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(47); match(CLASS);
-			setState(48); ((ClassDecContext)_localctx).className = match(ID);
-			setState(49); match(LPAR);
+			setState(55); match(CLASS);
+			setState(56); ((ClassDecContext)_localctx).className = match(ID);
+			setState(57); match(LPAR);
 			{
-			setState(50); ((ClassDecContext)_localctx).parameters = parDef();
+			setState(58); ((ClassDecContext)_localctx).parameters = parDef();
 			}
-			setState(51); match(RPAR);
-			setState(52); match(LCBRACK);
-			setState(53); ((ClassDecContext)_localctx).fields = varDec();
-			setState(59);
+			setState(59); match(RPAR);
+			setState(60); match(LCBRACK);
+			setState(61); ((ClassDecContext)_localctx).fields = varDeclaration();
+			setState(67);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INT) | (1L << BOOL) | (1L << ID))) != 0)) {
 				{
 				{
-				setState(54); ((ClassDecContext)_localctx).method = methodDef();
-				  if (methods.containsValue(((ClassDecContext)_localctx).method.methodSign.getMethodName()))
-								    	                                       {
-								    	                                       	  LinkedList<Method> list = methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName());
-								    	                                       	  for (Method m : list)
-								    	                                       	  { 
-								    	                                       	  	if (m.isEqual(((ClassDecContext)_localctx).method.methodSign))
-								    	                                       	  	   System.out.println("Errore!");
-								    	                                       	  	else
-								    													methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName()).add(((ClassDecContext)_localctx).method.methodSign);
-								    											  }
-								    										   }
-								    										   else
-								    										   {  methodList = new LinkedList<>();
-								    										   	  methodList.add(((ClassDecContext)_localctx).method.methodSign); 
-								    	                                          methods.put(((ClassDecContext)_localctx).method.methodSign.getMethodName(),methodList);
-								    	                                       }
+				setState(62); ((ClassDecContext)_localctx).method = methodDef();
+				if (methods.containsKey(((ClassDecContext)_localctx).method.methodSign.getMethodName()))
+								    	                                      	     { LinkedList<Method> list = methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName());
+								    	                                       	  	   if (((ClassDecContext)_localctx).method.methodSign.isIn(list))
+								    	                                       	  	   { System.out.println("The method "+ ((ClassDecContext)_localctx).method.methodSign.getMethodName() +  
+								    	                                       	  		 		             " has been defined more than once! Rename it");
+								    	                                       	  		 System.exit(0); }   
+								    	                                       	  		else
+								    	                                       	  		{ ((ClassDecContext)_localctx).method.methodSign.setID(methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName()).size());
+																				    	  methods.get(((ClassDecContext)_localctx).method.methodSign.getMethodName()).add(((ClassDecContext)_localctx).method.methodSign);
+																				  		}
+				 					    										     }
+									    										   	 else
+									    										   	 {  methodList = new LinkedList<>();
+									    										   	    ((ClassDecContext)_localctx).method.methodSign.setID(0);
+									    										   	    methodList.add(((ClassDecContext)_localctx).method.methodSign); 
+									    	                                            methods.put(((ClassDecContext)_localctx).method.methodSign.getMethodName(),methodList);
+									    	                                       	  }
 								    	                                     
 				}
 				}
-				setState(61);
+				setState(69);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(62); match(RCBRACK);
-			 
-							    	((ClassDecContext)_localctx).classObj =  new ClassDecl( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
-							    	 					    ((ClassDecContext)_localctx).parameters.pars, 
-							    	 					    ((ClassDecContext)_localctx).fields.vars,
-							    	 					    methods
+			setState(70); match(RCBRACK);
+			 ((ClassDecContext)_localctx).classObj =  new ClassDecl( (((ClassDecContext)_localctx).className!=null?((ClassDecContext)_localctx).className.getText():null),
+							    	    				     ((ClassDecContext)_localctx).parameters.pars, 
+							    	 					     ((ClassDecContext)_localctx).fields.vars,
+							    	 					     methods
 							    	 					   );
-							    
 			}
 		}
 		catch (RecognitionException re) {
@@ -294,14 +294,14 @@ public class ASPgrammarParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(65); ((MethodDefContext)_localctx).returnedType = type();
-			setState(66); ((MethodDefContext)_localctx).methodName = match(ID);
-			setState(67); match(LPAR);
+			setState(73); ((MethodDefContext)_localctx).returnedType = type();
+			setState(74); ((MethodDefContext)_localctx).methodName = match(ID);
+			setState(75); match(LPAR);
 			{
-			setState(68); ((MethodDefContext)_localctx).p = parDef();
+			setState(76); ((MethodDefContext)_localctx).p = parDef();
 			}
-			setState(69); match(RPAR);
-			setState(70); ((MethodDefContext)_localctx).b = body();
+			setState(77); match(RPAR);
+			setState(78); ((MethodDefContext)_localctx).b = body();
 			((MethodDefContext)_localctx).methodSign =  new Method(((MethodDefContext)_localctx).returnedType.varType, (((MethodDefContext)_localctx).methodName!=null?((MethodDefContext)_localctx).methodName.getText():null), ((MethodDefContext)_localctx).p.pars,((MethodDefContext)_localctx).b.stb); 
 			}
 		}
@@ -318,11 +318,11 @@ public class ASPgrammarParser extends Parser {
 
 	public static class BodyContext extends ParserRuleContext {
 		public StmtBlock stb;
-		public VarDecContext v;
+		public VarDeclarationContext v;
 		public StmtContext st;
 		public TerminalNode LCBRACK() { return getToken(ASPgrammarParser.LCBRACK, 0); }
-		public VarDecContext varDec() {
-			return getRuleContext(VarDecContext.class,0);
+		public VarDeclarationContext varDeclaration() {
+			return getRuleContext(VarDeclarationContext.class,0);
 		}
 		public StmtContext stmt(int i) {
 			return getRuleContext(StmtContext.class,i);
@@ -359,27 +359,92 @@ public class ASPgrammarParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(73); match(LCBRACK);
+			setState(81); match(LCBRACK);
 			{
-			setState(74); ((BodyContext)_localctx).v = varDec();
+			setState(82); ((BodyContext)_localctx).v = varDeclaration();
 			vars=((BodyContext)_localctx).v.vars;
 			}
-			setState(82);
+			setState(90);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << SKIP) | (1L << RETURN) | (1L << IF) | (1L << ID))) != 0)) {
 				{
 				{
-				setState(77); ((BodyContext)_localctx).st = stmt();
+				setState(85); ((BodyContext)_localctx).st = stmt();
 				stmts.add(((BodyContext)_localctx).st.s);
 				}
 				}
-				setState(84);
+				setState(92);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(85); match(RCBRACK);
+			setState(93); match(RCBRACK);
 			((BodyContext)_localctx).stb =  new StmtBlock(vars,stmts);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class VarDeclarationContext extends ParserRuleContext {
+		public HashMap<String,Declaration> vars;
+		public VarDecContext v;
+		public List<VarDecContext> varDec() {
+			return getRuleContexts(VarDecContext.class);
+		}
+		public VarDecContext varDec(int i) {
+			return getRuleContext(VarDecContext.class,i);
+		}
+		public VarDeclarationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_varDeclaration; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).enterVarDeclaration(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).exitVarDeclaration(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ASPgrammarVisitor ) return ((ASPgrammarVisitor<? extends T>)visitor).visitVarDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final VarDeclarationContext varDeclaration() throws RecognitionException {
+		VarDeclarationContext _localctx = new VarDeclarationContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_varDeclaration);
+		 ((VarDeclarationContext)_localctx).vars =  new HashMap<>();
+		try {
+			int _alt;
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(101);
+			_errHandler.sync(this);
+			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
+					{
+					{
+					setState(96); ((VarDeclarationContext)_localctx).v = varDec();
+					((VarDeclarationContext)_localctx).vars =  ((VarDeclarationContext)_localctx).v.vars;
+					}
+					} 
+				}
+				setState(103);
+				_errHandler.sync(this);
+				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -395,23 +460,26 @@ public class ASPgrammarParser extends Parser {
 
 	public static class VarDecContext extends ParserRuleContext {
 		public HashMap<String,Declaration> vars;
-		public TypeContext t;
+		public ObjTypeContext t;
 		public VariableContext v;
-		public List<TerminalNode> SEMI() { return getTokens(ASPgrammarParser.SEMI); }
-		public TypeContext type(int i) {
-			return getRuleContext(TypeContext.class,i);
+		public IntTypeContext t1;
+		public BoolTypeContext t2;
+		public TerminalNode ASSIGN() { return getToken(ASPgrammarParser.ASSIGN, 0); }
+		public ObjTypeContext objType() {
+			return getRuleContext(ObjTypeContext.class,0);
 		}
-		public TerminalNode SEMI(int i) {
-			return getToken(ASPgrammarParser.SEMI, i);
+		public BoolTypeContext boolType() {
+			return getRuleContext(BoolTypeContext.class,0);
 		}
-		public List<TypeContext> type() {
-			return getRuleContexts(TypeContext.class);
+		public IntTypeContext intType() {
+			return getRuleContext(IntTypeContext.class,0);
 		}
-		public VariableContext variable(int i) {
-			return getRuleContext(VariableContext.class,i);
-		}
-		public List<VariableContext> variable() {
-			return getRuleContexts(VariableContext.class);
+		public TerminalNode FALSE() { return getToken(ASPgrammarParser.FALSE, 0); }
+		public TerminalNode SEMI() { return getToken(ASPgrammarParser.SEMI, 0); }
+		public TerminalNode TRUE() { return getToken(ASPgrammarParser.TRUE, 0); }
+		public TerminalNode NUMBER() { return getToken(ASPgrammarParser.NUMBER, 0); }
+		public VariableContext variable() {
+			return getRuleContext(VariableContext.class,0);
 		}
 		public VarDecContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -434,35 +502,67 @@ public class ASPgrammarParser extends Parser {
 
 	public final VarDecContext varDec() throws RecognitionException {
 		VarDecContext _localctx = new VarDecContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_varDec);
+		enterRule(_localctx, 10, RULE_varDec);
 		 ((VarDecContext)_localctx).vars =  new HashMap<>();
 					   		  TypeBase type = null; 
 					   		  Variable var = null; 
+		int _la;
 		try {
-			int _alt;
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(95);
-			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					setState(88); ((VarDecContext)_localctx).t = type();
-					setState(89); ((VarDecContext)_localctx).v = variable();
-					setState(90); match(SEMI);
-					 type = ((VarDecContext)_localctx).t.varType;
-					     									  var = ((VarDecContext)_localctx).v.var;
-					     									  Declaration dec = new Declaration(type,var);
-					     								      _localctx.vars.put(var.getName(),dec);
-					}
-					} 
+			setState(123);
+			switch (_input.LA(1)) {
+			case ID:
+				enterOuterAlt(_localctx, 1);
+				{
+				{
+				setState(104); ((VarDecContext)_localctx).t = objType();
+				setState(105); ((VarDecContext)_localctx).v = variable();
+				setState(106); match(SEMI);
+				 type = ((VarDecContext)_localctx).t.varType;
+				     									    var = ((VarDecContext)_localctx).v.var;
+				     									    Declaration dec = new Declaration(type,var);
+				     								        _localctx.vars.put(var.getName(),dec);
 				}
-				setState(97);
-				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
-			}
+				}
+				break;
+			case INT:
+				enterOuterAlt(_localctx, 2);
+				{
+				{
+				setState(109); ((VarDecContext)_localctx).t1 = intType();
+				setState(110); ((VarDecContext)_localctx).v = variable();
+				setState(111); match(ASSIGN);
+				setState(112); match(NUMBER);
+				setState(113); match(SEMI);
+				 type = ((VarDecContext)_localctx).t1.varType;
+				     									  				   var = ((VarDecContext)_localctx).v.var;
+				     									  				   Declaration dec = new Declaration(type,var);
+				     								      				   _localctx.vars.put(var.getName(),dec);
+				}
+				}
+				break;
+			case BOOL:
+				enterOuterAlt(_localctx, 3);
+				{
+				{
+				setState(116); ((VarDecContext)_localctx).t2 = boolType();
+				setState(117); ((VarDecContext)_localctx).v = variable();
+				setState(118); match(ASSIGN);
+				setState(119);
+				_la = _input.LA(1);
+				if ( !(_la==TRUE || _la==FALSE) ) {
+				_errHandler.recoverInline(this);
+				}
+				consume();
+				setState(120); match(SEMI);
+				 type = ((VarDecContext)_localctx).t2.varType;
+				     									  				  		    var = ((VarDecContext)_localctx).v.var;
+				     									  				  		    Declaration dec = new Declaration(type,var);
+				     								      				  		    _localctx.vars.put(var.getName(),dec);
+				}
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -519,7 +619,7 @@ public class ASPgrammarParser extends Parser {
 
 	public final ParDefContext parDef() throws RecognitionException {
 		ParDefContext _localctx = new ParDefContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_parDef);
+		enterRule(_localctx, 12, RULE_parDef);
 		((ParDefContext)_localctx).pars =  new HashMap<>();
 							  TypeBase type = null; 
 					   		  Variable var = null; 
@@ -528,12 +628,12 @@ public class ASPgrammarParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(102);
+			setState(129);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INT) | (1L << BOOL) | (1L << ID))) != 0)) {
 				{
-				setState(98); ((ParDefContext)_localctx).t = type();
-				setState(99); ((ParDefContext)_localctx).v = variable();
+				setState(125); ((ParDefContext)_localctx).t = type();
+				setState(126); ((ParDefContext)_localctx).v = variable();
 				 type = ((ParDefContext)_localctx).t.varType;
 				     								   var = ((ParDefContext)_localctx).v.var;
 				     								   Declaration dec = new Declaration(type,var);
@@ -541,22 +641,22 @@ public class ASPgrammarParser extends Parser {
 				}
 			}
 
-			setState(111);
+			setState(138);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(104); match(COMMA);
-				setState(105); ((ParDefContext)_localctx).t1 = type();
-				setState(106); ((ParDefContext)_localctx).v1 = variable();
+				setState(131); match(COMMA);
+				setState(132); ((ParDefContext)_localctx).t1 = type();
+				setState(133); ((ParDefContext)_localctx).v1 = variable();
 				type = ((ParDefContext)_localctx).t1.varType;
 				     								   		   var = ((ParDefContext)_localctx).v1.var;
 				     								   		   Declaration dec = new Declaration(type,var);
 								  							   _localctx.pars.put((Integer) (parIndex +1),dec);
 				}
 				}
-				setState(113);
+				setState(140);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -575,10 +675,18 @@ public class ASPgrammarParser extends Parser {
 
 	public static class TypeContext extends ParserRuleContext {
 		public TypeBase varType;
-		public Token ID;
-		public TerminalNode ID() { return getToken(ASPgrammarParser.ID, 0); }
-		public TerminalNode BOOL() { return getToken(ASPgrammarParser.BOOL, 0); }
-		public TerminalNode INT() { return getToken(ASPgrammarParser.INT, 0); }
+		public IntTypeContext t;
+		public BoolTypeContext t1;
+		public ObjTypeContext t2;
+		public BoolTypeContext boolType() {
+			return getRuleContext(BoolTypeContext.class,0);
+		}
+		public ObjTypeContext objType() {
+			return getRuleContext(ObjTypeContext.class,0);
+		}
+		public IntTypeContext intType() {
+			return getRuleContext(IntTypeContext.class,0);
+		}
 		public TypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -600,33 +708,163 @@ public class ASPgrammarParser extends Parser {
 
 	public final TypeContext type() throws RecognitionException {
 		TypeContext _localctx = new TypeContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_type);
+		enterRule(_localctx, 14, RULE_type);
 		try {
-			setState(120);
+			setState(150);
 			switch (_input.LA(1)) {
-			case ID:
+			case INT:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(114); ((TypeContext)_localctx).ID = match(ID);
-				((TypeContext)_localctx).varType =  new TypeObject((((TypeContext)_localctx).ID!=null?((TypeContext)_localctx).ID.getText():null));
-				}
-				break;
-			case INT:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(116); match(INT);
-				((TypeContext)_localctx).varType =  new TypeInt();
+				setState(141); ((TypeContext)_localctx).t = intType();
+				((TypeContext)_localctx).varType =  ((TypeContext)_localctx).t.varType;
 				}
 				break;
 			case BOOL:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(144); ((TypeContext)_localctx).t1 = boolType();
+				((TypeContext)_localctx).varType =  ((TypeContext)_localctx).t1.varType;
+				}
+				break;
+			case ID:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(118); match(BOOL);
-				((TypeContext)_localctx).varType =  new TypeBool();
+				setState(147); ((TypeContext)_localctx).t2 = objType();
+				((TypeContext)_localctx).varType =  ((TypeContext)_localctx).t2.varType;
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class IntTypeContext extends ParserRuleContext {
+		public TypeBase varType;
+		public TerminalNode INT() { return getToken(ASPgrammarParser.INT, 0); }
+		public IntTypeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_intType; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).enterIntType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).exitIntType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ASPgrammarVisitor ) return ((ASPgrammarVisitor<? extends T>)visitor).visitIntType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final IntTypeContext intType() throws RecognitionException {
+		IntTypeContext _localctx = new IntTypeContext(_ctx, getState());
+		enterRule(_localctx, 16, RULE_intType);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(152); match(INT);
+			((IntTypeContext)_localctx).varType =  new TypeInt();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class BoolTypeContext extends ParserRuleContext {
+		public TypeBase varType;
+		public TerminalNode BOOL() { return getToken(ASPgrammarParser.BOOL, 0); }
+		public BoolTypeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_boolType; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).enterBoolType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).exitBoolType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ASPgrammarVisitor ) return ((ASPgrammarVisitor<? extends T>)visitor).visitBoolType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final BoolTypeContext boolType() throws RecognitionException {
+		BoolTypeContext _localctx = new BoolTypeContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_boolType);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(155); match(BOOL);
+			((BoolTypeContext)_localctx).varType =  new TypeBool();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class ObjTypeContext extends ParserRuleContext {
+		public TypeBase varType;
+		public Token ID;
+		public TerminalNode ID() { return getToken(ASPgrammarParser.ID, 0); }
+		public ObjTypeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_objType; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).enterObjType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ASPgrammarListener ) ((ASPgrammarListener)listener).exitObjType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ASPgrammarVisitor ) return ((ASPgrammarVisitor<? extends T>)visitor).visitObjType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final ObjTypeContext objType() throws RecognitionException {
+		ObjTypeContext _localctx = new ObjTypeContext(_ctx, getState());
+		enterRule(_localctx, 20, RULE_objType);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(158); ((ObjTypeContext)_localctx).ID = match(ID);
+			((ObjTypeContext)_localctx).varType =  new TypeObject((((ObjTypeContext)_localctx).ID!=null?((ObjTypeContext)_localctx).ID.getText():null));
 			}
 		}
 		catch (RecognitionException re) {
@@ -665,11 +903,11 @@ public class ASPgrammarParser extends Parser {
 
 	public final VariableContext variable() throws RecognitionException {
 		VariableContext _localctx = new VariableContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_variable);
+		enterRule(_localctx, 22, RULE_variable);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(122); ((VariableContext)_localctx).v = match(ID);
+			setState(161); ((VariableContext)_localctx).v = match(ID);
 			((VariableContext)_localctx).var =  new Variable((((VariableContext)_localctx).v!=null?((VariableContext)_localctx).v.getText():null));
 			}
 		}
@@ -699,7 +937,6 @@ public class ASPgrammarParser extends Parser {
 		}
 		public TerminalNode ELSE() { return getToken(ASPgrammarParser.ELSE, 0); }
 		public TerminalNode IF() { return getToken(ASPgrammarParser.IF, 0); }
-		public TerminalNode THEN() { return getToken(ASPgrammarParser.THEN, 0); }
 		public BooleanExpressionContext booleanExpression() {
 			return getRuleContext(BooleanExpressionContext.class,0);
 		}
@@ -707,7 +944,7 @@ public class ASPgrammarParser extends Parser {
 		public List<StmtContext> stmt() {
 			return getRuleContexts(StmtContext.class);
 		}
-		public TerminalNode EQUALS() { return getToken(ASPgrammarParser.EQUALS, 0); }
+		public TerminalNode ASSIGN() { return getToken(ASPgrammarParser.ASSIGN, 0); }
 		public TerminalNode ID() { return getToken(ASPgrammarParser.ID, 0); }
 		public StmtblockContext stmtblock(int i) {
 			return getRuleContext(StmtblockContext.class,i);
@@ -746,85 +983,84 @@ public class ASPgrammarParser extends Parser {
 
 	public final StmtContext stmt() throws RecognitionException {
 		StmtContext _localctx = new StmtContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_stmt);
+		enterRule(_localctx, 24, RULE_stmt);
 		  Variable var = null;
 							ExpressionSideEffects exprse = null;
 							Expression cond = null;
 							Statement stTrue = null;
 							Statement stFalse = null; 
 		try {
-			setState(169);
+			setState(207);
 			switch (_input.LA(1)) {
 			case SKIP:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(125); match(SKIP);
-				setState(126); match(SEMI);
+				setState(164); match(SKIP);
+				setState(165); match(SEMI);
 				((StmtContext)_localctx).s =  new Skip();
 				}
 				break;
 			case ID:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(128); ((StmtContext)_localctx).l = match(ID);
+				setState(167); ((StmtContext)_localctx).l = match(ID);
 				var = new Variable((((StmtContext)_localctx).l!=null?((StmtContext)_localctx).l.getText():null));
-				setState(130); match(EQUALS);
-				setState(131); ((StmtContext)_localctx).r = expressionSideEffect();
+				setState(169); match(ASSIGN);
+				setState(170); ((StmtContext)_localctx).r = expressionSideEffect();
 				exprse = ((StmtContext)_localctx).r.exprse;
-				setState(133); match(SEMI);
+				setState(172); match(SEMI);
 				((StmtContext)_localctx).s =  new Assignment(var,exprse);
 				}
 				break;
 			case IF:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(136); match(IF);
-				setState(137); match(LPAR);
+				setState(175); match(IF);
+				setState(176); match(LPAR);
 				{
-				setState(138); ((StmtContext)_localctx).guard = booleanExpression(0);
+				setState(177); ((StmtContext)_localctx).guard = booleanExpression(0);
 				cond = ((StmtContext)_localctx).guard.exprBool;
 				}
-				setState(141); match(RPAR);
-				setState(142); match(THEN);
-				setState(149);
+				setState(180); match(RPAR);
+				setState(187);
 				switch (_input.LA(1)) {
 				case SKIP:
 				case RETURN:
 				case IF:
 				case ID:
 					{
-					setState(143); ((StmtContext)_localctx).trueSideS = stmt();
+					setState(181); ((StmtContext)_localctx).trueSideS = stmt();
 					stTrue = ((StmtContext)_localctx).trueSideS.s;
 					}
 					break;
 				case LCBRACK:
 					{
-					setState(146); ((StmtContext)_localctx).trueSideSB = stmtblock();
+					setState(184); ((StmtContext)_localctx).trueSideSB = stmtblock();
 					stTrue = ((StmtContext)_localctx).trueSideSB.stb;
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(160);
-				switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
+				setState(198);
+				switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
 				case 1:
 					{
-					setState(151); match(ELSE);
-					setState(158);
+					setState(189); match(ELSE);
+					setState(196);
 					switch (_input.LA(1)) {
 					case SKIP:
 					case RETURN:
 					case IF:
 					case ID:
 						{
-						setState(152); ((StmtContext)_localctx).falseSideS = stmt();
+						setState(190); ((StmtContext)_localctx).falseSideS = stmt();
 						stFalse = ((StmtContext)_localctx).falseSideS.s;
 						}
 						break;
 					case LCBRACK:
 						{
-						setState(155); ((StmtContext)_localctx).falseSideSB = stmtblock();
+						setState(193); ((StmtContext)_localctx).falseSideSB = stmtblock();
 						stFalse = ((StmtContext)_localctx).falseSideSB.stb;
 						}
 						break;
@@ -840,9 +1076,9 @@ public class ASPgrammarParser extends Parser {
 			case RETURN:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(164); match(RETURN);
-				setState(165); ((StmtContext)_localctx).e = expression();
-				setState(166); match(SEMI);
+				setState(202); match(RETURN);
+				setState(203); ((StmtContext)_localctx).e = expression();
+				setState(204); match(SEMI);
 				((StmtContext)_localctx).s =  new Return(((StmtContext)_localctx).e.expr);
 				}
 				break;
@@ -893,29 +1129,29 @@ public class ASPgrammarParser extends Parser {
 
 	public final StmtblockContext stmtblock() throws RecognitionException {
 		StmtblockContext _localctx = new StmtblockContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_stmtblock);
+		enterRule(_localctx, 26, RULE_stmtblock);
 		((StmtblockContext)_localctx).stb =  new StmtBlock();
 						  		LinkedList<Statement> stmts = new LinkedList<>();
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(171); match(LCBRACK);
-			setState(177);
+			setState(209); match(LCBRACK);
+			setState(215);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << SKIP) | (1L << RETURN) | (1L << IF) | (1L << ID))) != 0)) {
 				{
 				{
-				setState(172); ((StmtblockContext)_localctx).st = stmt();
+				setState(210); ((StmtblockContext)_localctx).st = stmt();
 				stmts.add(((StmtblockContext)_localctx).st.s);
 				}
 				}
-				setState(179);
+				setState(217);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(180); match(RCBRACK);
+			setState(218); match(RCBRACK);
 			_localctx.stb.setStmts(stmts);
 			}
 		}
@@ -973,91 +1209,91 @@ public class ASPgrammarParser extends Parser {
 
 	public final ExpressionSideEffectContext expressionSideEffect() throws RecognitionException {
 		ExpressionSideEffectContext _localctx = new ExpressionSideEffectContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_expressionSideEffect);
+		enterRule(_localctx, 28, RULE_expressionSideEffect);
 		LinkedList<Expression> param = new LinkedList<>();
 									 	   Variable obj = null;
 		int _la;
 		try {
-			setState(228);
-			switch ( getInterpreter().adaptivePredict(_input,15,_ctx) ) {
+			setState(266);
+			switch ( getInterpreter().adaptivePredict(_input,16,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(183); ((ExpressionSideEffectContext)_localctx).exp = expression();
+				setState(221); ((ExpressionSideEffectContext)_localctx).exp = expression();
 				((ExpressionSideEffectContext)_localctx).exprse = ((ExpressionSideEffectContext)_localctx).exp.expr;
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(186); ((ExpressionSideEffectContext)_localctx).elem = element();
+				setState(224); ((ExpressionSideEffectContext)_localctx).elem = element();
 				obj = new Variable((((ExpressionSideEffectContext)_localctx).elem!=null?_input.getText(((ExpressionSideEffectContext)_localctx).elem.start,((ExpressionSideEffectContext)_localctx).elem.stop):null));
-				setState(188); match(DOT);
-				setState(189); ((ExpressionSideEffectContext)_localctx).methodName = match(ID);
-				setState(190); match(LPAR);
-				setState(196);
+				setState(226); match(DOT);
+				setState(227); ((ExpressionSideEffectContext)_localctx).methodName = match(ID);
+				setState(228); match(LPAR);
+				setState(234);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LPAR) | (1L << NOT) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << THIS) | (1L << ID) | (1L << NUMBER))) != 0)) {
 					{
 					{
-					setState(191); ((ExpressionSideEffectContext)_localctx).par = expression();
+					setState(229); ((ExpressionSideEffectContext)_localctx).par = expression();
 					param.add(((ExpressionSideEffectContext)_localctx).par.expr);
 					}
 					}
-					setState(198);
+					setState(236);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(199); match(RPAR);
+				setState(237); match(RPAR);
 				((ExpressionSideEffectContext)_localctx).exprse =  new MethodCall(obj,(((ExpressionSideEffectContext)_localctx).methodName!=null?((ExpressionSideEffectContext)_localctx).methodName.getText():null),param);
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(202); match(NEW);
-				setState(203); ((ExpressionSideEffectContext)_localctx).className = match(ID);
-				setState(204); match(LPAR);
-				setState(210);
+				setState(240); match(NEW);
+				setState(241); ((ExpressionSideEffectContext)_localctx).className = match(ID);
+				setState(242); match(LPAR);
+				setState(248);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LPAR) | (1L << NOT) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << THIS) | (1L << ID) | (1L << NUMBER))) != 0)) {
 					{
 					{
-					setState(205); ((ExpressionSideEffectContext)_localctx).par = expression();
+					setState(243); ((ExpressionSideEffectContext)_localctx).par = expression();
 					param.add(((ExpressionSideEffectContext)_localctx).par.expr);
 					}
 					}
-					setState(212);
+					setState(250);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(213); match(RPAR);
+				setState(251); match(RPAR);
 				((ExpressionSideEffectContext)_localctx).exprse =  new New((((ExpressionSideEffectContext)_localctx).className!=null?((ExpressionSideEffectContext)_localctx).className.getText():null),param);
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(215); match(NEWACT);
-				setState(216); ((ExpressionSideEffectContext)_localctx).className = match(ID);
-				setState(217); match(LPAR);
-				setState(223);
+				setState(253); match(NEWACT);
+				setState(254); ((ExpressionSideEffectContext)_localctx).className = match(ID);
+				setState(255); match(LPAR);
+				setState(261);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << LPAR) | (1L << NOT) | (1L << NULL) | (1L << TRUE) | (1L << FALSE) | (1L << THIS) | (1L << ID) | (1L << NUMBER))) != 0)) {
 					{
 					{
-					setState(218); ((ExpressionSideEffectContext)_localctx).par = expression();
+					setState(256); ((ExpressionSideEffectContext)_localctx).par = expression();
 					param.add(((ExpressionSideEffectContext)_localctx).par.expr);
 					}
 					}
-					setState(225);
+					setState(263);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(226); match(RPAR);
+				setState(264); match(RPAR);
 				((ExpressionSideEffectContext)_localctx).exprse =  new NewActive((((ExpressionSideEffectContext)_localctx).className!=null?((ExpressionSideEffectContext)_localctx).className.getText():null),param);
 				}
 				break;
@@ -1113,35 +1349,35 @@ public class ASPgrammarParser extends Parser {
 
 	public final ExpressionContext expression() throws RecognitionException {
 		ExpressionContext _localctx = new ExpressionContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_expression);
+		enterRule(_localctx, 30, RULE_expression);
 		try {
-			setState(242);
-			switch ( getInterpreter().adaptivePredict(_input,16,_ctx) ) {
+			setState(280);
+			switch ( getInterpreter().adaptivePredict(_input,17,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(230); ((ExpressionContext)_localctx).v = value();
+				setState(268); ((ExpressionContext)_localctx).v = value();
 				((ExpressionContext)_localctx).expr =  ((ExpressionContext)_localctx).v.val;
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(233); ((ExpressionContext)_localctx).el = element();
+				setState(271); ((ExpressionContext)_localctx).el = element();
 				((ExpressionContext)_localctx).expr =  ((ExpressionContext)_localctx).el.elem;
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(236); ((ExpressionContext)_localctx).expra = arithmeticExpression(0);
+				setState(274); ((ExpressionContext)_localctx).expra = arithmeticExpression(0);
 				((ExpressionContext)_localctx).expr =  ((ExpressionContext)_localctx).expra.exprArit;
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(239); ((ExpressionContext)_localctx).exprb = booleanExpression(0);
+				setState(277); ((ExpressionContext)_localctx).exprb = booleanExpression(0);
 				((ExpressionContext)_localctx).expr =  ((ExpressionContext)_localctx).exprb.exprBool;
 				}
 				break;
@@ -1201,63 +1437,63 @@ public class ASPgrammarParser extends Parser {
 		int _parentState = getState();
 		ArithmeticExpressionContext _localctx = new ArithmeticExpressionContext(_ctx, _parentState);
 		ArithmeticExpressionContext _prevctx = _localctx;
-		int _startState = 24;
-		enterRecursionRule(_localctx, 24, RULE_arithmeticExpression, _p);
+		int _startState = 32;
+		enterRecursionRule(_localctx, 32, RULE_arithmeticExpression, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(253);
+			setState(291);
 			switch (_input.LA(1)) {
 			case NUMBER:
 				{
-				setState(245); ((ArithmeticExpressionContext)_localctx).n = match(NUMBER);
+				setState(283); ((ArithmeticExpressionContext)_localctx).n = match(NUMBER);
 				((ArithmeticExpressionContext)_localctx).exprArit =  new ExpressionIntValue(Integer.parseInt((((ArithmeticExpressionContext)_localctx).n!=null?((ArithmeticExpressionContext)_localctx).n.getText():null)));
 				}
 				break;
 			case ID:
 				{
-				setState(247); ((ArithmeticExpressionContext)_localctx).v = match(ID);
+				setState(285); ((ArithmeticExpressionContext)_localctx).v = match(ID);
 				((ArithmeticExpressionContext)_localctx).exprArit =  new Variable((((ArithmeticExpressionContext)_localctx).v!=null?((ArithmeticExpressionContext)_localctx).v.getText():null));
 				}
 				break;
 			case LPAR:
 				{
-				setState(249); match(LPAR);
-				setState(250); arithmeticExpression(0);
-				setState(251); match(RPAR);
+				setState(287); match(LPAR);
+				setState(288); arithmeticExpression(0);
+				setState(289); match(RPAR);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(267);
+			setState(305);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,19,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(265);
-					switch ( getInterpreter().adaptivePredict(_input,18,_ctx) ) {
+					setState(303);
+					switch ( getInterpreter().adaptivePredict(_input,19,_ctx) ) {
 					case 1:
 						{
 						_localctx = new ArithmeticExpressionContext(_parentctx, _parentState);
 						_localctx.l = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmeticExpression);
-						setState(255);
+						setState(293);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-						setState(256);
+						setState(294);
 						((ArithmeticExpressionContext)_localctx).o = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==MULT || _la==DIV) ) {
 							((ArithmeticExpressionContext)_localctx).o = (Token)_errHandler.recoverInline(this);
 						}
 						consume();
-						setState(257); ((ArithmeticExpressionContext)_localctx).r = arithmeticExpression(6);
+						setState(295); ((ArithmeticExpressionContext)_localctx).r = arithmeticExpression(6);
 						((ArithmeticExpressionContext)_localctx).exprArit =  new ExpressionBinaryOperation(((ArithmeticExpressionContext)_localctx).l.exprArit,(((ArithmeticExpressionContext)_localctx).o!=null?((ArithmeticExpressionContext)_localctx).o.getText():null),((ArithmeticExpressionContext)_localctx).r.exprArit);
 						}
 						break;
@@ -1266,25 +1502,25 @@ public class ASPgrammarParser extends Parser {
 						_localctx = new ArithmeticExpressionContext(_parentctx, _parentState);
 						_localctx.l = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmeticExpression);
-						setState(260);
+						setState(298);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
-						setState(261);
+						setState(299);
 						((ArithmeticExpressionContext)_localctx).o = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
 							((ArithmeticExpressionContext)_localctx).o = (Token)_errHandler.recoverInline(this);
 						}
 						consume();
-						setState(262); ((ArithmeticExpressionContext)_localctx).r = arithmeticExpression(5);
+						setState(300); ((ArithmeticExpressionContext)_localctx).r = arithmeticExpression(5);
 						((ArithmeticExpressionContext)_localctx).exprArit =  new ExpressionBinaryOperation(((ArithmeticExpressionContext)_localctx).l.exprArit,(((ArithmeticExpressionContext)_localctx).o!=null?((ArithmeticExpressionContext)_localctx).o.getText():null),((ArithmeticExpressionContext)_localctx).r.exprArit);
 						}
 						break;
 					}
 					} 
 				}
-				setState(269);
+				setState(307);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,19,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
 			}
 			}
 		}
@@ -1361,52 +1597,52 @@ public class ASPgrammarParser extends Parser {
 		int _parentState = getState();
 		BooleanExpressionContext _localctx = new BooleanExpressionContext(_ctx, _parentState);
 		BooleanExpressionContext _prevctx = _localctx;
-		int _startState = 26;
-		enterRecursionRule(_localctx, 26, RULE_booleanExpression, _p);
+		int _startState = 34;
+		enterRecursionRule(_localctx, 34, RULE_booleanExpression, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(288);
-			switch ( getInterpreter().adaptivePredict(_input,20,_ctx) ) {
+			setState(326);
+			switch ( getInterpreter().adaptivePredict(_input,21,_ctx) ) {
 			case 1:
 				{
-				setState(271); ((BooleanExpressionContext)_localctx).n = match(NOT);
-				setState(272); ((BooleanExpressionContext)_localctx).exb = booleanExpression(6);
+				setState(309); ((BooleanExpressionContext)_localctx).n = match(NOT);
+				setState(310); ((BooleanExpressionContext)_localctx).exb = booleanExpression(6);
 				((BooleanExpressionContext)_localctx).exprBool =  new ExpressionUnaryOperation((((BooleanExpressionContext)_localctx).n!=null?((BooleanExpressionContext)_localctx).n.getText():null),((BooleanExpressionContext)_localctx).exb.exprBool);
 				}
 				break;
 			case 2:
 				{
-				setState(275); ((BooleanExpressionContext)_localctx).exa = arithmeticExpression(0);
+				setState(313); ((BooleanExpressionContext)_localctx).exa = arithmeticExpression(0);
 				((BooleanExpressionContext)_localctx).exprBool = ((BooleanExpressionContext)_localctx).exa.exprArit;
 				}
 				break;
 			case 3:
 				{
-				setState(278); ((BooleanExpressionContext)_localctx).v = value();
+				setState(316); ((BooleanExpressionContext)_localctx).v = value();
 				((BooleanExpressionContext)_localctx).exprBool = ((BooleanExpressionContext)_localctx).v.val;
 				}
 				break;
 			case 4:
 				{
-				setState(281); ((BooleanExpressionContext)_localctx).e = element();
+				setState(319); ((BooleanExpressionContext)_localctx).e = element();
 				((BooleanExpressionContext)_localctx).exprBool = ((BooleanExpressionContext)_localctx).e.elem;
 				}
 				break;
 			case 5:
 				{
-				setState(284); match(LPAR);
-				setState(285); booleanExpression(0);
-				setState(286); match(RPAR);
+				setState(322); match(LPAR);
+				setState(323); booleanExpression(0);
+				setState(324); match(RPAR);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(297);
+			setState(335);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,21,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,22,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
@@ -1416,23 +1652,23 @@ public class ASPgrammarParser extends Parser {
 					_localctx = new BooleanExpressionContext(_parentctx, _parentState);
 					_localctx.l = _prevctx;
 					pushNewRecursionContext(_localctx, _startState, RULE_booleanExpression);
-					setState(290);
+					setState(328);
 					if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-					setState(291);
+					setState(329);
 					((BooleanExpressionContext)_localctx).o = _input.LT(1);
 					_la = _input.LA(1);
 					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << AND) | (1L << OR) | (1L << GT) | (1L << LT) | (1L << GEG) | (1L << LEG) | (1L << EQUALS) | (1L << DISTINCT))) != 0)) ) {
 						((BooleanExpressionContext)_localctx).o = (Token)_errHandler.recoverInline(this);
 					}
 					consume();
-					setState(292); ((BooleanExpressionContext)_localctx).r = booleanExpression(6);
+					setState(330); ((BooleanExpressionContext)_localctx).r = booleanExpression(6);
 					((BooleanExpressionContext)_localctx).exprBool =  new ExpressionBinaryOperation(((BooleanExpressionContext)_localctx).l.exprBool,(((BooleanExpressionContext)_localctx).o!=null?((BooleanExpressionContext)_localctx).o.getText():null),((BooleanExpressionContext)_localctx).r.exprBool);
 					}
 					} 
 				}
-				setState(299);
+				setState(337);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,21,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,22,_ctx);
 			}
 			}
 		}
@@ -1477,35 +1713,35 @@ public class ASPgrammarParser extends Parser {
 
 	public final ValueContext value() throws RecognitionException {
 		ValueContext _localctx = new ValueContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_value);
+		enterRule(_localctx, 36, RULE_value);
 		try {
-			setState(308);
+			setState(346);
 			switch (_input.LA(1)) {
 			case NULL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(300); match(NULL);
+				setState(338); match(NULL);
 				((ValueContext)_localctx).val =  new ExpressionNullValue();
 				}
 				break;
 			case NUMBER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(302); ((ValueContext)_localctx).n = match(NUMBER);
+				setState(340); ((ValueContext)_localctx).n = match(NUMBER);
 				((ValueContext)_localctx).val =  new ExpressionIntValue(Integer.parseInt((((ValueContext)_localctx).n!=null?((ValueContext)_localctx).n.getText():null)));
 				}
 				break;
 			case TRUE:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(304); ((ValueContext)_localctx).t = match(TRUE);
+				setState(342); ((ValueContext)_localctx).t = match(TRUE);
 				((ValueContext)_localctx).val =  new ExpressionBoolValue(Boolean.parseBoolean((((ValueContext)_localctx).t!=null?((ValueContext)_localctx).t.getText():null)));
 				}
 				break;
 			case FALSE:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(306); ((ValueContext)_localctx).f = match(FALSE);
+				setState(344); ((ValueContext)_localctx).f = match(FALSE);
 				((ValueContext)_localctx).val =  new ExpressionBoolValue(Boolean.parseBoolean((((ValueContext)_localctx).f!=null?((ValueContext)_localctx).f.getText():null)));
 				}
 				break;
@@ -1551,21 +1787,21 @@ public class ASPgrammarParser extends Parser {
 
 	public final ElementContext element() throws RecognitionException {
 		ElementContext _localctx = new ElementContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_element);
+		enterRule(_localctx, 38, RULE_element);
 		try {
-			setState(314);
+			setState(352);
 			switch (_input.LA(1)) {
 			case ID:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(310); ((ElementContext)_localctx).ID = match(ID);
+				setState(348); ((ElementContext)_localctx).ID = match(ID);
 				((ElementContext)_localctx).elem =  new Variable((((ElementContext)_localctx).ID!=null?((ElementContext)_localctx).ID.getText():null));
 				}
 				break;
 			case THIS:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(312); ((ElementContext)_localctx).t = match(THIS);
+				setState(350); ((ElementContext)_localctx).t = match(THIS);
 				((ElementContext)_localctx).elem =  new ExpressionValue((((ElementContext)_localctx).t!=null?((ElementContext)_localctx).t.getText():null));
 				}
 				break;
@@ -1607,11 +1843,11 @@ public class ASPgrammarParser extends Parser {
 
 	public final LcbrakContext lcbrak() throws RecognitionException {
 		LcbrakContext _localctx = new LcbrakContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_lcbrak);
+		enterRule(_localctx, 40, RULE_lcbrak);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(316); match(LCBRACK);
+			setState(354); match(LCBRACK);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1648,11 +1884,11 @@ public class ASPgrammarParser extends Parser {
 
 	public final RcbrakContext rcbrak() throws RecognitionException {
 		RcbrakContext _localctx = new RcbrakContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_rcbrak);
+		enterRule(_localctx, 42, RULE_rcbrak);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(318); match(RCBRACK);
+			setState(356); match(RCBRACK);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1668,8 +1904,8 @@ public class ASPgrammarParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 12: return arithmeticExpression_sempred((ArithmeticExpressionContext)_localctx, predIndex);
-		case 13: return booleanExpression_sempred((BooleanExpressionContext)_localctx, predIndex);
+		case 16: return arithmeticExpression_sempred((ArithmeticExpressionContext)_localctx, predIndex);
+		case 17: return booleanExpression_sempred((BooleanExpressionContext)_localctx, predIndex);
 		}
 		return true;
 	}
@@ -1688,114 +1924,130 @@ public class ASPgrammarParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3,\u0143\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3-\u0169\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
-		"\4\23\t\23\3\2\3\2\3\2\7\2*\n\2\f\2\16\2-\13\2\3\2\3\2\3\2\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\7\3<\n\3\f\3\16\3?\13\3\3\3\3\3\3\3\3\4\3"+
-		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5S\n\5\f\5\16"+
-		"\5V\13\5\3\5\3\5\3\5\3\6\3\6\3\6\3\6\3\6\7\6`\n\6\f\6\16\6c\13\6\3\7\3"+
-		"\7\3\7\3\7\5\7i\n\7\3\7\3\7\3\7\3\7\3\7\7\7p\n\7\f\7\16\7s\13\7\3\b\3"+
-		"\b\3\b\3\b\3\b\3\b\5\b{\n\b\3\t\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3"+
-		"\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n"+
-		"\u0098\n\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u00a1\n\n\5\n\u00a3\n\n\3\n"+
-		"\3\n\3\n\3\n\3\n\3\n\3\n\5\n\u00ac\n\n\3\13\3\13\3\13\3\13\7\13\u00b2"+
-		"\n\13\f\13\16\13\u00b5\13\13\3\13\3\13\3\13\3\f\3\f\3\f\3\f\3\f\3\f\3"+
-		"\f\3\f\3\f\3\f\3\f\7\f\u00c5\n\f\f\f\16\f\u00c8\13\f\3\f\3\f\3\f\3\f\3"+
-		"\f\3\f\3\f\3\f\3\f\7\f\u00d3\n\f\f\f\16\f\u00d6\13\f\3\f\3\f\3\f\3\f\3"+
-		"\f\3\f\3\f\3\f\7\f\u00e0\n\f\f\f\16\f\u00e3\13\f\3\f\3\f\5\f\u00e7\n\f"+
-		"\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\3\r\5\r\u00f5\n\r\3\16\3"+
-		"\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u0100\n\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\7\16\u010c\n\16\f\16\16\16\u010f\13"+
-		"\16\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3"+
-		"\17\3\17\3\17\3\17\3\17\5\17\u0123\n\17\3\17\3\17\3\17\3\17\3\17\7\17"+
-		"\u012a\n\17\f\17\16\17\u012d\13\17\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
-		"\3\20\5\20\u0137\n\20\3\21\3\21\3\21\3\21\5\21\u013d\n\21\3\22\3\22\3"+
-		"\23\3\23\3\23\2\4\32\34\24\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$"+
-		"\2\5\3\2\13\f\3\2\t\n\3\2\r\24\u0155\2+\3\2\2\2\4\61\3\2\2\2\6C\3\2\2"+
-		"\2\bK\3\2\2\2\na\3\2\2\2\fh\3\2\2\2\16z\3\2\2\2\20|\3\2\2\2\22\u00ab\3"+
-		"\2\2\2\24\u00ad\3\2\2\2\26\u00e6\3\2\2\2\30\u00f4\3\2\2\2\32\u00ff\3\2"+
-		"\2\2\34\u0122\3\2\2\2\36\u0136\3\2\2\2 \u013c\3\2\2\2\"\u013e\3\2\2\2"+
-		"$\u0140\3\2\2\2&\'\5\4\3\2\'(\b\2\1\2(*\3\2\2\2)&\3\2\2\2*-\3\2\2\2+)"+
-		"\3\2\2\2+,\3\2\2\2,.\3\2\2\2-+\3\2\2\2./\5\b\5\2/\60\b\2\1\2\60\3\3\2"+
-		"\2\2\61\62\7\36\2\2\62\63\7(\2\2\63\64\7\3\2\2\64\65\5\f\7\2\65\66\7\4"+
-		"\2\2\66\67\7\b\2\2\67=\5\n\6\289\5\6\4\29:\b\3\1\2:<\3\2\2\2;8\3\2\2\2"+
-		"<?\3\2\2\2=;\3\2\2\2=>\3\2\2\2>@\3\2\2\2?=\3\2\2\2@A\7\7\2\2AB\b\3\1\2"+
-		"B\5\3\2\2\2CD\5\16\b\2DE\7(\2\2EF\7\3\2\2FG\5\f\7\2GH\7\4\2\2HI\5\b\5"+
-		"\2IJ\b\4\1\2J\7\3\2\2\2KL\7\b\2\2LM\5\n\6\2MN\b\5\1\2NT\3\2\2\2OP\5\22"+
-		"\n\2PQ\b\5\1\2QS\3\2\2\2RO\3\2\2\2SV\3\2\2\2TR\3\2\2\2TU\3\2\2\2UW\3\2"+
-		"\2\2VT\3\2\2\2WX\7\7\2\2XY\b\5\1\2Y\t\3\2\2\2Z[\5\16\b\2[\\\5\20\t\2\\"+
-		"]\7\31\2\2]^\b\6\1\2^`\3\2\2\2_Z\3\2\2\2`c\3\2\2\2a_\3\2\2\2ab\3\2\2\2"+
-		"b\13\3\2\2\2ca\3\2\2\2de\5\16\b\2ef\5\20\t\2fg\b\7\1\2gi\3\2\2\2hd\3\2"+
-		"\2\2hi\3\2\2\2iq\3\2\2\2jk\7\27\2\2kl\5\16\b\2lm\5\20\t\2mn\b\7\1\2np"+
-		"\3\2\2\2oj\3\2\2\2ps\3\2\2\2qo\3\2\2\2qr\3\2\2\2r\r\3\2\2\2sq\3\2\2\2"+
-		"tu\7(\2\2u{\b\b\1\2vw\7&\2\2w{\b\b\1\2xy\7\'\2\2y{\b\b\1\2zt\3\2\2\2z"+
-		"v\3\2\2\2zx\3\2\2\2{\17\3\2\2\2|}\7(\2\2}~\b\t\1\2~\21\3\2\2\2\177\u0080"+
-		"\7\26\2\2\u0080\u0081\7\31\2\2\u0081\u00ac\b\n\1\2\u0082\u0083\7(\2\2"+
-		"\u0083\u0084\b\n\1\2\u0084\u0085\7\23\2\2\u0085\u0086\5\26\f\2\u0086\u0087"+
-		"\b\n\1\2\u0087\u0088\7\31\2\2\u0088\u0089\b\n\1\2\u0089\u00ac\3\2\2\2"+
-		"\u008a\u008b\7#\2\2\u008b\u008c\7\3\2\2\u008c\u008d\5\34\17\2\u008d\u008e"+
-		"\b\n\1\2\u008e\u008f\3\2\2\2\u008f\u0090\7\4\2\2\u0090\u0097\7$\2\2\u0091"+
-		"\u0092\5\22\n\2\u0092\u0093\b\n\1\2\u0093\u0098\3\2\2\2\u0094\u0095\5"+
-		"\24\13\2\u0095\u0096\b\n\1\2\u0096\u0098\3\2\2\2\u0097\u0091\3\2\2\2\u0097"+
-		"\u0094\3\2\2\2\u0098\u00a2\3\2\2\2\u0099\u00a0\7%\2\2\u009a\u009b\5\22"+
-		"\n\2\u009b\u009c\b\n\1\2\u009c\u00a1\3\2\2\2\u009d\u009e\5\24\13\2\u009e"+
-		"\u009f\b\n\1\2\u009f\u00a1\3\2\2\2\u00a0\u009a\3\2\2\2\u00a0\u009d\3\2"+
-		"\2\2\u00a1\u00a3\3\2\2\2\u00a2\u0099\3\2\2\2\u00a2\u00a3\3\2\2\2\u00a3"+
-		"\u00a4\3\2\2\2\u00a4\u00a5\b\n\1\2\u00a5\u00ac\3\2\2\2\u00a6\u00a7\7\37"+
-		"\2\2\u00a7\u00a8\5\30\r\2\u00a8\u00a9\7\31\2\2\u00a9\u00aa\b\n\1\2\u00aa"+
-		"\u00ac\3\2\2\2\u00ab\177\3\2\2\2\u00ab\u0082\3\2\2\2\u00ab\u008a\3\2\2"+
-		"\2\u00ab\u00a6\3\2\2\2\u00ac\23\3\2\2\2\u00ad\u00b3\7\b\2\2\u00ae\u00af"+
-		"\5\22\n\2\u00af\u00b0\b\13\1\2\u00b0\u00b2\3\2\2\2\u00b1\u00ae\3\2\2\2"+
-		"\u00b2\u00b5\3\2\2\2\u00b3\u00b1\3\2\2\2\u00b3\u00b4\3\2\2\2\u00b4\u00b6"+
-		"\3\2\2\2\u00b5\u00b3\3\2\2\2\u00b6\u00b7\7\7\2\2\u00b7\u00b8\b\13\1\2"+
-		"\u00b8\25\3\2\2\2\u00b9\u00ba\5\30\r\2\u00ba\u00bb\b\f\1\2\u00bb\u00e7"+
-		"\3\2\2\2\u00bc\u00bd\5 \21\2\u00bd\u00be\b\f\1\2\u00be\u00bf\7\32\2\2"+
-		"\u00bf\u00c0\7(\2\2\u00c0\u00c6\7\3\2\2\u00c1\u00c2\5\30\r\2\u00c2\u00c3"+
-		"\b\f\1\2\u00c3\u00c5\3\2\2\2\u00c4\u00c1\3\2\2\2\u00c5\u00c8\3\2\2\2\u00c6"+
-		"\u00c4\3\2\2\2\u00c6\u00c7\3\2\2\2\u00c7\u00c9\3\2\2\2\u00c8\u00c6\3\2"+
-		"\2\2\u00c9\u00ca\7\4\2\2\u00ca\u00cb\b\f\1\2\u00cb\u00e7\3\2\2\2\u00cc"+
-		"\u00cd\7!\2\2\u00cd\u00ce\7(\2\2\u00ce\u00d4\7\3\2\2\u00cf\u00d0\5\30"+
-		"\r\2\u00d0\u00d1\b\f\1\2\u00d1\u00d3\3\2\2\2\u00d2\u00cf\3\2\2\2\u00d3"+
-		"\u00d6\3\2\2\2\u00d4\u00d2\3\2\2\2\u00d4\u00d5\3\2\2\2\u00d5\u00d7\3\2"+
-		"\2\2\u00d6\u00d4\3\2\2\2\u00d7\u00d8\7\4\2\2\u00d8\u00e7\b\f\1\2\u00d9"+
-		"\u00da\7\"\2\2\u00da\u00db\7(\2\2\u00db\u00e1\7\3\2\2\u00dc\u00dd\5\30"+
-		"\r\2\u00dd\u00de\b\f\1\2\u00de\u00e0\3\2\2\2\u00df\u00dc\3\2\2\2\u00e0"+
-		"\u00e3\3\2\2\2\u00e1\u00df\3\2\2\2\u00e1\u00e2\3\2\2\2\u00e2\u00e4\3\2"+
-		"\2\2\u00e3\u00e1\3\2\2\2\u00e4\u00e5\7\4\2\2\u00e5\u00e7\b\f\1\2\u00e6"+
-		"\u00b9\3\2\2\2\u00e6\u00bc\3\2\2\2\u00e6\u00cc\3\2\2\2\u00e6\u00d9\3\2"+
-		"\2\2\u00e7\27\3\2\2\2\u00e8\u00e9\5\36\20\2\u00e9\u00ea\b\r\1\2\u00ea"+
-		"\u00f5\3\2\2\2\u00eb\u00ec\5 \21\2\u00ec\u00ed\b\r\1\2\u00ed\u00f5\3\2"+
-		"\2\2\u00ee\u00ef\5\32\16\2\u00ef\u00f0\b\r\1\2\u00f0\u00f5\3\2\2\2\u00f1"+
-		"\u00f2\5\34\17\2\u00f2\u00f3\b\r\1\2\u00f3\u00f5\3\2\2\2\u00f4\u00e8\3"+
-		"\2\2\2\u00f4\u00eb\3\2\2\2\u00f4\u00ee\3\2\2\2\u00f4\u00f1\3\2\2\2\u00f5"+
-		"\31\3\2\2\2\u00f6\u00f7\b\16\1\2\u00f7\u00f8\7)\2\2\u00f8\u0100\b\16\1"+
-		"\2\u00f9\u00fa\7(\2\2\u00fa\u0100\b\16\1\2\u00fb\u00fc\7\3\2\2\u00fc\u00fd"+
-		"\5\32\16\2\u00fd\u00fe\7\4\2\2\u00fe\u0100\3\2\2\2\u00ff\u00f6\3\2\2\2"+
-		"\u00ff\u00f9\3\2\2\2\u00ff\u00fb\3\2\2\2\u0100\u010d\3\2\2\2\u0101\u0102"+
-		"\f\7\2\2\u0102\u0103\t\2\2\2\u0103\u0104\5\32\16\b\u0104\u0105\b\16\1"+
-		"\2\u0105\u010c\3\2\2\2\u0106\u0107\f\6\2\2\u0107\u0108\t\3\2\2\u0108\u0109"+
-		"\5\32\16\7\u0109\u010a\b\16\1\2\u010a\u010c\3\2\2\2\u010b\u0101\3\2\2"+
-		"\2\u010b\u0106\3\2\2\2\u010c\u010f\3\2\2\2\u010d\u010b\3\2\2\2\u010d\u010e"+
-		"\3\2\2\2\u010e\33\3\2\2\2\u010f\u010d\3\2\2\2\u0110\u0111\b\17\1\2\u0111"+
-		"\u0112\7\25\2\2\u0112\u0113\5\34\17\b\u0113\u0114\b\17\1\2\u0114\u0123"+
-		"\3\2\2\2\u0115\u0116\5\32\16\2\u0116\u0117\b\17\1\2\u0117\u0123\3\2\2"+
-		"\2\u0118\u0119\5\36\20\2\u0119\u011a\b\17\1\2\u011a\u0123\3\2\2\2\u011b"+
-		"\u011c\5 \21\2\u011c\u011d\b\17\1\2\u011d\u0123\3\2\2\2\u011e\u011f\7"+
-		"\3\2\2\u011f\u0120\5\34\17\2\u0120\u0121\7\4\2\2\u0121\u0123\3\2\2\2\u0122"+
-		"\u0110\3\2\2\2\u0122\u0115\3\2\2\2\u0122\u0118\3\2\2\2\u0122\u011b\3\2"+
-		"\2\2\u0122\u011e\3\2\2\2\u0123\u012b\3\2\2\2\u0124\u0125\f\7\2\2\u0125"+
-		"\u0126\t\4\2\2\u0126\u0127\5\34\17\b\u0127\u0128\b\17\1\2\u0128\u012a"+
-		"\3\2\2\2\u0129\u0124\3\2\2\2\u012a\u012d\3\2\2\2\u012b\u0129\3\2\2\2\u012b"+
-		"\u012c\3\2\2\2\u012c\35\3\2\2\2\u012d\u012b\3\2\2\2\u012e\u012f\7\33\2"+
-		"\2\u012f\u0137\b\20\1\2\u0130\u0131\7)\2\2\u0131\u0137\b\20\1\2\u0132"+
-		"\u0133\7\34\2\2\u0133\u0137\b\20\1\2\u0134\u0135\7\35\2\2\u0135\u0137"+
-		"\b\20\1\2\u0136\u012e\3\2\2\2\u0136\u0130\3\2\2\2\u0136\u0132\3\2\2\2"+
-		"\u0136\u0134\3\2\2\2\u0137\37\3\2\2\2\u0138\u0139\7(\2\2\u0139\u013d\b"+
-		"\21\1\2\u013a\u013b\7 \2\2\u013b\u013d\b\21\1\2\u013c\u0138\3\2\2\2\u013c"+
-		"\u013a\3\2\2\2\u013d!\3\2\2\2\u013e\u013f\7\b\2\2\u013f#\3\2\2\2\u0140"+
-		"\u0141\7\7\2\2\u0141%\3\2\2\2\32+=Tahqz\u0097\u00a0\u00a2\u00ab\u00b3"+
-		"\u00c6\u00d4\u00e1\u00e6\u00f4\u00ff\u010b\u010d\u0122\u012b\u0136\u013c";
+		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\3\2\3\2\3\2\7\2\62"+
+		"\n\2\f\2\16\2\65\13\2\3\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
+		"\3\3\7\3D\n\3\f\3\16\3G\13\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
+		"\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5[\n\5\f\5\16\5^\13\5\3\5\3\5\3\5\3\6"+
+		"\3\6\3\6\7\6f\n\6\f\6\16\6i\13\6\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3"+
+		"\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\5\7~\n\7\3\b\3\b\3\b\3\b\5\b\u0084"+
+		"\n\b\3\b\3\b\3\b\3\b\3\b\7\b\u008b\n\b\f\b\16\b\u008e\13\b\3\t\3\t\3\t"+
+		"\3\t\3\t\3\t\3\t\3\t\3\t\5\t\u0099\n\t\3\n\3\n\3\n\3\13\3\13\3\13\3\f"+
+		"\3\f\3\f\3\r\3\r\3\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
+		"\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16"+
+		"\u00be\n\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u00c7\n\16\5\16\u00c9"+
+		"\n\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u00d2\n\16\3\17\3\17\3\17"+
+		"\3\17\7\17\u00d8\n\17\f\17\16\17\u00db\13\17\3\17\3\17\3\17\3\20\3\20"+
+		"\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00eb\n\20\f\20\16"+
+		"\20\u00ee\13\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7\20\u00f9"+
+		"\n\20\f\20\16\20\u00fc\13\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\7"+
+		"\20\u0106\n\20\f\20\16\20\u0109\13\20\3\20\3\20\5\20\u010d\n\20\3\21\3"+
+		"\21\3\21\3\21\3\21\3\21\3\21\3\21\3\21\3\21\3\21\3\21\5\21\u011b\n\21"+
+		"\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\5\22\u0126\n\22\3\22\3\22"+
+		"\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\7\22\u0132\n\22\f\22\16\22\u0135"+
+		"\13\22\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23\3\23"+
+		"\3\23\3\23\3\23\3\23\3\23\5\23\u0149\n\23\3\23\3\23\3\23\3\23\3\23\7\23"+
+		"\u0150\n\23\f\23\16\23\u0153\13\23\3\24\3\24\3\24\3\24\3\24\3\24\3\24"+
+		"\3\24\5\24\u015d\n\24\3\25\3\25\3\25\3\25\5\25\u0163\n\25\3\26\3\26\3"+
+		"\27\3\27\3\27\2\4\"$\30\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*"+
+		",\2\6\3\2\35\36\3\2\13\f\3\2\t\n\4\2\r\22\24\25\u0179\2\63\3\2\2\2\49"+
+		"\3\2\2\2\6K\3\2\2\2\bS\3\2\2\2\ng\3\2\2\2\f}\3\2\2\2\16\u0083\3\2\2\2"+
+		"\20\u0098\3\2\2\2\22\u009a\3\2\2\2\24\u009d\3\2\2\2\26\u00a0\3\2\2\2\30"+
+		"\u00a3\3\2\2\2\32\u00d1\3\2\2\2\34\u00d3\3\2\2\2\36\u010c\3\2\2\2 \u011a"+
+		"\3\2\2\2\"\u0125\3\2\2\2$\u0148\3\2\2\2&\u015c\3\2\2\2(\u0162\3\2\2\2"+
+		"*\u0164\3\2\2\2,\u0166\3\2\2\2./\5\4\3\2/\60\b\2\1\2\60\62\3\2\2\2\61"+
+		".\3\2\2\2\62\65\3\2\2\2\63\61\3\2\2\2\63\64\3\2\2\2\64\66\3\2\2\2\65\63"+
+		"\3\2\2\2\66\67\5\b\5\2\678\b\2\1\28\3\3\2\2\29:\7\37\2\2:;\7)\2\2;<\7"+
+		"\3\2\2<=\5\16\b\2=>\7\4\2\2>?\7\b\2\2?E\5\n\6\2@A\5\6\4\2AB\b\3\1\2BD"+
+		"\3\2\2\2C@\3\2\2\2DG\3\2\2\2EC\3\2\2\2EF\3\2\2\2FH\3\2\2\2GE\3\2\2\2H"+
+		"I\7\7\2\2IJ\b\3\1\2J\5\3\2\2\2KL\5\20\t\2LM\7)\2\2MN\7\3\2\2NO\5\16\b"+
+		"\2OP\7\4\2\2PQ\5\b\5\2QR\b\4\1\2R\7\3\2\2\2ST\7\b\2\2TU\5\n\6\2UV\b\5"+
+		"\1\2V\\\3\2\2\2WX\5\32\16\2XY\b\5\1\2Y[\3\2\2\2ZW\3\2\2\2[^\3\2\2\2\\"+
+		"Z\3\2\2\2\\]\3\2\2\2]_\3\2\2\2^\\\3\2\2\2_`\7\7\2\2`a\b\5\1\2a\t\3\2\2"+
+		"\2bc\5\f\7\2cd\b\6\1\2df\3\2\2\2eb\3\2\2\2fi\3\2\2\2ge\3\2\2\2gh\3\2\2"+
+		"\2h\13\3\2\2\2ig\3\2\2\2jk\5\26\f\2kl\5\30\r\2lm\7\32\2\2mn\b\7\1\2n~"+
+		"\3\2\2\2op\5\22\n\2pq\5\30\r\2qr\7\23\2\2rs\7*\2\2st\7\32\2\2tu\b\7\1"+
+		"\2u~\3\2\2\2vw\5\24\13\2wx\5\30\r\2xy\7\23\2\2yz\t\2\2\2z{\7\32\2\2{|"+
+		"\b\7\1\2|~\3\2\2\2}j\3\2\2\2}o\3\2\2\2}v\3\2\2\2~\r\3\2\2\2\177\u0080"+
+		"\5\20\t\2\u0080\u0081\5\30\r\2\u0081\u0082\b\b\1\2\u0082\u0084\3\2\2\2"+
+		"\u0083\177\3\2\2\2\u0083\u0084\3\2\2\2\u0084\u008c\3\2\2\2\u0085\u0086"+
+		"\7\30\2\2\u0086\u0087\5\20\t\2\u0087\u0088\5\30\r\2\u0088\u0089\b\b\1"+
+		"\2\u0089\u008b\3\2\2\2\u008a\u0085\3\2\2\2\u008b\u008e\3\2\2\2\u008c\u008a"+
+		"\3\2\2\2\u008c\u008d\3\2\2\2\u008d\17\3\2\2\2\u008e\u008c\3\2\2\2\u008f"+
+		"\u0090\5\22\n\2\u0090\u0091\b\t\1\2\u0091\u0099\3\2\2\2\u0092\u0093\5"+
+		"\24\13\2\u0093\u0094\b\t\1\2\u0094\u0099\3\2\2\2\u0095\u0096\5\26\f\2"+
+		"\u0096\u0097\b\t\1\2\u0097\u0099\3\2\2\2\u0098\u008f\3\2\2\2\u0098\u0092"+
+		"\3\2\2\2\u0098\u0095\3\2\2\2\u0099\21\3\2\2\2\u009a\u009b\7\'\2\2\u009b"+
+		"\u009c\b\n\1\2\u009c\23\3\2\2\2\u009d\u009e\7(\2\2\u009e\u009f\b\13\1"+
+		"\2\u009f\25\3\2\2\2\u00a0\u00a1\7)\2\2\u00a1\u00a2\b\f\1\2\u00a2\27\3"+
+		"\2\2\2\u00a3\u00a4\7)\2\2\u00a4\u00a5\b\r\1\2\u00a5\31\3\2\2\2\u00a6\u00a7"+
+		"\7\27\2\2\u00a7\u00a8\7\32\2\2\u00a8\u00d2\b\16\1\2\u00a9\u00aa\7)\2\2"+
+		"\u00aa\u00ab\b\16\1\2\u00ab\u00ac\7\23\2\2\u00ac\u00ad\5\36\20\2\u00ad"+
+		"\u00ae\b\16\1\2\u00ae\u00af\7\32\2\2\u00af\u00b0\b\16\1\2\u00b0\u00d2"+
+		"\3\2\2\2\u00b1\u00b2\7$\2\2\u00b2\u00b3\7\3\2\2\u00b3\u00b4\5$\23\2\u00b4"+
+		"\u00b5\b\16\1\2\u00b5\u00b6\3\2\2\2\u00b6\u00bd\7\4\2\2\u00b7\u00b8\5"+
+		"\32\16\2\u00b8\u00b9\b\16\1\2\u00b9\u00be\3\2\2\2\u00ba\u00bb\5\34\17"+
+		"\2\u00bb\u00bc\b\16\1\2\u00bc\u00be\3\2\2\2\u00bd\u00b7\3\2\2\2\u00bd"+
+		"\u00ba\3\2\2\2\u00be\u00c8\3\2\2\2\u00bf\u00c6\7&\2\2\u00c0\u00c1\5\32"+
+		"\16\2\u00c1\u00c2\b\16\1\2\u00c2\u00c7\3\2\2\2\u00c3\u00c4\5\34\17\2\u00c4"+
+		"\u00c5\b\16\1\2\u00c5\u00c7\3\2\2\2\u00c6\u00c0\3\2\2\2\u00c6\u00c3\3"+
+		"\2\2\2\u00c7\u00c9\3\2\2\2\u00c8\u00bf\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9"+
+		"\u00ca\3\2\2\2\u00ca\u00cb\b\16\1\2\u00cb\u00d2\3\2\2\2\u00cc\u00cd\7"+
+		" \2\2\u00cd\u00ce\5 \21\2\u00ce\u00cf\7\32\2\2\u00cf\u00d0\b\16\1\2\u00d0"+
+		"\u00d2\3\2\2\2\u00d1\u00a6\3\2\2\2\u00d1\u00a9\3\2\2\2\u00d1\u00b1\3\2"+
+		"\2\2\u00d1\u00cc\3\2\2\2\u00d2\33\3\2\2\2\u00d3\u00d9\7\b\2\2\u00d4\u00d5"+
+		"\5\32\16\2\u00d5\u00d6\b\17\1\2\u00d6\u00d8\3\2\2\2\u00d7\u00d4\3\2\2"+
+		"\2\u00d8\u00db\3\2\2\2\u00d9\u00d7\3\2\2\2\u00d9\u00da\3\2\2\2\u00da\u00dc"+
+		"\3\2\2\2\u00db\u00d9\3\2\2\2\u00dc\u00dd\7\7\2\2\u00dd\u00de\b\17\1\2"+
+		"\u00de\35\3\2\2\2\u00df\u00e0\5 \21\2\u00e0\u00e1\b\20\1\2\u00e1\u010d"+
+		"\3\2\2\2\u00e2\u00e3\5(\25\2\u00e3\u00e4\b\20\1\2\u00e4\u00e5\7\33\2\2"+
+		"\u00e5\u00e6\7)\2\2\u00e6\u00ec\7\3\2\2\u00e7\u00e8\5 \21\2\u00e8\u00e9"+
+		"\b\20\1\2\u00e9\u00eb\3\2\2\2\u00ea\u00e7\3\2\2\2\u00eb\u00ee\3\2\2\2"+
+		"\u00ec\u00ea\3\2\2\2\u00ec\u00ed\3\2\2\2\u00ed\u00ef\3\2\2\2\u00ee\u00ec"+
+		"\3\2\2\2\u00ef\u00f0\7\4\2\2\u00f0\u00f1\b\20\1\2\u00f1\u010d\3\2\2\2"+
+		"\u00f2\u00f3\7\"\2\2\u00f3\u00f4\7)\2\2\u00f4\u00fa\7\3\2\2\u00f5\u00f6"+
+		"\5 \21\2\u00f6\u00f7\b\20\1\2\u00f7\u00f9\3\2\2\2\u00f8\u00f5\3\2\2\2"+
+		"\u00f9\u00fc\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb\u00fd"+
+		"\3\2\2\2\u00fc\u00fa\3\2\2\2\u00fd\u00fe\7\4\2\2\u00fe\u010d\b\20\1\2"+
+		"\u00ff\u0100\7#\2\2\u0100\u0101\7)\2\2\u0101\u0107\7\3\2\2\u0102\u0103"+
+		"\5 \21\2\u0103\u0104\b\20\1\2\u0104\u0106\3\2\2\2\u0105\u0102\3\2\2\2"+
+		"\u0106\u0109\3\2\2\2\u0107\u0105\3\2\2\2\u0107\u0108\3\2\2\2\u0108\u010a"+
+		"\3\2\2\2\u0109\u0107\3\2\2\2\u010a\u010b\7\4\2\2\u010b\u010d\b\20\1\2"+
+		"\u010c\u00df\3\2\2\2\u010c\u00e2\3\2\2\2\u010c\u00f2\3\2\2\2\u010c\u00ff"+
+		"\3\2\2\2\u010d\37\3\2\2\2\u010e\u010f\5&\24\2\u010f\u0110\b\21\1\2\u0110"+
+		"\u011b\3\2\2\2\u0111\u0112\5(\25\2\u0112\u0113\b\21\1\2\u0113\u011b\3"+
+		"\2\2\2\u0114\u0115\5\"\22\2\u0115\u0116\b\21\1\2\u0116\u011b\3\2\2\2\u0117"+
+		"\u0118\5$\23\2\u0118\u0119\b\21\1\2\u0119\u011b\3\2\2\2\u011a\u010e\3"+
+		"\2\2\2\u011a\u0111\3\2\2\2\u011a\u0114\3\2\2\2\u011a\u0117\3\2\2\2\u011b"+
+		"!\3\2\2\2\u011c\u011d\b\22\1\2\u011d\u011e\7*\2\2\u011e\u0126\b\22\1\2"+
+		"\u011f\u0120\7)\2\2\u0120\u0126\b\22\1\2\u0121\u0122\7\3\2\2\u0122\u0123"+
+		"\5\"\22\2\u0123\u0124\7\4\2\2\u0124\u0126\3\2\2\2\u0125\u011c\3\2\2\2"+
+		"\u0125\u011f\3\2\2\2\u0125\u0121\3\2\2\2\u0126\u0133\3\2\2\2\u0127\u0128"+
+		"\f\7\2\2\u0128\u0129\t\3\2\2\u0129\u012a\5\"\22\b\u012a\u012b\b\22\1\2"+
+		"\u012b\u0132\3\2\2\2\u012c\u012d\f\6\2\2\u012d\u012e\t\4\2\2\u012e\u012f"+
+		"\5\"\22\7\u012f\u0130\b\22\1\2\u0130\u0132\3\2\2\2\u0131\u0127\3\2\2\2"+
+		"\u0131\u012c\3\2\2\2\u0132\u0135\3\2\2\2\u0133\u0131\3\2\2\2\u0133\u0134"+
+		"\3\2\2\2\u0134#\3\2\2\2\u0135\u0133\3\2\2\2\u0136\u0137\b\23\1\2\u0137"+
+		"\u0138\7\26\2\2\u0138\u0139\5$\23\b\u0139\u013a\b\23\1\2\u013a\u0149\3"+
+		"\2\2\2\u013b\u013c\5\"\22\2\u013c\u013d\b\23\1\2\u013d\u0149\3\2\2\2\u013e"+
+		"\u013f\5&\24\2\u013f\u0140\b\23\1\2\u0140\u0149\3\2\2\2\u0141\u0142\5"+
+		"(\25\2\u0142\u0143\b\23\1\2\u0143\u0149\3\2\2\2\u0144\u0145\7\3\2\2\u0145"+
+		"\u0146\5$\23\2\u0146\u0147\7\4\2\2\u0147\u0149\3\2\2\2\u0148\u0136\3\2"+
+		"\2\2\u0148\u013b\3\2\2\2\u0148\u013e\3\2\2\2\u0148\u0141\3\2\2\2\u0148"+
+		"\u0144\3\2\2\2\u0149\u0151\3\2\2\2\u014a\u014b\f\7\2\2\u014b\u014c\t\5"+
+		"\2\2\u014c\u014d\5$\23\b\u014d\u014e\b\23\1\2\u014e\u0150\3\2\2\2\u014f"+
+		"\u014a\3\2\2\2\u0150\u0153\3\2\2\2\u0151\u014f\3\2\2\2\u0151\u0152\3\2"+
+		"\2\2\u0152%\3\2\2\2\u0153\u0151\3\2\2\2\u0154\u0155\7\34\2\2\u0155\u015d"+
+		"\b\24\1\2\u0156\u0157\7*\2\2\u0157\u015d\b\24\1\2\u0158\u0159\7\35\2\2"+
+		"\u0159\u015d\b\24\1\2\u015a\u015b\7\36\2\2\u015b\u015d\b\24\1\2\u015c"+
+		"\u0154\3\2\2\2\u015c\u0156\3\2\2\2\u015c\u0158\3\2\2\2\u015c\u015a\3\2"+
+		"\2\2\u015d\'\3\2\2\2\u015e\u015f\7)\2\2\u015f\u0163\b\25\1\2\u0160\u0161"+
+		"\7!\2\2\u0161\u0163\b\25\1\2\u0162\u015e\3\2\2\2\u0162\u0160\3\2\2\2\u0163"+
+		")\3\2\2\2\u0164\u0165\7\b\2\2\u0165+\3\2\2\2\u0166\u0167\7\7\2\2\u0167"+
+		"-\3\2\2\2\33\63E\\g}\u0083\u008c\u0098\u00bd\u00c6\u00c8\u00d1\u00d9\u00ec"+
+		"\u00fa\u0107\u010c\u011a\u0125\u0131\u0133\u0148\u0151\u015c\u0162";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

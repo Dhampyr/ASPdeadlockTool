@@ -2,8 +2,8 @@ package asp.models;
 
 public class Declaration {
 	
-	TypeBase type;
-	Variable var;
+	private TypeBase type;
+	private Variable var;
 	
 	public Declaration(TypeBase type, Variable var)
 	{

@@ -3,9 +3,9 @@ package asp.models;
 public class IfThenElse extends Statement{
 	
 	private final static String STMTTYPE = "ITE";
-	Expression condition;
-	Statement trueSide;
-	Statement falseSide;
+	private Expression condition;
+	private Statement trueSide;
+	private Statement falseSide;
 	
 	public IfThenElse(Expression condition, Statement trueSide, Statement falseSide) {
 		super(STMTTYPE);

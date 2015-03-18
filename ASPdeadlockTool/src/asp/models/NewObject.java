@@ -6,9 +6,9 @@ public class NewObject extends ExpressionSideEffects{
 
 	private final static String EXPSETYPE = "Object Creation";
 	
-	boolean isActive;	
-	String className;
-	LinkedList<Expression> parameters;
+	private boolean isActive;	
+	private String className;
+	private LinkedList<Expression> parameters;
 	
 	public NewObject(boolean isActive, String className, LinkedList<Expression> parameters) {
 		super(EXPSETYPE);

@@ -3,8 +3,8 @@ package asp.models;
 public class Assignment extends Statement {
 	
 	private final static String STMTTYPE = "Assignment";
-	Variable leftSide;
-	ExpressionSideEffects rightSide;
+	private Variable leftSide;
+	private ExpressionSideEffects rightSide;
 	
 	public Assignment(Variable leftSide, ExpressionSideEffects rightSide) {
 		super(STMTTYPE);

@@ -9,10 +9,10 @@ import java.util.HashMap;
  * @author Vincenzo Mastandrea
  * Base class for an ASP program
  */
-public class Program extends ComputationUnit {
+public class Program extends CompilationUnit {
 	
-	HashMap<String, ClassDecl> classSpec;
-	StmtBlock mainFunction;
+	private HashMap<String, ClassDecl> classSpec;
+	private StmtBlock mainFunction;
 	
 	//setter
 	public Program(HashMap<String, ClassDecl> classSpec, StmtBlock mainFunction)
@@ -36,5 +36,16 @@ public class Program extends ComputationUnit {
 	public HashMap<String, ClassDecl> getClasses()
 	{
 		return classSpec;
+	}
+	
+	
+	public void print(){
+		System.out.println("Il programma ha le classi:");
+		for (String key: classSpec.keySet()){
+            ClassDecl cl = classSpec.get(key);  
+            cl.print();  
+		} 
+		System.out.println("La main funcrion é:");
+		mainFunction.print();
 	}
 }

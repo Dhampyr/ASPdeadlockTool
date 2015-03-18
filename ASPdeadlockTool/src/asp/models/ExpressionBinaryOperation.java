@@ -6,9 +6,9 @@ package asp.models;
  */
 public class ExpressionBinaryOperation extends Expression {
 	
-	protected Expression leftOperand;
-	protected Expression rightOperand;
-	protected String op;
+	private Expression leftOperand;
+	private Expression rightOperand;
+	private String op;
 	
 	/**
 	 * Creates a new binary operation

@@ -6,8 +6,8 @@ import java.util.LinkedList;
 public class StmtBlock extends Statement{
 	
 	private final static String STMTTYPE = "Block";
-	HashMap<String,Declaration> varDec;
-	LinkedList<Statement> stmts; 
+	private HashMap<String,Declaration> varDec;
+	private LinkedList<Statement> stmts; 
 		
 	public StmtBlock(HashMap<String,Declaration> varDec, LinkedList<Statement> stmts)
 	{
@@ -41,5 +41,17 @@ public class StmtBlock extends Statement{
 	public void setVarDec(HashMap<String,Declaration> varDec)
 	{
 		this.varDec = varDec;
+	}
+	
+	
+	public void print() {
+		System.out.println("Le variabili sono: ");
+		for (String key: varDec.keySet()){
+			Declaration var = varDec.get(key);  
+			System.out.println(var.getType().getType() + " -> " + var.getVar().getName());  
+		}
+		for(int i=0;i<stmts.size();i++)
+		{System.out.println(i +") " + stmts.get(i).toString());}
+		
 	}
 }

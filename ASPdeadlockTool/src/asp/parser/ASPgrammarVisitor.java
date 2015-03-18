@@ -29,6 +29,12 @@ public interface ASPgrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(@NotNull ASPgrammarParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ASPgrammarParser#intType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntType(@NotNull ASPgrammarParser.IntTypeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ASPgrammarParser#program}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -65,11 +71,23 @@ public interface ASPgrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBooleanExpression(@NotNull ASPgrammarParser.BooleanExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ASPgrammarParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVarDeclaration(@NotNull ASPgrammarParser.VarDeclarationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ASPgrammarParser#parDef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitParDef(@NotNull ASPgrammarParser.ParDefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPgrammarParser#boolType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBoolType(@NotNull ASPgrammarParser.BoolTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPgrammarParser#expressionSideEffect}.
 	 * @param ctx the parse tree
@@ -100,6 +118,12 @@ public interface ASPgrammarVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitVarDec(@NotNull ASPgrammarParser.VarDecContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPgrammarParser#objType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitObjType(@NotNull ASPgrammarParser.ObjTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPgrammarParser#value}.
 	 * @param ctx the parse tree

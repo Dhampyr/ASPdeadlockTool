@@ -34,6 +34,16 @@ public interface ASPgrammarListener extends ParseTreeListener {
 	 */
 	void exitExpression(@NotNull ASPgrammarParser.ExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ASPgrammarParser#intType}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntType(@NotNull ASPgrammarParser.IntTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPgrammarParser#intType}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntType(@NotNull ASPgrammarParser.IntTypeContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPgrammarParser#program}.
 	 * @param ctx the parse tree
 	 */
@@ -94,6 +104,16 @@ public interface ASPgrammarListener extends ParseTreeListener {
 	 */
 	void exitBooleanExpression(@NotNull ASPgrammarParser.BooleanExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ASPgrammarParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarDeclaration(@NotNull ASPgrammarParser.VarDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPgrammarParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarDeclaration(@NotNull ASPgrammarParser.VarDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPgrammarParser#parDef}.
 	 * @param ctx the parse tree
 	 */
@@ -103,6 +123,16 @@ public interface ASPgrammarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParDef(@NotNull ASPgrammarParser.ParDefContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPgrammarParser#boolType}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoolType(@NotNull ASPgrammarParser.BoolTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPgrammarParser#boolType}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoolType(@NotNull ASPgrammarParser.BoolTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPgrammarParser#expressionSideEffect}.
 	 * @param ctx the parse tree
@@ -153,6 +183,16 @@ public interface ASPgrammarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitVarDec(@NotNull ASPgrammarParser.VarDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPgrammarParser#objType}.
+	 * @param ctx the parse tree
+	 */
+	void enterObjType(@NotNull ASPgrammarParser.ObjTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPgrammarParser#objType}.
+	 * @param ctx the parse tree
+	 */
+	void exitObjType(@NotNull ASPgrammarParser.ObjTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPgrammarParser#value}.
 	 * @param ctx the parse tree

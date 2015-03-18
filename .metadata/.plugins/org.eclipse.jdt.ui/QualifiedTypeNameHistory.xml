@@ -6,5 +6,9 @@
 <fullyQualifiedTypeName name="java.io.PrintStream"/>
 <fullyQualifiedTypeName name="java.io.FileNotFoundException"/>
 <fullyQualifiedTypeName name="asp.parser.ASPgrammarParser.ProgramContext"/>
+<fullyQualifiedTypeName name="asp.models.Model"/>
+<fullyQualifiedTypeName name="asp.models.ClassDecl"/>
+<fullyQualifiedTypeName name="asp.models.Declaration"/>
 <fullyQualifiedTypeName name="asp.models.Program"/>
+<fullyQualifiedTypeName name="java.util.LinkedList"/>
 </qualifiedTypeNameHistroy>
