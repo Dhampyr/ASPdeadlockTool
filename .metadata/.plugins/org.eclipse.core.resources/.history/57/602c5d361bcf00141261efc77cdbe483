@@ -1,0 +1,35 @@
+**********
+Start scope:
+4
+g --> Int
+u --> I
+h --> Int
+y --> I
+End scope
+**********
+**********
+Start scope:
+5
+w --> Int
+g --> Int
+u --> I
+z --> Int
+y --> I
+End scope
+**********
+**********
+Start scope:
+1
+u --> I
+End scope
+**********
+**********
+Start scope:
+5
+w --> Int
+u --> I
+z --> I
+y --> I
+x --> I
+End scope
+**********

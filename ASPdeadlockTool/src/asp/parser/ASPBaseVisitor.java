@@ -23,20 +23,6 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitElem(@NotNull ASPParser.ElemContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitVal(@NotNull ASPParser.ValContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitRcbrak(@NotNull ASPParser.RcbrakContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -44,7 +30,21 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExprb(@NotNull ASPParser.ExprbContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExpression(@NotNull ASPParser.ExpressionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitIntType(@NotNull ASPParser.IntTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitProgram(@NotNull ASPParser.ProgramContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -58,7 +58,7 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExpra(@NotNull ASPParser.ExpraContext ctx) { return visitChildren(ctx); }
+	@Override public T visitArithmeticExpression(@NotNull ASPParser.ArithmeticExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -79,7 +79,14 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitProg(@NotNull ASPParser.ProgContext ctx) { return visitChildren(ctx); }
+	@Override public T visitBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -93,7 +100,14 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExprse(@NotNull ASPParser.ExprseContext ctx) { return visitChildren(ctx); }
+	@Override public T visitBoolType(@NotNull ASPParser.BoolTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -107,13 +121,6 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitListvar(@NotNull ASPParser.ListvarContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitStmtblock(@NotNull ASPParser.StmtblockContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -121,14 +128,7 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMethodSign(@NotNull ASPParser.MethodSignContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitExpr(@NotNull ASPParser.ExprContext ctx) { return visitChildren(ctx); }
+	@Override public T visitVariable(@NotNull ASPParser.VariableContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,6 +136,20 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitVarDec(@NotNull ASPParser.VarDecContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitObjType(@NotNull ASPParser.ObjTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitValue(@NotNull ASPParser.ValueContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -150,4 +164,11 @@ public class ASPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AS
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitStmt(@NotNull ASPParser.StmtContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitElement(@NotNull ASPParser.ElementContext ctx) { return visitChildren(ctx); }
 }

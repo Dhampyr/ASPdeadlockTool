@@ -32,4 +32,10 @@ public class Assignment extends Statement {
 	{
 		return rightSide;
 	}
+	
+	public String toString()
+	{
+		return (leftSide.getName() +" --> " + leftSide.getType().getType());
+		
+	}
 }

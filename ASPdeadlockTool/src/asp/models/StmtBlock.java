@@ -51,7 +51,9 @@ public class StmtBlock extends Statement{
 			System.out.println(var.getType().getType() + " -> " + var.getVar().getName());  
 		}
 		for(int i=0;i<stmts.size();i++)
-		{System.out.println(i +") " + stmts.get(i).toString());}
+		{ String s;
+		  System.out.println(i +") " + stmts.get(i).toString());}
+
 		
 	}
 }

@@ -17,29 +17,29 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#elem}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElem(@NotNull ASPParser.ElemContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ASPParser#val}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVal(@NotNull ASPParser.ValContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ASPParser#rcbrak}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitRcbrak(@NotNull ASPParser.RcbrakContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#exprb}.
+	 * Visit a parse tree produced by {@link ASPParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExprb(@NotNull ASPParser.ExprbContext ctx);
+	T visitExpression(@NotNull ASPParser.ExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#intType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntType(@NotNull ASPParser.IntTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#program}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProgram(@NotNull ASPParser.ProgramContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#methodDef}.
 	 * @param ctx the parse tree
@@ -47,11 +47,11 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodDef(@NotNull ASPParser.MethodDefContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#expra}.
+	 * Visit a parse tree produced by {@link ASPParser#arithmeticExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpra(@NotNull ASPParser.ExpraContext ctx);
+	T visitArithmeticExpression(@NotNull ASPParser.ArithmeticExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#body}.
 	 * @param ctx the parse tree
@@ -65,11 +65,17 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitType(@NotNull ASPParser.TypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#prog}.
+	 * Visit a parse tree produced by {@link ASPParser#booleanExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitProg(@NotNull ASPParser.ProgContext ctx);
+	T visitBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#parDef}.
 	 * @param ctx the parse tree
@@ -77,11 +83,17 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParDef(@NotNull ASPParser.ParDefContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#exprse}.
+	 * Visit a parse tree produced by {@link ASPParser#boolType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExprse(@NotNull ASPParser.ExprseContext ctx);
+	T visitBoolType(@NotNull ASPParser.BoolTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#expressionSideEffect}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#classDec}.
 	 * @param ctx the parse tree
@@ -89,35 +101,35 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitClassDec(@NotNull ASPParser.ClassDecContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#listvar}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitListvar(@NotNull ASPParser.ListvarContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ASPParser#stmtblock}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitStmtblock(@NotNull ASPParser.StmtblockContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ASPParser#methodSign}.
+	 * Visit a parse tree produced by {@link ASPParser#variable}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMethodSign(@NotNull ASPParser.MethodSignContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ASPParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpr(@NotNull ASPParser.ExprContext ctx);
+	T visitVariable(@NotNull ASPParser.VariableContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#varDec}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitVarDec(@NotNull ASPParser.VarDecContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#objType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitObjType(@NotNull ASPParser.ObjTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#value}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValue(@NotNull ASPParser.ValueContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#lcbrak}.
 	 * @param ctx the parse tree
@@ -130,4 +142,10 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStmt(@NotNull ASPParser.StmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElement(@NotNull ASPParser.ElementContext ctx);
 }

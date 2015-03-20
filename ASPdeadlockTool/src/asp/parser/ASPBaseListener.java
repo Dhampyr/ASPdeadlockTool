@@ -22,30 +22,6 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterElem(@NotNull ASPParser.ElemContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitElem(@NotNull ASPParser.ElemContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVal(@NotNull ASPParser.ValContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVal(@NotNull ASPParser.ValContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterRcbrak(@NotNull ASPParser.RcbrakContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -58,13 +34,37 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExprb(@NotNull ASPParser.ExprbContext ctx) { }
+	@Override public void enterExpression(@NotNull ASPParser.ExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExprb(@NotNull ASPParser.ExprbContext ctx) { }
+	@Override public void exitExpression(@NotNull ASPParser.ExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIntType(@NotNull ASPParser.IntTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntType(@NotNull ASPParser.IntTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterProgram(@NotNull ASPParser.ProgramContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitProgram(@NotNull ASPParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -82,13 +82,13 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpra(@NotNull ASPParser.ExpraContext ctx) { }
+	@Override public void enterArithmeticExpression(@NotNull ASPParser.ArithmeticExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExpra(@NotNull ASPParser.ExpraContext ctx) { }
+	@Override public void exitArithmeticExpression(@NotNull ASPParser.ArithmeticExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -118,13 +118,25 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterProg(@NotNull ASPParser.ProgContext ctx) { }
+	@Override public void enterBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProg(@NotNull ASPParser.ProgContext ctx) { }
+	@Override public void exitBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -142,13 +154,25 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExprse(@NotNull ASPParser.ExprseContext ctx) { }
+	@Override public void enterBoolType(@NotNull ASPParser.BoolTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExprse(@NotNull ASPParser.ExprseContext ctx) { }
+	@Override public void exitBoolType(@NotNull ASPParser.BoolTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -166,18 +190,6 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterListvar(@NotNull ASPParser.ListvarContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitListvar(@NotNull ASPParser.ListvarContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterStmtblock(@NotNull ASPParser.StmtblockContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -190,25 +202,13 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMethodSign(@NotNull ASPParser.MethodSignContext ctx) { }
+	@Override public void enterVariable(@NotNull ASPParser.VariableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMethodSign(@NotNull ASPParser.MethodSignContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExpr(@NotNull ASPParser.ExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExpr(@NotNull ASPParser.ExprContext ctx) { }
+	@Override public void exitVariable(@NotNull ASPParser.VariableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -221,6 +221,30 @@ public class ASPBaseListener implements ASPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitVarDec(@NotNull ASPParser.VarDecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterObjType(@NotNull ASPParser.ObjTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitObjType(@NotNull ASPParser.ObjTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterValue(@NotNull ASPParser.ValueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitValue(@NotNull ASPParser.ValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -245,6 +269,18 @@ public class ASPBaseListener implements ASPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStmt(@NotNull ASPParser.StmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterElement(@NotNull ASPParser.ElementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElement(@NotNull ASPParser.ElementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

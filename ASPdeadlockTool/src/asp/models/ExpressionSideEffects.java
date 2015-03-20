@@ -12,14 +12,12 @@ public class ExpressionSideEffects extends Statement {
 		this.expseType = expseType;
 	}
 	
-	public String getType()
-	{
+	public String getExpseType() {
 		return expseType;
 	}
-	
-	public void setType(String expseType)
-	{
+
+	public void setExpseType(String expseType) {
 		this.expseType = expseType;
 	}
-	
+
 }
