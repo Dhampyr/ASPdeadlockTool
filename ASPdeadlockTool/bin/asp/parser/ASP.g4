@@ -38,28 +38,28 @@ classDec returns [ClassDecl classObj]
 				: 	CLASS className=IDUC {$classObj.setClassName($className.text);} 
 				    LPAR (parameters=parDef) {$classObj.setParameters($parameters.pars);} RPAR 
 				    LCBRACK fields=varDeclaration {$classObj.setFields($fields.vars);} 
-				    		(method=methodDef {if (methods.containsKey($method.methodSign.getMethodName()))
-				    	                	   { LinkedList<Method> list = methods.get($method.methodSign.getMethodName());
-				    	                         if ($method.methodSign.isIn(list))
-				    	                         { System.out.println("The method "+ $method.methodSign.getMethodName() +  
+				    		(m=methodDef {if (methods.containsKey($m.method.getMethodName()))
+				    	                	   { LinkedList<Method> list = methods.get($m.method.getMethodName());
+				    	                         if ($m.method.isIn(list))
+				    	                         { System.out.println("The method "+ $m.method.getMethodName() +  
 				    	                                              " has been defined more than once! Rename it");
 				    	                           System.exit(0); }   
 				    	                         else
-				    	                         { $method.methodSign.setID(methods.get($method.methodSign.getMethodName()).size());
-												   methods.get($method.methodSign.getMethodName()).add($method.methodSign);
+				    	                         { $m.method.setID(methods.get($m.method.getMethodName()).size());
+												   methods.get($m.method.getMethodName()).add($m.method);
 											     }
  					    					   }
 					    					   else
 					    					   {  methodList = new LinkedList<>();
-					    						  $method.methodSign.setID(0);
-					    						  methodList.add($method.methodSign); 
-					    	                      methods.put($method.methodSign.getMethodName(),methodList);
+					    						  $m.method.setID(0);
+					    						  methodList.add($m.method); 
+					    	                      methods.put($m.method.getMethodName(),methodList);
 					    	                   }
 				    	    })* 
 				     RCBRACK
 				    { $classObj.setMethods(methods);};
-				    
-methodDef returns [Method methodSign]
+
+methodSignature returns [Method methodSign]
 				  @init{scope = new Environment();
 				  	    scope.putAllInt(currentClass.getParameters());
 				  	    scope.putAll(currentClass.getFields());
@@ -71,8 +71,14 @@ methodDef returns [Method methodSign]
 				  :	returnedType=type {$methodSign.setReturnedType($returnedType.varType);} 
 				    methodName=IDLC {$methodSign.setMethodName($methodName.text);} 
 				    LPAR (p=parDef) {$methodSign.setParameters($p.pars); scope.putAllInt($p.pars);}RPAR 
+				  ;
+
+
+				    
+methodDef returns [Method method]
+				  :	ms = methodSignature {$method = $ms.methodSign;} 
 				    b=body
-				    {$methodSign.setBody($b.stb); }
+				    {$method.setBody($b.stb); }
 				  ;
 
 
@@ -87,23 +93,39 @@ varDeclaration returns [HashMap<String,Declaration> vars]
 				       @init{ $vars = new HashMap<>();}
 		               : (v=varDec {$vars.put($v.dec.getVar().getName(),$v.dec);})*;
 
-varDec returns [Declaration dec]
+varDec returns [Declaration dec]	
+     		: od = objDec  {$dec = $od.dec;} 
+     		| id = intDec  {$dec = $id.dec;}
+     		| bd = boolDec {$dec = $bd.dec;}
+     		;
+     		
+objDec returns [Declaration dec]
 			   @init{ TypeBase type = null; 
 			   		  Variable var = null; }		
      		: (t=objType v=variable SEMI  { type = $t.varType;
      									    var = $v.var;
      									    var.setType(type);
      									    $dec = new Declaration(type,var);} ) 
-     		| (t1=intType v=variable ASSIGN NUMBER SEMI  { type = $t1.varType;
-     									  				   var = $v.var;
-     									  				   var.setType(type);
-     									  				   $dec = new Declaration(type,var);} )
-     		| (t2=boolType v=variable ASSIGN (TRUE | FALSE) SEMI  { type = $t2.varType;
-     									  				  		    var = $v.var;
-     									  				  		    var.setType(type);
-     									  				  		    $dec = new Declaration(type,var);} )
      		;
-
+     		  		
+intDec returns [Declaration dec]
+			   @init{ TypeBase type = null; 
+			   		  Variable var = null; }		
+     		   : (t=intType v=variable ASSIGN NUMBER SEMI  { type = $t.varType;
+     			   						  				     var = $v.var;
+     									  				     var.setType(type);
+     									  				     $dec = new Declaration(type,var);} )
+     		   ;
+     		
+boolDec returns [Declaration dec]
+			    @init{ TypeBase type = null; 
+			   	  	   Variable var = null; }		
+     		: (t=boolType v=variable ASSIGN (TRUE | FALSE) SEMI  { type = $t.varType;
+     									  				  		   var = $v.var;
+     									  				  		   var.setType(type);
+     									  				  		   $dec = new Declaration(type,var);} )
+     		;
+     		
 parDef returns [HashMap<Integer,Declaration> pars]
 				@init{$pars = new HashMap<>();
 					  TypeBase type = null; 
@@ -121,9 +143,9 @@ parDef returns [HashMap<Integer,Declaration> pars]
 				  							   $pars.put((Integer) (parIndex +1),dec);}   )*;
 
 type returns [TypeBase varType] 
-            : t=intType   {$varType = $t.varType;}
-            | t1=boolType {$varType = $t1.varType;}
-            | t2=objType  {$varType = $t2.varType;};
+            : it=intType   {$varType = $it.varType;}
+            | bt=boolType  {$varType = $bt.varType;}
+            | ot=objType   {$varType = $ot.varType;};
             
 intType returns [TypeBase varType] 
             : INT  {$varType = new TypeInt();};
@@ -140,19 +162,34 @@ variable returns [Variable var]
 				 :   v=IDLC {$var = new Variable($v.text);};
 
 stmt returns [Statement s]
-			@init{  Variable var = null;
-					ExpressionSideEffects exprse = null;
-					Expression cond = null;
+     		: sk  = skipStmt   {$s = $sk.s ;}
+            | as  = assignStmt {$s = $as.s ;} 
+            | ite = ifStmt     {$s = $ite.s;}
+            | rt  = returnStmt {$s = $rt.s ;}
+            ;
+
+
+
+skipStmt returns [Statement s] : SKIP SEMI {$s = new Skip();} ;
+
+assignStmt returns [Statement s]
+				   @init{  Variable var = null;
+					       ExpressionSideEffects exprse = null; } 
+                   : l=IDLC {var = scope.getVar($l.text);} ASSIGN r=expressionSideEffect {exprse = $r.exprse;} SEMI {$s = new Assignment(var,exprse);};
+
+ifStmt returns [Statement s]
+			@init{  Expression cond = null;
 					Statement stTrue = null;
 					Statement stFalse = null; }
-     		: SKIP SEMI {$s = new Skip();}
-            | l=IDLC {var = scope.getVar($l.text);} ASSIGN r=expressionSideEffect {exprse = $r.exprse;} SEMI {$s = new Assignment(var,exprse);} 
-            | IF LPAR (guard=booleanExpression {cond = $guard.exprBool;}) RPAR  
-              (trueSideS=stmt {stTrue = $trueSideS.s;}| trueSideSB=stmtblock {stTrue = $trueSideSB.stb;})   
-              (ELSE (falseSideS=stmt {stFalse = $falseSideS.s;}| falseSideSB=stmtblock {stFalse = $falseSideSB.stb;}) )? 
-              {$s = new IfThenElse(cond,stTrue,stFalse);}
-            | RETURN e=expression SEMI {$s = new Return($e.expr);}
-            ;
+               : IF LPAR (guard=booleanExpression {cond = $guard.exprBool;}) RPAR  
+                 (trueSideS=stmt {stTrue = $trueSideS.s;}| trueSideSB=stmtblock {stTrue = $trueSideSB.stb;})   
+                 (ELSE (falseSideS=stmt {stFalse = $falseSideS.s;}| falseSideSB=stmtblock {stFalse = $falseSideSB.stb;}) )? 
+                 {$s = new IfThenElse(cond,stTrue,stFalse);};
+
+
+returnStmt returns [Statement s] : RETURN e=expression SEMI {$s = new Return($e.expr);}; 	
+
+
             
 stmtblock returns [StmtBlock stb]
 				  @init{$stb = new StmtBlock();
@@ -163,14 +200,18 @@ stmtblock returns [StmtBlock stb]
 expressionSideEffect returns [ExpressionSideEffects exprse]	
 							 @init{LinkedList<Expression> param = new LinkedList<>();
 							 	   Variable obj = null;}	
-							 : exp=expression	{$exprse=$exp.expr;} 
-							 | elem=element {obj = scope.getVar($elem.text);}DOT methodName=IDLC LPAR (par=expression {param.add($par.expr);})* RPAR 
-							   					{$exprse = new MethodCall(obj,$methodName.text,param);} 
-							 | NEW className=IDUC LPAR (par=expression {param.add($par.expr);})* RPAR     
-							 					{$exprse= new New($className.text,param);}
-							 | NEWACT className=IDUC LPAR (par=expression {param.add($par.expr);})* RPAR  
-							 					{$exprse= new NewActive($className.text,param);} 
+							 : exp=expression	 {$exprse = $exp.expr    ;} 
+							 | mc = methodCall   {$exprse = $mc.expr     ;}  
+							 | newObj =newExp 	 {$exprse = $newObj.expr ;}
+							 | newAObj=newActExp {$exprse = $newAObj.expr;} 
 							 ;
+
+methodCall returns [ExpressionSideEffects expr]	
+				   @init{LinkedList<Expression> param = new LinkedList<>();
+					 	 Variable obj = null;}	
+				   : elem=element {obj = scope.getVar($elem.text);}DOT methodName=IDLC LPAR (par=expression {param.add($par.expr);})* RPAR 
+							   	  {$expr = new MethodCall(obj,$methodName.text,param);} 
+				   ;
 
 expression returns [Expression expr]
    		    	   : v=value      				{$expr = $v.val;} 
@@ -179,39 +220,73 @@ expression returns [Expression expr]
 				   | exprb=booleanExpression	{$expr = $exprb.exprBool;}
 				   ;    
 
+newExp returns [ExpressionSideEffects expr]	
+			   @init{LinkedList<Expression> param = new LinkedList<>();}	
+			   : NEW className=IDUC LPAR (par=expression {param.add($par.expr);})* RPAR     
+							 			  {$expr = new New($className.text,param);}
+			   ;
+			   
+newActExp returns [ExpressionSideEffects expr]	
+			   @init{LinkedList<Expression> param = new LinkedList<>();}	
+			   : NEWACT className=IDUC LPAR (par=expression {param.add($par.expr);})* RPAR  
+						 					{$expr = new NewActive($className.text,param);} 
+			   ;
+			   			   
 arithmeticExpression returns [Expression exprArit]
-	 			     		: l=arithmeticExpression o=('*'|'/') r=arithmeticExpression 
-	 			     					{$exprArit = new ExpressionBinaryOperation($l.exprArit,$o.text,$r.exprArit);}
-    						| l=arithmeticExpression o=('+'|'-') r=arithmeticExpression 
-    									{$exprArit = new ExpressionBinaryOperation($l.exprArit,$o.text,$r.exprArit);}
-    						| n=NUMBER    {$exprArit = new ExpressionIntValue(Integer.parseInt($n.text));}
-    						| v=IDLC      {$exprArit = scope.getVar($v.text);;}
-    						| '(' arithmeticExpression ')'			
+	 			     		: l=arithmeticExpression o=('*'|'/' | '+'|'-') r=arithmeticExpression 
+	 			       		   {$exprArit = new ExpressionBinaryOperation($l.exprArit,$o.text,$r.exprArit);}
+	 			       		|n=valAritExp       {$exprArit = $n.exprArit  ;}
+    						| v=variableExp      {$exprArit = $v.exprArit  ;}
+    						| parAritExp			
     						;
-    	
+
+   				 
+valAritExp returns [Expression exprArit]
+                  : n=NUMBER    {$exprArit = new ExpressionIntValue(Integer.parseInt($n.text));}
+    			  ;  
+     				 
+variableExp returns [Expression exprArit]
+				  : v=IDLC      {$exprArit = scope.getVar($v.text);}
+				  ;
+
+parAritExp returns [Expression exprArit]
+			   : LPAR arithmeticExpression RPAR;
+
 booleanExpression returns [Expression exprBool]
-     				      : n=NOT exb=booleanExpression		{$exprBool= new ExpressionUnaryOperation($n.text,$exb.exprBool);}
-						  | l=booleanExpression o=(OR | AND | EQUALS | DISTINCT | GT | LT | GEG | LEG) r=booleanExpression  
-						    								{$exprBool = new ExpressionBinaryOperation($l.exprBool,$o.text,$r.exprBool);}   		
-    					  | exa=arithmeticExpression 		{$exprBool=$exa.exprArit;}
-    					  | v=value 						{$exprBool=$v.val;} 
-    				 	  | e=element  						{$exprBool=$e.elem;}	
-    					  | '(' booleanExpression ')' 
+     				      : b1o = boolExpOneOp	{$exprBool= $b1o.exprBool;}
+     				      | l=booleanExpression o=(OR | AND | EQUALS | DISTINCT | GT | LT | GEG | LEG) r=booleanExpression  
+					   		{$exprBool = new ExpressionBinaryOperation($l.exprBool,$o.text,$r.exprBool);}
+					   	  | a=arithmeticExpression {$exprBool=$a.exprArit;}  	
+						  | v   = boolVal 		   {$exprBool=$v.val;} 
+    				 	  | e   = element  		   {$exprBool=$e.elem;}	
+    					  | '(' booleanExpression ')'  
     					  ;
+    					  
+boolExpOneOp returns [Expression exprBool]
+     				 : n=NOT exb=booleanExpression	{$exprBool= new ExpressionUnaryOperation($n.text,$exb.exprBool);}
+     				 ;
+     				     
+parBoolExp returns [Expression exprBool]
+     			   : '(' booleanExpression ')'
+    			   ;
     		
 value returns [ExpressionValue val]
-			  : NULL   	 {$val = new ExpressionNullValue();}
-			  | n=NUMBER {$val = new ExpressionIntValue(Integer.parseInt($n.text));} 
-			  | t=TRUE   {$val = new ExpressionBoolValue(Boolean.parseBoolean($t.text));}
+			  : NULL   	  {$val = new ExpressionNullValue();}
+			  | n=NUMBER  {$val = new ExpressionIntValue(Integer.parseInt($n.text));} 
+			  | b=boolVal {$val = $b.val;}
+			  ;
+			  
+boolVal returns [ExpressionValue val]
+			  : t=TRUE   {$val = new ExpressionBoolValue(Boolean.parseBoolean($t.text));}
 			  | f=FALSE  {$val = new ExpressionBoolValue(Boolean.parseBoolean($f.text));}
 			  ;
     		
 element returns [Element elem]
                 : IDLC   	 {$elem = scope.getVar($IDLC.text);}
-                | t=THIS {$elem = new ExpressionValue($t.text);}
+                | t=THIS     {$elem = new ExpressionValue($t.text);}
                 ;
             
-                	
+                	 
 lcbrak		: LCBRACK	; 
 rcbrak		: RCBRACK	; 
 

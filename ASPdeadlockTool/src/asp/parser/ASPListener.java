@@ -14,6 +14,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface ASPListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link ASPParser#valAritExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterValAritExp(@NotNull ASPParser.ValAritExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#valAritExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitValAritExp(@NotNull ASPParser.ValAritExpContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPParser#rcbrak}.
 	 * @param ctx the parse tree
 	 */
@@ -24,25 +34,25 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitRcbrak(@NotNull ASPParser.RcbrakContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#expression}.
+	 * Enter a parse tree produced by {@link ASPParser#skipStmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpression(@NotNull ASPParser.ExpressionContext ctx);
+	void enterSkipStmt(@NotNull ASPParser.SkipStmtContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#expression}.
+	 * Exit a parse tree produced by {@link ASPParser#skipStmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpression(@NotNull ASPParser.ExpressionContext ctx);
+	void exitSkipStmt(@NotNull ASPParser.SkipStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#intType}.
+	 * Enter a parse tree produced by {@link ASPParser#assignStmt}.
 	 * @param ctx the parse tree
 	 */
-	void enterIntType(@NotNull ASPParser.IntTypeContext ctx);
+	void enterAssignStmt(@NotNull ASPParser.AssignStmtContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#intType}.
+	 * Exit a parse tree produced by {@link ASPParser#assignStmt}.
 	 * @param ctx the parse tree
 	 */
-	void exitIntType(@NotNull ASPParser.IntTypeContext ctx);
+	void exitAssignStmt(@NotNull ASPParser.AssignStmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#program}.
 	 * @param ctx the parse tree
@@ -54,15 +64,15 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitProgram(@NotNull ASPParser.ProgramContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#methodDef}.
+	 * Enter a parse tree produced by {@link ASPParser#objDec}.
 	 * @param ctx the parse tree
 	 */
-	void enterMethodDef(@NotNull ASPParser.MethodDefContext ctx);
+	void enterObjDec(@NotNull ASPParser.ObjDecContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#methodDef}.
+	 * Exit a parse tree produced by {@link ASPParser#objDec}.
 	 * @param ctx the parse tree
 	 */
-	void exitMethodDef(@NotNull ASPParser.MethodDefContext ctx);
+	void exitObjDec(@NotNull ASPParser.ObjDecContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#arithmeticExpression}.
 	 * @param ctx the parse tree
@@ -94,25 +104,15 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitType(@NotNull ASPParser.TypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#booleanExpression}.
+	 * Enter a parse tree produced by {@link ASPParser#boolVal}.
 	 * @param ctx the parse tree
 	 */
-	void enterBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx);
+	void enterBoolVal(@NotNull ASPParser.BoolValContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#booleanExpression}.
+	 * Exit a parse tree produced by {@link ASPParser#boolVal}.
 	 * @param ctx the parse tree
 	 */
-	void exitBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link ASPParser#varDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void enterVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ASPParser#varDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void exitVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx);
+	void exitBoolVal(@NotNull ASPParser.BoolValContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#parDef}.
 	 * @param ctx the parse tree
@@ -134,25 +134,15 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitBoolType(@NotNull ASPParser.BoolTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#expressionSideEffect}.
+	 * Enter a parse tree produced by {@link ASPParser#parAritExp}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx);
+	void enterParAritExp(@NotNull ASPParser.ParAritExpContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#expressionSideEffect}.
+	 * Exit a parse tree produced by {@link ASPParser#parAritExp}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link ASPParser#classDec}.
-	 * @param ctx the parse tree
-	 */
-	void enterClassDec(@NotNull ASPParser.ClassDecContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ASPParser#classDec}.
-	 * @param ctx the parse tree
-	 */
-	void exitClassDec(@NotNull ASPParser.ClassDecContext ctx);
+	void exitParAritExp(@NotNull ASPParser.ParAritExpContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#stmtblock}.
 	 * @param ctx the parse tree
@@ -164,25 +154,25 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitStmtblock(@NotNull ASPParser.StmtblockContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#variable}.
+	 * Enter a parse tree produced by {@link ASPParser#methodSignature}.
 	 * @param ctx the parse tree
 	 */
-	void enterVariable(@NotNull ASPParser.VariableContext ctx);
+	void enterMethodSignature(@NotNull ASPParser.MethodSignatureContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#variable}.
+	 * Exit a parse tree produced by {@link ASPParser#methodSignature}.
 	 * @param ctx the parse tree
 	 */
-	void exitVariable(@NotNull ASPParser.VariableContext ctx);
+	void exitMethodSignature(@NotNull ASPParser.MethodSignatureContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#varDec}.
+	 * Enter a parse tree produced by {@link ASPParser#parBoolExp}.
 	 * @param ctx the parse tree
 	 */
-	void enterVarDec(@NotNull ASPParser.VarDecContext ctx);
+	void enterParBoolExp(@NotNull ASPParser.ParBoolExpContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#varDec}.
+	 * Exit a parse tree produced by {@link ASPParser#parBoolExp}.
 	 * @param ctx the parse tree
 	 */
-	void exitVarDec(@NotNull ASPParser.VarDecContext ctx);
+	void exitParBoolExp(@NotNull ASPParser.ParBoolExpContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#objType}.
 	 * @param ctx the parse tree
@@ -214,6 +204,176 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitLcbrak(@NotNull ASPParser.LcbrakContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ASPParser#element}.
+	 * @param ctx the parse tree
+	 */
+	void enterElement(@NotNull ASPParser.ElementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#element}.
+	 * @param ctx the parse tree
+	 */
+	void exitElement(@NotNull ASPParser.ElementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#boolDec}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoolDec(@NotNull ASPParser.BoolDecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#boolDec}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoolDec(@NotNull ASPParser.BoolDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#intDec}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntDec(@NotNull ASPParser.IntDecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#intDec}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntDec(@NotNull ASPParser.IntDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpression(@NotNull ASPParser.ExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpression(@NotNull ASPParser.ExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#newExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewExp(@NotNull ASPParser.NewExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#newExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewExp(@NotNull ASPParser.NewExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#intType}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntType(@NotNull ASPParser.IntTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#intType}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntType(@NotNull ASPParser.IntTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#variableExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariableExp(@NotNull ASPParser.VariableExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#variableExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariableExp(@NotNull ASPParser.VariableExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#methodDef}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodDef(@NotNull ASPParser.MethodDefContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#methodDef}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodDef(@NotNull ASPParser.MethodDefContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#returnStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturnStmt(@NotNull ASPParser.ReturnStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#returnStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturnStmt(@NotNull ASPParser.ReturnStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#booleanExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#booleanExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitBooleanExpression(@NotNull ASPParser.BooleanExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#varDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarDeclaration(@NotNull ASPParser.VarDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#expressionSideEffect}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#expressionSideEffect}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionSideEffect(@NotNull ASPParser.ExpressionSideEffectContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#classDec}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassDec(@NotNull ASPParser.ClassDecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#classDec}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassDec(@NotNull ASPParser.ClassDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#ifStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfStmt(@NotNull ASPParser.IfStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#ifStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfStmt(@NotNull ASPParser.IfStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#variable}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariable(@NotNull ASPParser.VariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#variable}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariable(@NotNull ASPParser.VariableContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#varDec}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarDec(@NotNull ASPParser.VarDecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#varDec}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarDec(@NotNull ASPParser.VarDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#newActExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewActExp(@NotNull ASPParser.NewActExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#newActExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewActExp(@NotNull ASPParser.NewActExpContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPParser#stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -224,13 +384,23 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitStmt(@NotNull ASPParser.StmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ASPParser#element}.
+	 * Enter a parse tree produced by {@link ASPParser#boolExpOneOp}.
 	 * @param ctx the parse tree
 	 */
-	void enterElement(@NotNull ASPParser.ElementContext ctx);
+	void enterBoolExpOneOp(@NotNull ASPParser.BoolExpOneOpContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ASPParser#element}.
+	 * Exit a parse tree produced by {@link ASPParser#boolExpOneOp}.
 	 * @param ctx the parse tree
 	 */
-	void exitElement(@NotNull ASPParser.ElementContext ctx);
+	void exitBoolExpOneOp(@NotNull ASPParser.BoolExpOneOpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#methodCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodCall(@NotNull ASPParser.MethodCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#methodCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodCall(@NotNull ASPParser.MethodCallContext ctx);
 }

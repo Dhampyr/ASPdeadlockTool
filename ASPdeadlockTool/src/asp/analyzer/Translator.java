@@ -44,6 +44,10 @@ public class Translator {
 	    System.setOut(new PrintStream(log));
 	    if(program != null)
 	    	program.print();
+	    
+	    Object i;
+		i = true;
+		System.out.println("LA CLASSE DI I É: " + i.toString());
 	}
 	
 	public static void print(HashMap<String, ClassDecl> classSpec){
@@ -53,4 +57,6 @@ public class Translator {
             cl.print();  
 		} 
 	}
+	
+	
 }
