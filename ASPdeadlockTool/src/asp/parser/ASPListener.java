@@ -14,6 +14,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface ASPListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link ASPParser#typeVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeVariable(@NotNull ASPParser.TypeVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#typeVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeVariable(@NotNull ASPParser.TypeVariableContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPParser#valAritExp}.
 	 * @param ctx the parse tree
 	 */
@@ -53,6 +63,16 @@ public interface ASPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAssignStmt(@NotNull ASPParser.AssignStmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#elseStmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterElseStmt(@NotNull ASPParser.ElseStmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#elseStmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitElseStmt(@NotNull ASPParser.ElseStmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#program}.
 	 * @param ctx the parse tree
@@ -244,6 +264,16 @@ public interface ASPListener extends ParseTreeListener {
 	 */
 	void exitExpression(@NotNull ASPParser.ExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ASPParser#classSignature}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassSignature(@NotNull ASPParser.ClassSignatureContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#classSignature}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassSignature(@NotNull ASPParser.ClassSignatureContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ASPParser#newExp}.
 	 * @param ctx the parse tree
 	 */
@@ -333,6 +363,16 @@ public interface ASPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitClassDec(@NotNull ASPParser.ClassDecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ASPParser#secondPair}.
+	 * @param ctx the parse tree
+	 */
+	void enterSecondPair(@NotNull ASPParser.SecondPairContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ASPParser#secondPair}.
+	 * @param ctx the parse tree
+	 */
+	void exitSecondPair(@NotNull ASPParser.SecondPairContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ASPParser#ifStmt}.
 	 * @param ctx the parse tree

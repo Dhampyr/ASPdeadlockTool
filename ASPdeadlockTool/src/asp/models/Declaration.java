@@ -26,4 +26,9 @@ public class Declaration {
 	public void setVar(Variable var) {
 		this.var = var;
 	}
+	
+	public String toString()
+	{
+		return type.getType() + " " + var.getName();
+	}
 }

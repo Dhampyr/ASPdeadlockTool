@@ -11,4 +11,6 @@
 <fullyQualifiedTypeName name="asp.models.Declaration"/>
 <fullyQualifiedTypeName name="asp.models.Program"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="asp.parser.ASPBaseListener"/>
 </qualifiedTypeNameHistroy>

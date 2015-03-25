@@ -1,7 +1,7 @@
 module CpxSched;
 
-class CpxSched (I u) {
-  Int m_1(I y) {
+class CpxSched (CpxSched u) {
+  Int m1(CpxSched y) {
      Int h = 0;
      Int g = 0;
      if (g == 1) h = y.m2(u);
@@ -11,11 +11,11 @@ class CpxSched (I u) {
      return g;
   }
   
-  Int m2(I z) {
+  Int m2(CpxSched z) {
      Int h = 0;
      Int w = 0;
      Int g = 0;
-     I y;
+     CpxSched y;
      y = new CpxSched(null);
      if ((g == 1) && (h == 5)) {h = y.m2(u); h = y.m2(u);} 
      if (g == 2) {h = y.m2(u); h = y.m2(u);} 
@@ -29,9 +29,11 @@ class CpxSched (I u) {
 
 }
 
-{ I x; I y; I z;
-Int w = 0 ;
-x = new CpxSched(null);
-y = new CpxSched(x);
-z = new CpxSched(null);
-w = y.m1(z);}
+{ CpxSched x; 
+  CpxSched y; 
+  CpxSched z;
+  Int w = 0 ;
+  x = newActive CpxSched(null);
+  y = newActive CpxSched(x);
+  z = newActive CpxSched(null);
+  w = y.m1(z);}

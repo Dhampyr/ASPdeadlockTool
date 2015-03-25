@@ -51,11 +51,10 @@ public class ASPLexer extends Lexer {
 	};
 
 
-		public HashMap<String, ClassDecl> environment;
+		public HashMap<String, ClassDecl> classTable;
 		public ClassDecl currentClass;
 		public Method currentMethod;
-		public Environment scope;
-		
+		public Environment environment;
 
 
 	public ASPLexer(CharStream input) {

@@ -8,8 +8,11 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.antlr.v4.parse.ANTLRParser.parserRule_return;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import asp.models.ClassDecl;
 import asp.models.Program;
@@ -21,33 +24,31 @@ import asp.parser.ASPParser.ProgramContext;
 public class Translator {
 	
 	public static void main(String[] args) throws Exception {
+		
+		//Setting
 		InputStream is = System.in;
 		is = new FileInputStream("src/input.txt");
 		ANTLRInputStream input = new ANTLRInputStream(is);
 		ASPLexer lexer = new ASPLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ASPParser parser = new ASPParser(tokens);
-		//parser.setBuildParseTree(false);
+		//parser.setBuildParseTree(true);
 		FileOutputStream trad = new FileOutputStream("src/trad.abs"); 
-		FileOutputStream log = new FileOutputStream("src/log.abs");
-		FileOutputStream env = new FileOutputStream("src/env.abs");
+	  //FileOutputStream log = new FileOutputStream("src/log.txt");
+		FileOutputStream env = new FileOutputStream("src/env.txt");
 		
-		//PRINT TRAD
-		System.setOut(new PrintStream(trad));
-	    Program program = parser.program().prog;
+		//PARSING
+		ParseTree tree = parser.program();
+//		Program program = parser.program().prog;
 	    
 	    //PRINT ENVIRONMENT
 	    System.setOut(new PrintStream(env));
-	    print(parser.environment);
-	    
-	    //PRINT LOG
-	    System.setOut(new PrintStream(log));
-	    if(program != null)
-	    	program.print();
-	    
-	    Object i;
-		i = true;
-		System.out.println("LA CLASSE DI I É: " + i.toString());
+	    print(parser.classTable);
+	       
+	    //TRAD
+	    System.setOut(new PrintStream(trad));
+	    translate(parser,tree);
+
 	}
 	
 	public static void print(HashMap<String, ClassDecl> classSpec){
@@ -56,6 +57,15 @@ public class Translator {
             ClassDecl cl = classSpec.get(key);  
             cl.print();  
 		} 
+	}
+	
+	public static void translate(ASPParser parser, ParseTree tree)
+	{
+		// Create a generic parse tree walker that can trigger callbacks
+		ParseTreeWalker walker = new ParseTreeWalker();
+		// Walk the tree created during the parse, trigger callbacks
+		walker.walk(new AspToAbs(parser.classTable), tree);
+		System.out.println(); 
 	}
 	
 	

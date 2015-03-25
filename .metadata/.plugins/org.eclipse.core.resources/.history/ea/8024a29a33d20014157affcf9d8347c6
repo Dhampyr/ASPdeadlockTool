@@ -1,0 +1,47 @@
+module CpxSched;
+class CpxSched (I u) {
+Int m_1(B y, H n){
+Int h = 0 ;
+Int g = 0 ;
+1 h = ;
+g = ;
+;
+2 h = ;
+h = ;
+g = ;
+;
+;
+}
+Int m2(I z){
+Int h = 0 ;
+Int w = 0 ;
+Int g = 0 ;
+I y;
+y = ;
+1 5 h = ;
+h = ;
+;
+2 h = ;
+h = ;
+g = ;
+g = ;
+;
+h = ;
+w = 1 ;
+;
+}
+Int m3(){
+;
+}
+}
+{
+I x;
+I y;
+I z;
+Int w = 0 ;
+x = ;
+y = ;
+z = ;
+w = ;
+}
+

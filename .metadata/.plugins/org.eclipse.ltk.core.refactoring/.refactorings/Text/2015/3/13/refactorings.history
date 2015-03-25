@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Text/Hello.g4&apos; to &apos;ASP.g4&apos;" description="Rename resource &apos;Hello.g4&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Hello.g4" name="ASP.g4" stamp="1427198718213" updateReferences="true"/>
+</session>

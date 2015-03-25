@@ -22,6 +22,18 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTypeVariable(@NotNull ASPParser.TypeVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTypeVariable(@NotNull ASPParser.TypeVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterValAritExp(@NotNull ASPParser.ValAritExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -65,6 +77,18 @@ public class ASPBaseListener implements ASPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAssignStmt(@NotNull ASPParser.AssignStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterElseStmt(@NotNull ASPParser.ElseStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElseStmt(@NotNull ASPParser.ElseStmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -298,6 +322,18 @@ public class ASPBaseListener implements ASPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterClassSignature(@NotNull ASPParser.ClassSignatureContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassSignature(@NotNull ASPParser.ClassSignatureContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNewExp(@NotNull ASPParser.NewExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -401,6 +437,18 @@ public class ASPBaseListener implements ASPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitClassDec(@NotNull ASPParser.ClassDecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSecondPair(@NotNull ASPParser.SecondPairContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSecondPair(@NotNull ASPParser.SecondPairContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

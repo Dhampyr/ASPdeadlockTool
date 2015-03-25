@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="for" key="selection"/>
-		<item value="true" key="casesensitive"/>
+		<item value="Variable" key="selection"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="for"/>
-			<item value="controllando"/>
-			<item value="getId"/>
-			<item value="HashMap&lt;TypeBase,Variable&gt;"/>
-			<item value="Class"/>
-			<item value="ClassClassDecl"/>
-			<item value="ClassDecl"/>
-			<item value="System"/>
+			<item value="variable"/>
+			<item value="entermethod"/>
+			<item value="enterinttype"/>
+			<item value="returnStmt"/>
+			<item value="lpar"/>
+			<item value="methodSign"/>
+			<item value="inttype"/>
+			<item value="int"/>
 		</list>
 		<list key="replacehistory">
 			<item value="ClassDecl"/>
@@ -25,7 +25,7 @@
 		<item value="265" key="DIALOG_WIDTH"/>
 		<item value="1|.Helvetica Neue DeskInterface|11.0|0|COCOA|1|.HelveticaNeueDeskInterface-Regular" key="DIALOG_FONT_NAME"/>
 		<item value="399" key="DIALOG_HEIGHT"/>
-		<item value="962" key="DIALOG_X_ORIGIN"/>
-		<item value="488" key="DIALOG_Y_ORIGIN"/>
+		<item value="1409" key="DIALOG_X_ORIGIN"/>
+		<item value="610" key="DIALOG_Y_ORIGIN"/>
 	</section>
 </section>

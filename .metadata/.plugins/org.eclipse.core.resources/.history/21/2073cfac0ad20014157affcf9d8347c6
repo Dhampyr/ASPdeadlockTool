@@ -1,0 +1,42 @@
+Il programma ha le classi:
+Class: CpxSched
+I parametri sono: 
+I -> u
+I campi sono: 
+I metodi sono: 
+
+ Metodo m_1 id m_1_0:
+tipo di ritorno: Int
+I parametri sono: 
+I -> y
+Il corpo é: 
+Le variabili sono: 
+Int -> g
+Int -> h
+0) ITE
+1) ITE
+2) Return
+
+ Metodo m2 id m2_0:
+tipo di ritorno: Int
+I parametri sono: 
+I -> z
+Il corpo é: 
+Le variabili sono: 
+Int -> w
+Int -> g
+I -> y
+Int -> h
+0) y --> I
+1) ITE
+2) ITE
+3) h --> Int
+4) w --> Int
+5) Return
+
+ Metodo m3 id m3_0:
+tipo di ritorno: Int
+I parametri sono: 
+Il corpo é: 
+Le variabili sono: 
+0) Return

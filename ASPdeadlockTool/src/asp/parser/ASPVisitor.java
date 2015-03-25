@@ -17,6 +17,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link ASPParser#typeVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeVariable(@NotNull ASPParser.TypeVariableContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ASPParser#valAritExp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -40,6 +46,12 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAssignStmt(@NotNull ASPParser.AssignStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#elseStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElseStmt(@NotNull ASPParser.ElseStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#program}.
 	 * @param ctx the parse tree
@@ -155,6 +167,12 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(@NotNull ASPParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ASPParser#classSignature}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassSignature(@NotNull ASPParser.ClassSignatureContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ASPParser#newExp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -208,6 +226,12 @@ public interface ASPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitClassDec(@NotNull ASPParser.ClassDecContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ASPParser#secondPair}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSecondPair(@NotNull ASPParser.SecondPairContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ASPParser#ifStmt}.
 	 * @param ctx the parse tree
