@@ -1,0 +1,308 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:54
+ * @production ConstructorArg : {@link ASTNode} ::= <span class="component">{@link DataTypeUse}</span> <span class="component">[SelectorName:{@link Name}]</span>;
+
+ */
+public class ConstructorArg extends ASTNode<ASTNode> implements Cloneable, HasType {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:851
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        getDataTypeUse().doPrettyPrint(stream, formatter);
+        if (hasSelectorName()) {
+            stream.print(" ");
+            stream.print(getSelectorName());
+        }
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:510
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        getDataTypeUse().generateProlog(s,reachInfo);
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:55
+   */
+  public ConstructorArg parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:396
+   */
+  public void typeCheck(SemanticErrorList e) {
+        getDataTypeUse().typeCheck(e);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ConstructorArg() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[2];
+    setChild(new Opt(), 1);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public ConstructorArg(DataTypeUse p0, Opt<Name> p1) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:21
+   */
+  protected int numChildren() {
+    return 2;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:27
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:33
+   */
+  public void flushCache() {
+    super.flushCache();
+    getType_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:40
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:46
+   */
+  public ConstructorArg clone() throws CloneNotSupportedException {
+    ConstructorArg node = (ConstructorArg) super.clone();
+    node.getType_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:56
+   */
+  public ConstructorArg copy() {
+    try {
+      ConstructorArg node = (ConstructorArg) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:74
+   */
+  public ConstructorArg fullCopy() {
+    ConstructorArg tree = (ConstructorArg) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the DataTypeUse child.
+   * @param node The new node to replace the DataTypeUse child.
+   * @apilevel high-level
+   */
+  public void setDataTypeUse(DataTypeUse node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the DataTypeUse child.
+   * @return The current node used as the DataTypeUse child.
+   * @apilevel high-level
+   */
+  public DataTypeUse getDataTypeUse() {
+    return (DataTypeUse) getChild(0);
+  }
+  /**
+   * Retrieves the DataTypeUse child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the DataTypeUse child.
+   * @apilevel low-level
+   */
+  public DataTypeUse getDataTypeUseNoTransform() {
+    return (DataTypeUse) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the optional node for the SelectorName child. This is the <code>Opt</code>
+   * node containing the child SelectorName, not the actual child!
+   * @param opt The new node to be used as the optional node for the SelectorName child.
+   * @apilevel low-level
+   */
+  public void setSelectorNameOpt(Opt<Name> opt) {
+    setChild(opt, 1);
+  }
+  /**
+   * Replaces the (optional) SelectorName child.
+   * @param node The new node to be used as the SelectorName child.
+   * @apilevel high-level
+   */
+  public void setSelectorName(Name node) {
+    getSelectorNameOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional SelectorName child exists.
+   * @return {@code true} if the optional SelectorName child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasSelectorName() {
+    return getSelectorNameOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) SelectorName child.
+   * @return The SelectorName child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public Name getSelectorName() {
+    return (Name) getSelectorNameOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the SelectorName child. This is the <code>Opt</code> node containing the child SelectorName, not the actual child!
+   * @return The optional node for child the SelectorName child.
+   * @apilevel low-level
+   */
+  public Opt<Name> getSelectorNameOpt() {
+    return (Opt<Name>) getChild(1);
+  }
+  /**
+   * Retrieves the optional node for child SelectorName. This is the <code>Opt</code> node containing the child SelectorName, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child SelectorName.
+   * @apilevel low-level
+   */
+  public Opt<Name> getSelectorNameOptNoTransform() {
+    return (Opt<Name>) getChildNoTransform(1);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:97
+   */
+  public Type getType() {
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    try {  return getDataTypeUse().getType();  }
+    finally {
+      getType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

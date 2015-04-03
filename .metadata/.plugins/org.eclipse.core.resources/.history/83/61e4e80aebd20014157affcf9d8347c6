@@ -1,0 +1,388 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:26
+ * @production FromExport : {@link Export} ::= <span class="component">{@link Name}*</span> <span class="component">&lt;ModuleName:String&gt;</span>;
+
+ */
+public class FromExport extends Export implements Cloneable {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:431
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("export ");
+        getNames().doPrettyPrint(stream, formatter, ",");
+        stream.print(" from ");
+        stream.print(getModuleName());
+        stream.print(";");
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:1001
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        //generates "fromExport(moduleName,ExportedDeclarationsList)."
+        s.print("fromExport("+quote(this.getModuleName())+",");
+        List<Name> exportedDecl = this.getNameList();
+        int n = exportedDecl.getNumChild();
+        for (int i = 0; i < n; i++){
+            exportedDecl.getChild(i).generateProlog(s,reachInfo);
+            if (i != n-1) s.print(",");
+        }
+        s.println(").");
+    }
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:179
+   */
+  protected void printInfo(PrintStream stream)
+    {
+        stream.print(this.getModuleName());
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:95
+   */
+  public FromExport parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:129
+   */
+  public void typeCheck(SemanticErrorList e) {
+        ModuleDecl d = lookupModule(getModuleName());
+        if (d == null) {
+            e.add(new TypeError(this, ErrorMessage.MODULE_NOT_RESOLVABLE, getModuleName()));
+            return;
+        }
+
+        ModuleDecl mod = getModuleDecl();
+        for (Name name: getNames()) {
+            String s = d.getName()+"."+name.getName();
+            if (!mod.isVisible(s)) {
+                e.add(new TypeError(this, ErrorMessage.NAME_NOT_RESOLVABLE, s));
+            }
+        }
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public FromExport() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public FromExport(List<Name> p0, String p1) {
+    setChild(p0, 0);
+    setModuleName(p1);
+  }
+  /**
+   * @declaredat ASTNode:18
+   */
+  public FromExport(List<Name> p0, beaver.Symbol p1) {
+    setChild(p0, 0);
+    setModuleName(p1);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:25
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:31
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:37
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:43
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:49
+   */
+  public FromExport clone() throws CloneNotSupportedException {
+    FromExport node = (FromExport) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:58
+   */
+  public FromExport copy() {
+    try {
+      FromExport node = (FromExport) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:76
+   */
+  public FromExport fullCopy() {
+    FromExport tree = (FromExport) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Name list.
+   * @param list The new list node to be used as the Name list.
+   * @apilevel high-level
+   */
+  public void setNameList(List<Name> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the Name list.
+   * @return Number of children in the Name list.
+   * @apilevel high-level
+   */
+  public int getNumName() {
+    return getNameList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Name list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Name list.
+   * @apilevel low-level
+   */
+  public int getNumNameNoTransform() {
+    return getNameListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Name list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Name list.
+   * @apilevel high-level
+   */
+  public Name getName(int i) {
+    return (Name) getNameList().getChild(i);
+  }
+  /**
+   * Check whether the Name list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasName() {
+    return getNameList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Name list.
+   * @param node The element to append to the Name list.
+   * @apilevel high-level
+   */
+  public void addName(Name node) {
+    List<Name> list = (parent == null || state == null) ? getNameListNoTransform() : getNameList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addNameNoTransform(Name node) {
+    List<Name> list = getNameListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Name list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setName(Name node, int i) {
+    List<Name> list = getNameList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Name list.
+   * @return The node representing the Name list.
+   * @apilevel high-level
+   */
+  public List<Name> getNameList() {
+    List<Name> list = (List<Name>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Name list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Name list.
+   * @apilevel low-level
+   */
+  public List<Name> getNameListNoTransform() {
+    return (List<Name>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the Name list.
+   * @return The node representing the Name list.
+   * @apilevel high-level
+   */
+  public List<Name> getNames() {
+    return getNameList();
+  }
+  /**
+   * Retrieves the Name list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Name list.
+   * @apilevel low-level
+   */
+  public List<Name> getNamesNoTransform() {
+    return getNameListNoTransform();
+  }
+  /**
+   * Replaces the lexeme ModuleName.
+   * @param value The new value for the lexeme ModuleName.
+   * @apilevel high-level
+   */
+  public void setModuleName(String value) {
+    tokenString_ModuleName = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_ModuleName;
+  /**
+   */
+  public int ModuleNamestart;
+  /**
+   */
+  public int ModuleNameend;
+  /**
+   * JastAdd-internal setter for lexeme ModuleName using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme ModuleName
+   * @apilevel internal
+   */
+  public void setModuleName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setModuleName is only valid for String lexemes");
+    tokenString_ModuleName = (String)symbol.value;
+    ModuleNamestart = symbol.getStart();
+    ModuleNameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme ModuleName.
+   * @return The value for the lexeme ModuleName.
+   * @apilevel high-level
+   */
+  public String getModuleName() {
+    return tokenString_ModuleName != null ? tokenString_ModuleName : "";
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

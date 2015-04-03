@@ -1,0 +1,457 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:218
+ * @production CaseBranch : {@link ASTNode} ::= <span class="component">Left:{@link Pattern}</span> <span class="component">Right:{@link PureExp}</span>;
+
+ */
+public class CaseBranch extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:497
+   */
+  public void generateMaude(PrintStream stream) {
+		getLeft().generateMaude(stream);
+        stream.print("=> ( ");
+        getRight().generateMaude(stream);
+        stream.print(") ");
+	}
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:503
+   */
+  public int numberOfRandom(Set<String> visitedFunctions) {
+        return getRight().numberOfRandom(visitedFunctions);
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:384
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        s.print("branch(");
+        getChild(0).generateProlog(s,reachInfo); // child(0) is a Pattern
+        s.print(",");
+        getChild(1).generateProlog(s,reachInfo); // child(1) is a PureExp
+        s.print(")"); // This closes the "casebranch" term
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:45
+   */
+  public CaseBranch parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:815
+   */
+  public void typeCheck(SemanticErrorList e, DataTypeType t) {
+        int size = e.size();
+        getLeft().typeCheck(e,t);
+        /* If the LHS is botched, we can't reliably use any variables bound therein. */
+        if (e.size() == size)
+          getRight().typeCheck(e);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public CaseBranch() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[2];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public CaseBranch(Pattern p0, PureExp p1) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:20
+   */
+  protected int numChildren() {
+    return 2;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:26
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:32
+   */
+  public void flushCache() {
+    super.flushCache();
+    getFreeVars_visited = -1;
+    getFreeVars_computed = false;
+    getFreeVars_value = null;
+    getFields_FieldUseInfo_visited = null;
+    getFields_FieldUseInfo_values = null;
+    getType_visited = -1;
+    getType_computed = false;
+    getType_value = null;
+    getPatternExpType_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:47
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:53
+   */
+  public CaseBranch clone() throws CloneNotSupportedException {
+    CaseBranch node = (CaseBranch) super.clone();
+    node.getFreeVars_visited = -1;
+    node.getFreeVars_computed = false;
+    node.getFreeVars_value = null;
+    node.getFields_FieldUseInfo_visited = null;
+    node.getFields_FieldUseInfo_values = null;
+    node.getType_visited = -1;
+    node.getType_computed = false;
+    node.getType_value = null;
+    node.getPatternExpType_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:71
+   */
+  public CaseBranch copy() {
+    try {
+      CaseBranch node = (CaseBranch) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:89
+   */
+  public CaseBranch fullCopy() {
+    CaseBranch tree = (CaseBranch) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Left child.
+   * @param node The new node to replace the Left child.
+   * @apilevel high-level
+   */
+  public void setLeft(Pattern node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the Left child.
+   * @return The current node used as the Left child.
+   * @apilevel high-level
+   */
+  public Pattern getLeft() {
+    return (Pattern) getChild(0);
+  }
+  /**
+   * Retrieves the Left child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Left child.
+   * @apilevel low-level
+   */
+  public Pattern getLeftNoTransform() {
+    return (Pattern) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the Right child.
+   * @param node The new node to replace the Right child.
+   * @apilevel high-level
+   */
+  public void setRight(PureExp node) {
+    setChild(node, 1);
+  }
+  /**
+   * Retrieves the Right child.
+   * @return The current node used as the Right child.
+   * @apilevel high-level
+   */
+  public PureExp getRight() {
+    return (PureExp) getChild(1);
+  }
+  /**
+   * Retrieves the Right child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Right child.
+   * @apilevel low-level
+   */
+  public PureExp getRightNoTransform() {
+    return (PureExp) getChildNoTransform(1);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getFreeVars_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getFreeVars_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<String> getFreeVars_value;
+  /**
+   * @attribute syn
+   * @aspect VarUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FreeVars.jrag:89
+   */
+  public Collection<String> getFreeVars() {
+    if(getFreeVars_computed) {
+      return getFreeVars_value;
+    }
+    ASTNode$State state = state();
+    if (getFreeVars_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getFreeVars in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFreeVars_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getFreeVars_value = getFreeVars_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getFreeVars_computed = true;
+    } else {
+    }
+
+    getFreeVars_visited = -1;
+    return getFreeVars_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<String> getFreeVars_compute() {
+  		HashSet<String> res = new HashSet<String>();
+  		res.addAll(getLeft().getFreeVars());
+  		
+  		res.addAll(getRight().getFreeVars());
+  		for (PatternVar v : getLeft().getFreePatternVars()) {
+  			res.remove(v.getVar().getName());
+  		}
+  		return res;
+  	}
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getFields_FieldUseInfo_visited;
+  protected java.util.Map getFields_FieldUseInfo_values;
+  /**
+   * @attribute syn
+   * @aspect FieldUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/FieldAccesses.jrag:145
+   */
+  public FieldUseInfo getFields(FieldUseInfo fui) {
+    Object _parameters = fui;
+    if(getFields_FieldUseInfo_visited == null) getFields_FieldUseInfo_visited = new java.util.HashMap(4);
+    if(getFields_FieldUseInfo_values == null) getFields_FieldUseInfo_values = new java.util.HashMap(4);
+    if(getFields_FieldUseInfo_values.containsKey(_parameters)) {
+      return (FieldUseInfo)getFields_FieldUseInfo_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getFields_FieldUseInfo_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getFields in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFields_FieldUseInfo_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    FieldUseInfo getFields_FieldUseInfo_value = getFields_compute(fui);
+    if(isFinal && num == state().boundariesCrossed) {
+      getFields_FieldUseInfo_values.put(_parameters, getFields_FieldUseInfo_value);
+    } else {
+    }
+
+    getFields_FieldUseInfo_visited.remove(_parameters);
+    return getFields_FieldUseInfo_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private FieldUseInfo getFields_compute(FieldUseInfo fui) {
+  	    fui.merge(getLeft().getFields(fui));
+  	    return new FieldUseInfo(fui.merge(getRight().getFields(fui)));
+  	}
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getType_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Type getType_value;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:288
+   */
+  public Type getType() {
+    if(getType_computed) {
+      return getType_value;
+    }
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getType_value = getType_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getType_computed = true;
+    } else {
+    }
+
+    getType_visited = -1;
+    return getType_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Type getType_compute() {  return getRight().getType();  }
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:290
+   */
+  public Type getPatternExpType() {
+    ASTNode$State state = state();
+    if (getPatternExpType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getPatternExpType in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getPatternExpType_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Type getPatternExpType_value = getParent().Define_Type_getPatternExpType(this, null);
+
+    getPatternExpType_visited = -1;
+    return getPatternExpType_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getPatternExpType_visited = -1;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:310
+   * @apilevel internal
+   */
+  public Type Define_Type_getInhType(ASTNode caller, ASTNode child) {
+    if (caller == getLeftNoTransform()){
+        return getPatternExpType();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Type_getInhType(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

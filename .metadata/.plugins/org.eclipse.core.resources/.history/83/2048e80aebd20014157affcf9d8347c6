@@ -1,0 +1,331 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:116
+ * @production ExpFunctionDef : {@link FunctionDef} ::= <span class="component">Rhs:{@link PureExp}</span>;
+
+ */
+public class ExpFunctionDef extends FunctionDef implements Cloneable {
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:99
+   */
+  @Override
+  public  void generateErlangCode(ErlangCodeStream ecs,Vars vars) throws IOException{
+    getRhs().generateErlangCode( ecs, vars);
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:300
+   */
+  public void generateJava(PrintStream stream) {
+        getRhs().generateJava(stream);
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:337
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        getRhs().generateJavaDynamic(stream);
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:112
+   */
+  public void generateMaude(PrintStream stream) {
+        getRhs().generateMaude(stream);
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:511
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.println();
+        formatter.afterOpenBrace();
+        formatter.afterStmt();
+        getRhs().doPrettyPrint(stream, formatter);
+        stream.print(";");
+        formatter.beforeCloseBrace();
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:168
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        // child(0) is a PureExp, i.e., a CaseExp, LetExp, FnApp, DataConstructoreExp, etc (see ABS.ast)
+        ((PureExp) getChild(0)).generateProlog(s,reachInfo);
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:80
+   */
+  public ExpFunctionDef parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ExpFunctionDef() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public ExpFunctionDef(PureExp p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:19
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:25
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  public void flushCache() {
+    super.flushCache();
+    usesBuiltin_Collection_FunctionDef__visited = null;
+    usesBuiltin_Collection_FunctionDef__values = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:39
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:45
+   */
+  public ExpFunctionDef clone() throws CloneNotSupportedException {
+    ExpFunctionDef node = (ExpFunctionDef) super.clone();
+    node.usesBuiltin_Collection_FunctionDef__visited = null;
+    node.usesBuiltin_Collection_FunctionDef__values = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:56
+   */
+  public ExpFunctionDef copy() {
+    try {
+      ExpFunctionDef node = (ExpFunctionDef) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:74
+   */
+  public ExpFunctionDef fullCopy() {
+    ExpFunctionDef tree = (ExpFunctionDef) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Rhs child.
+   * @param node The new node to replace the Rhs child.
+   * @apilevel high-level
+   */
+  public void setRhs(PureExp node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the Rhs child.
+   * @return The current node used as the Rhs child.
+   * @apilevel high-level
+   */
+  public PureExp getRhs() {
+    return (PureExp) getChild(0);
+  }
+  /**
+   * Retrieves the Rhs child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Rhs child.
+   * @apilevel low-level
+   */
+  public PureExp getRhsNoTransform() {
+    return (PureExp) getChildNoTransform(0);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map usesBuiltin_Collection_FunctionDef__visited;
+  protected java.util.Map usesBuiltin_Collection_FunctionDef__values;
+  /**
+   * @attribute syn
+   * @aspect FieldUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/FieldAccesses.jrag:114
+   */
+  public boolean usesBuiltin(Collection<FunctionDef> seen) {
+    Object _parameters = seen;
+    if(usesBuiltin_Collection_FunctionDef__visited == null) usesBuiltin_Collection_FunctionDef__visited = new java.util.HashMap(4);
+    if(usesBuiltin_Collection_FunctionDef__values == null) usesBuiltin_Collection_FunctionDef__values = new java.util.HashMap(4);
+    if(usesBuiltin_Collection_FunctionDef__values.containsKey(_parameters)) {
+      return ((Boolean)usesBuiltin_Collection_FunctionDef__values.get(_parameters)).booleanValue();
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(usesBuiltin_Collection_FunctionDef__visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: usesBuiltin in class: org.jastadd.ast.AST.SynDecl");
+    }
+    usesBuiltin_Collection_FunctionDef__visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    boolean usesBuiltin_Collection_FunctionDef__value = usesBuiltin_compute(seen);
+    if(isFinal && num == state().boundariesCrossed) {
+      usesBuiltin_Collection_FunctionDef__values.put(_parameters, Boolean.valueOf(usesBuiltin_Collection_FunctionDef__value));
+    } else {
+    }
+
+    usesBuiltin_Collection_FunctionDef__visited.remove(_parameters);
+    return usesBuiltin_Collection_FunctionDef__value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean usesBuiltin_compute(Collection<FunctionDef> seen) {
+        if (seen.add(this)) {      
+          FieldUseInfo info = getRhs().getFields(new FieldUseInfo(seen));
+          boolean a = seen.remove(this);
+          assert a;
+          return info.usesBuiltin;
+        } else
+          return false; // OK since it gets ORed
+      }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FnAppContext.jrag:39
+   * @apilevel internal
+   */
+  public boolean Define_boolean_isContextImperative(ASTNode caller, ASTNode child) {
+    if (caller == getRhsNoTransform()) {
+      return false;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_boolean_isContextImperative(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:270
+   * @apilevel internal
+   */
+  public VarOrFieldDecl Define_VarOrFieldDecl_lookupVarOrFieldName(ASTNode caller, ASTNode child, String name, boolean fieldOnly) {
+    if (caller == getRhsNoTransform()){ FunctionDecl fd = (FunctionDecl) getParent(); return fd.locallookupVarOrFieldName(name, fieldOnly); }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, caller, name, fieldOnly);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

@@ -6,28 +6,43 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
-import asp.models.Program;
+import deadlock.analyser.Tester;
 import asp.parser.ASPLexer;
 import asp.parser.ASPParser;
+import asp.translator.Translator;
+
 
 
 public class Analyzer {
 	
+	public static final String tradPath = "src/trad.abs";
+	public static final String logPath = "src/log.txt";
+	
 	public static void main(String[] args) throws Exception {
 		InputStream is = System.in;
-		is = new FileInputStream("src/input.txt");
+		is = new FileInputStream(args[0]);
+		
 		ANTLRInputStream input = new ANTLRInputStream(is);
 		ASPLexer lexer = new ASPLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ASPParser parser = new ASPParser(tokens);
 		//parser.setBuildParseTree(false);
-		FileOutputStream f = new FileOutputStream("src/log.txt"); 
-	    System.setOut(new PrintStream(f));
-	    Program program = parser.program().prog;
-	    program.print();
+		FileOutputStream trad = new FileOutputStream(tradPath); 
+	    System.setOut(new PrintStream(trad));
+	    
+	    //PARSING
+		ParseTree tree = parser.program();
+		   
+		//TRAD
+		System.setOut(new PrintStream(trad));
+		Translator.translate(parser,tree);
+		
+		FileOutputStream log = new FileOutputStream(logPath); 
+	    System.setOut(new PrintStream(log));
+		Tester.main(tradPath);
 	}
 }

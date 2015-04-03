@@ -1,0 +1,583 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:159
+ * @production AssignStmt : {@link Stmt} ::= <span class="component">Var:{@link VarOrFieldUse}</span> <span class="component">Value:{@link Exp}</span>;
+
+ */
+public class AssignStmt extends Stmt implements Cloneable {
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:213
+   */
+  @Override
+  public void generateErlangCode(ErlangCodeStream ecs,Vars vars) {
+    StringWriter sw = new StringWriter();
+    ErlangCodeStream buffer = new ErlangCodeStream(new WriterOutputStream(sw, Charset.forName("UTF-8")),ecs.getIndent());
+    boolean needTrunc=getVar().getType().isIntType() && getValue().getType().isRatType();
+    boolean isNewDC = getVar().getType().isDeploymentComponentType()
+        && getValue() instanceof NewExp;
+    if (needTrunc)
+      buffer.print("rationals:trunc(");
+    getValue().generateErlangCode(buffer,vars);
+    if (needTrunc)
+      buffer.print(")");
+    buffer.close();
+    if(getVar() instanceof VarUse) {
+      String varName = vars.inc(getVar().getName());
+      ecs.format("%s = %s", varName,sw.toString().substring(ecs.getIndent().length()));
+      if (isNewDC) {
+        ecs.println(",");
+        ecs.format("eventstream:event({newdc, %s})", varName);
+      }
+    } else if(getVar() instanceof FieldUse) {
+      ecs.format("set(O,'%s',%s)", getVar().getName(),sw.toString().substring(ecs.getIndent().length()));
+      if (isNewDC) {
+        ecs.println(",");
+        ecs.format("eventstream:event({newdc, get(O,%s)})", getVar().getName());
+      }
+    } else {
+      throw new NotImplementedYetException(this);
+    }
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:399
+   */
+  public void generateJava(PrintStream stream) {
+        super.generateJava(stream);
+        getVar().generateJava(stream);
+        stream.print(" = ");
+        getValue().generateJava(stream);
+        if (getVar().getType().isIntType() && getValue().getType().isRatType()) {
+            stream.print(".truncate()");
+        }
+        stream.println(";");
+
+        if (getVar() instanceof VarUse) {
+            stream.print("if (__ABS_getRuntime().debuggingEnabled()) ");
+            stream.print("__ABS_getRuntime().getCurrentTask().setLocalVariable(\"" + getVar().getName() + "\", ");
+            getVar().generateJava(stream);
+            stream.print(");");
+        }
+
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:450
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        super.generateJavaDynamic(stream);
+        DynamicJavaGeneratorHelper.assign(stream, this);
+
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:714
+   */
+  public void generateMaude(PrintStream stream) {
+        int randomcount = getValue().numberOfRandom(new TreeSet<String>());
+        MaudeCompilerHelper.emitPushRandomInst(stream, randomcount);
+        if (getValue() instanceof PureExp) {
+            boolean needConversion = getVar().getType().isIntType()
+                && getValue().getType().isRatType() ;
+            MaudeCompilerHelper.emitCostAnnotation(stream, this.getAnnotationList(), getModel().defaultResources);
+            stream.print("assign( ");
+            getVar().generateMaude(stream);
+            stream.print("; ");
+            if (needConversion) stream.print("\"ABS.StdLib.truncate\"(");
+            getValue().generateMaude(stream);
+            if (needConversion) stream.print(")");
+            stream.print(") ");
+        } else {
+            getValue().generateMaudeAsStatement(stream, ((VarOrFieldUse)getVar()).getName(), getAnnotations());
+        }
+        MaudeCompilerHelper.emitPopRandomInst(stream, randomcount);
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:229
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        getAnnotationList().doPrettyPrint(stream, formatter, "");
+        if (getNumAnnotation() > 0) {
+            stream.println();
+            formatter.afterStmt();
+        }
+        getVar().doPrettyPrint(stream, formatter);
+        stream.print(" = ");
+        getValue().doPrettyPrint(stream, formatter);
+        stream.print(";");
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:791
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo) {
+
+        s.print("assignStmt(");
+        getVar().generateProlog(s,reachInfo);
+        s.print(",");
+        getValue().generateProlog(s,reachInfo);
+        List<Annotation> anns = getAnnotations();
+        int n = anns.getNumChild();
+        s.print(",[");
+        for (int i = 0; i < n; i++){
+            anns.getChild(i).generateProlog(s,reachInfo);
+            if (i != n-1) s.print(",");
+        }
+         s.print("]");
+        s.print(",");
+        this.printContextInformation(s);
+        s.print(")");
+    }
+  /**
+   * @aspect DumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/DumpTree.jadd:55
+   */
+  public void dumpTree(String indent, java.io.PrintStream pStream) {
+	   	pStream.println(indent + this.toString() + "\t\t" +  ((VarOrFieldUse)this.getVar()).getName() + "=");
+		this.getValue().dumpTree("",pStream);
+		pStream.println();
+	}
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:126
+   */
+  protected void printInfo(PrintStream stream)
+    {
+        //    stream.print(((VarOrFieldUse)this.getVar()).getName() + "=");
+        stream.print((this.getVar()).getName());
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:25
+   */
+  public AssignStmt parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:538
+   */
+  public void refined_TypeChecker_AssignStmt_typeCheck(SemanticErrorList e) {
+        Type rht = getValue().getType();
+        Type lht = getVar().getType();
+
+        int nerrors = e.size();   	 	
+        getValue().typeCheck(e);
+        getVar().typeCheck(e);
+
+        if (e.size() > nerrors)
+            return;
+        TypeCheckerHelper.checkAssignment(e,this,lht,getValue());
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public AssignStmt() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[3];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public AssignStmt(List<Annotation> p0, VarOrFieldUse p1, Exp p2) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+    setChild(p2, 2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:22
+   */
+  protected int numChildren() {
+    return 3;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:28
+   */
+  public boolean mayHaveRewrite() {
+    return true;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:34
+   */
+  public void flushCache() {
+    super.flushCache();
+    getContainedSqlExp_visited = -1;
+    getContainedSqlExp_computed = false;
+    getContainedSqlExp_value = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:43
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:49
+   */
+  public AssignStmt clone() throws CloneNotSupportedException {
+    AssignStmt node = (AssignStmt) super.clone();
+    node.getContainedSqlExp_visited = -1;
+    node.getContainedSqlExp_computed = false;
+    node.getContainedSqlExp_value = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:61
+   */
+  public AssignStmt copy() {
+    try {
+      AssignStmt node = (AssignStmt) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:79
+   */
+  public AssignStmt fullCopy() {
+    AssignStmt tree = (AssignStmt) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Annotation list.
+   * @param list The new list node to be used as the Annotation list.
+   * @apilevel high-level
+   */
+  public void setAnnotationList(List<Annotation> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * @return Number of children in the Annotation list.
+   * @apilevel high-level
+   */
+  public int getNumAnnotation() {
+    return getAnnotationList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Annotation list.
+   * @apilevel low-level
+   */
+  public int getNumAnnotationNoTransform() {
+    return getAnnotationListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Annotation list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Annotation list.
+   * @apilevel high-level
+   */
+  public Annotation getAnnotation(int i) {
+    return (Annotation) getAnnotationList().getChild(i);
+  }
+  /**
+   * Check whether the Annotation list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasAnnotation() {
+    return getAnnotationList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Annotation list.
+   * @param node The element to append to the Annotation list.
+   * @apilevel high-level
+   */
+  public void addAnnotation(Annotation node) {
+    List<Annotation> list = (parent == null || state == null) ? getAnnotationListNoTransform() : getAnnotationList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addAnnotationNoTransform(Annotation node) {
+    List<Annotation> list = getAnnotationListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Annotation list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setAnnotation(Annotation node, int i) {
+    List<Annotation> list = getAnnotationList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotationList() {
+    List<Annotation> list = (List<Annotation>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationListNoTransform() {
+    return (List<Annotation>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotations() {
+    return getAnnotationList();
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationsNoTransform() {
+    return getAnnotationListNoTransform();
+  }
+  /**
+   * Replaces the Var child.
+   * @param node The new node to replace the Var child.
+   * @apilevel high-level
+   */
+  public void setVar(VarOrFieldUse node) {
+    setChild(node, 1);
+  }
+  /**
+   * Retrieves the Var child.
+   * @return The current node used as the Var child.
+   * @apilevel high-level
+   */
+  public VarOrFieldUse getVar() {
+    return (VarOrFieldUse) getChild(1);
+  }
+  /**
+   * Retrieves the Var child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Var child.
+   * @apilevel low-level
+   */
+  public VarOrFieldUse getVarNoTransform() {
+    return (VarOrFieldUse) getChildNoTransform(1);
+  }
+  /**
+   * Replaces the Value child.
+   * @param node The new node to replace the Value child.
+   * @apilevel high-level
+   */
+  public void setValue(Exp node) {
+    setChild(node, 2);
+  }
+  /**
+   * Retrieves the Value child.
+   * @return The current node used as the Value child.
+   * @apilevel high-level
+   */
+  public Exp getValue() {
+    return (Exp) getChild(2);
+  }
+  /**
+   * Retrieves the Value child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Value child.
+   * @apilevel low-level
+   */
+  public Exp getValueNoTransform() {
+    return (Exp) getChildNoTransform(2);
+  }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:123
+   */
+    public void typeCheck(SemanticErrorList s) {
+        int size = s.size();
+        refined_TypeChecker_AssignStmt_typeCheck(s);
+        if (s.size() > size) return;
+        getModel().getTypeExt().checkAssignStmt(this);
+    }
+  /**
+   * @apilevel internal
+   */
+  protected int getContainedSqlExp_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getContainedSqlExp_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected SqlExp getContainedSqlExp_value;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:10
+   */
+  public SqlExp getContainedSqlExp() {
+    if(getContainedSqlExp_computed) {
+      return getContainedSqlExp_value;
+    }
+    ASTNode$State state = state();
+    if (getContainedSqlExp_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getContainedSqlExp in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getContainedSqlExp_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getContainedSqlExp_value = getContainedSqlExp_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getContainedSqlExp_computed = true;
+    } else {
+    }
+
+    getContainedSqlExp_visited = -1;
+    return getContainedSqlExp_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private SqlExp getContainedSqlExp_compute() {  return getValueNoTransform().toSqlExp();  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FnAppContext.jrag:20
+   * @apilevel internal
+   */
+  public boolean Define_boolean_isContextImperative(ASTNode caller, ASTNode child) {
+    if (caller == getValueNoTransform()) {
+      return true;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_boolean_isContextImperative(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:70
+   * @apilevel internal
+   */
+  public List<Annotation> Define_List_Annotation__getAnnotations(ASTNode caller, ASTNode child) {
+    if (caller == getValueNoTransform()) {
+      return getAnnotations();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_List_Annotation__getAnnotations(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

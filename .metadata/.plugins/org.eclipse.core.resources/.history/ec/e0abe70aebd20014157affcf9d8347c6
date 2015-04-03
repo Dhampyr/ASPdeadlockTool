@@ -1,0 +1,541 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:298
+ * @production DeltaClause : {@link ASTNode} ::= <span class="component">{@link Deltaspec}</span> <span class="component">AfterDeltaID:{@link DeltaID}*</span> <span class="component">[FromAppCond:{@link AppCond}]</span> <span class="component">[{@link AppCond}]</span>;
+
+ */
+public class DeltaClause extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:143
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("delta ");
+        getDeltaspec().doPrettyPrint(stream, formatter);
+
+        if (getNumAfterDeltaID() > 0) {
+            stream.print(" after ");
+            getAfterDeltaIDList().doPrettyPrint(stream, formatter, ",");
+        }
+
+        if (hasAppCond()) {
+            stream.print(" when ");
+            getAppCond().doPrettyPrint(stream, formatter);
+        }
+
+        stream.print(";");
+    }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:86
+   */
+  public boolean isApplicable(Product prod) {
+        return evaluateApplicationCondition(prod.getFeatures());
+    }
+  /**************************************************************************
+   * Evaluate the application condition assciated with this DeltaClause
+   * in the context of the given list of features and attribute values
+   * 
+   * TODO Support feature attributes
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:152
+   */
+  public boolean evaluateApplicationCondition(List<Feature> onFeatures) {
+        // first, log the names of all onFeatures in a set, for easy lookup
+        HashSet<String> onFeatureIDs = new HashSet<String>();
+        for (Feature f : onFeatures)
+            onFeatureIDs.add(f.getName());
+        
+        if (hasAppCond())
+            return getAppCond().evaluate(onFeatureIDs);
+        else
+            return true;
+    }
+  /**************************************************************************
+   * Evaluate the "from" application condition assciated with this DeltaClause 
+   * in the context of the given list of features and attribute values
+   * 
+   * "from" app conditions are only for dynamic product reconfiguration,
+   * where a running product is re-configured into another product.
+   * 
+   * TODO Support feature attributes
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:173
+   */
+  public boolean evaluateFromApplicationCondition(List<Feature> onFeatures) {
+        // first, log the names of all onFeatures in a set, for easy lookup
+        HashSet<String> onFeatureIDs = new HashSet<String>();
+        for (Feature f : onFeatures)
+            onFeatureIDs.add(f.getName());
+        
+        if (hasFromAppCond())
+            return getFromAppCond().evaluate(onFeatureIDs);
+        else
+            return false;
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:65
+   */
+  public DeltaClause parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:1066
+   */
+  protected void typeCheck(Map<String,DeltaDecl> ds, Set<String> definedFeatures, SemanticErrorList e) {
+        TypeCheckerHelper.typeCheckDeltaClause(this, ds, definedFeatures, e);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public DeltaClause() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[4];
+    setChild(new List(), 1);
+    setChild(new Opt(), 2);
+    setChild(new Opt(), 3);
+  }
+  /**
+   * @declaredat ASTNode:16
+   */
+  public DeltaClause(Deltaspec p0, List<DeltaID> p1, Opt<AppCond> p2, Opt<AppCond> p3) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+    setChild(p2, 2);
+    setChild(p3, 3);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:25
+   */
+  protected int numChildren() {
+    return 4;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:31
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:37
+   */
+  public void flushCache() {
+    super.flushCache();
+    refersTo_Feature_visited = null;
+    getProductLine_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:45
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:51
+   */
+  public DeltaClause clone() throws CloneNotSupportedException {
+    DeltaClause node = (DeltaClause) super.clone();
+    node.refersTo_Feature_visited = null;
+    node.getProductLine_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:62
+   */
+  public DeltaClause copy() {
+    try {
+      DeltaClause node = (DeltaClause) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:80
+   */
+  public DeltaClause fullCopy() {
+    DeltaClause tree = (DeltaClause) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Deltaspec child.
+   * @param node The new node to replace the Deltaspec child.
+   * @apilevel high-level
+   */
+  public void setDeltaspec(Deltaspec node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the Deltaspec child.
+   * @return The current node used as the Deltaspec child.
+   * @apilevel high-level
+   */
+  public Deltaspec getDeltaspec() {
+    return (Deltaspec) getChild(0);
+  }
+  /**
+   * Retrieves the Deltaspec child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Deltaspec child.
+   * @apilevel low-level
+   */
+  public Deltaspec getDeltaspecNoTransform() {
+    return (Deltaspec) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the AfterDeltaID list.
+   * @param list The new list node to be used as the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public void setAfterDeltaIDList(List<DeltaID> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the AfterDeltaID list.
+   * @return Number of children in the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public int getNumAfterDeltaID() {
+    return getAfterDeltaIDList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the AfterDeltaID list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the AfterDeltaID list.
+   * @apilevel low-level
+   */
+  public int getNumAfterDeltaIDNoTransform() {
+    return getAfterDeltaIDListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the AfterDeltaID list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public DeltaID getAfterDeltaID(int i) {
+    return (DeltaID) getAfterDeltaIDList().getChild(i);
+  }
+  /**
+   * Check whether the AfterDeltaID list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasAfterDeltaID() {
+    return getAfterDeltaIDList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the AfterDeltaID list.
+   * @param node The element to append to the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public void addAfterDeltaID(DeltaID node) {
+    List<DeltaID> list = (parent == null || state == null) ? getAfterDeltaIDListNoTransform() : getAfterDeltaIDList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addAfterDeltaIDNoTransform(DeltaID node) {
+    List<DeltaID> list = getAfterDeltaIDListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the AfterDeltaID list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setAfterDeltaID(DeltaID node, int i) {
+    List<DeltaID> list = getAfterDeltaIDList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the AfterDeltaID list.
+   * @return The node representing the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public List<DeltaID> getAfterDeltaIDList() {
+    List<DeltaID> list = (List<DeltaID>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the AfterDeltaID list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the AfterDeltaID list.
+   * @apilevel low-level
+   */
+  public List<DeltaID> getAfterDeltaIDListNoTransform() {
+    return (List<DeltaID>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the AfterDeltaID list.
+   * @return The node representing the AfterDeltaID list.
+   * @apilevel high-level
+   */
+  public List<DeltaID> getAfterDeltaIDs() {
+    return getAfterDeltaIDList();
+  }
+  /**
+   * Retrieves the AfterDeltaID list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the AfterDeltaID list.
+   * @apilevel low-level
+   */
+  public List<DeltaID> getAfterDeltaIDsNoTransform() {
+    return getAfterDeltaIDListNoTransform();
+  }
+  /**
+   * Replaces the optional node for the FromAppCond child. This is the <code>Opt</code>
+   * node containing the child FromAppCond, not the actual child!
+   * @param opt The new node to be used as the optional node for the FromAppCond child.
+   * @apilevel low-level
+   */
+  public void setFromAppCondOpt(Opt<AppCond> opt) {
+    setChild(opt, 2);
+  }
+  /**
+   * Replaces the (optional) FromAppCond child.
+   * @param node The new node to be used as the FromAppCond child.
+   * @apilevel high-level
+   */
+  public void setFromAppCond(AppCond node) {
+    getFromAppCondOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional FromAppCond child exists.
+   * @return {@code true} if the optional FromAppCond child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasFromAppCond() {
+    return getFromAppCondOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) FromAppCond child.
+   * @return The FromAppCond child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public AppCond getFromAppCond() {
+    return (AppCond) getFromAppCondOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the FromAppCond child. This is the <code>Opt</code> node containing the child FromAppCond, not the actual child!
+   * @return The optional node for child the FromAppCond child.
+   * @apilevel low-level
+   */
+  public Opt<AppCond> getFromAppCondOpt() {
+    return (Opt<AppCond>) getChild(2);
+  }
+  /**
+   * Retrieves the optional node for child FromAppCond. This is the <code>Opt</code> node containing the child FromAppCond, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child FromAppCond.
+   * @apilevel low-level
+   */
+  public Opt<AppCond> getFromAppCondOptNoTransform() {
+    return (Opt<AppCond>) getChildNoTransform(2);
+  }
+  /**
+   * Replaces the optional node for the AppCond child. This is the <code>Opt</code>
+   * node containing the child AppCond, not the actual child!
+   * @param opt The new node to be used as the optional node for the AppCond child.
+   * @apilevel low-level
+   */
+  public void setAppCondOpt(Opt<AppCond> opt) {
+    setChild(opt, 3);
+  }
+  /**
+   * Replaces the (optional) AppCond child.
+   * @param node The new node to be used as the AppCond child.
+   * @apilevel high-level
+   */
+  public void setAppCond(AppCond node) {
+    getAppCondOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional AppCond child exists.
+   * @return {@code true} if the optional AppCond child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasAppCond() {
+    return getAppCondOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) AppCond child.
+   * @return The AppCond child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public AppCond getAppCond() {
+    return (AppCond) getAppCondOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the AppCond child. This is the <code>Opt</code> node containing the child AppCond, not the actual child!
+   * @return The optional node for child the AppCond child.
+   * @apilevel low-level
+   */
+  public Opt<AppCond> getAppCondOpt() {
+    return (Opt<AppCond>) getChild(3);
+  }
+  /**
+   * Retrieves the optional node for child AppCond. This is the <code>Opt</code> node containing the child AppCond, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child AppCond.
+   * @apilevel low-level
+   */
+  public Opt<AppCond> getAppCondOptNoTransform() {
+    return (Opt<AppCond>) getChildNoTransform(3);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map refersTo_Feature_visited;
+  /**
+   * @attribute syn
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:1105
+   */
+  public boolean refersTo(Feature f) {
+    Object _parameters = f;
+    if(refersTo_Feature_visited == null) refersTo_Feature_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(refersTo_Feature_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: refersTo in class: org.jastadd.ast.AST.SynDecl");
+    }
+    refersTo_Feature_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {  return !hasAppCond() || getAppCond().refersTo(f);  }
+    finally {
+      refersTo_Feature_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @attribute inh
+   * @aspect ProductLine
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:28
+   */
+  public ProductLine getProductLine() {
+    ASTNode$State state = state();
+    if (getProductLine_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getProductLine in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getProductLine_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    ProductLine getProductLine_value = getParent().Define_ProductLine_getProductLine(this, null);
+
+    getProductLine_visited = -1;
+    return getProductLine_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getProductLine_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

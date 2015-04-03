@@ -1,0 +1,286 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:319
+ * @production FIDAID : {@link Deltaparam} ::= <span class="component">&lt;FeatName:String&gt;</span> <span class="component">&lt;AttrName:String&gt;</span>;
+
+ */
+public class FIDAID extends Deltaparam implements Cloneable {
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:13
+   */
+  public String getName()  { return getFeatName() + "." + getAttrName(); }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:45
+   */
+  public Value calcValue(List<Feature> features) throws DeltaModellingException {
+        for (Feature f : features) {
+            if (f.getName().equals(this.getFeatName()))   // found feature
+                for (AttrAssignment attr : f.getAttrAssignments()) {
+                    if (attr.getName().equals(getAttrName()))   // found attribute
+                        return (Value) attr.getValue().fullCopy();
+                }
+        }
+        throw new DeltaModellingException("Argument " + getFeatName() + "." + getAttrName() + " not found.");
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:90
+   */
+  public FIDAID parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public FIDAID() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+  }
+  /**
+   * @declaredat ASTNode:12
+   */
+  public FIDAID(String p0, String p1) {
+    setFeatName(p0);
+    setAttrName(p1);
+  }
+  /**
+   * @declaredat ASTNode:16
+   */
+  public FIDAID(beaver.Symbol p0, beaver.Symbol p1) {
+    setFeatName(p0);
+    setAttrName(p1);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:23
+   */
+  protected int numChildren() {
+    return 0;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:29
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:35
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:41
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:47
+   */
+  public FIDAID clone() throws CloneNotSupportedException {
+    FIDAID node = (FIDAID) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:56
+   */
+  public FIDAID copy() {
+    try {
+      FIDAID node = (FIDAID) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:74
+   */
+  public FIDAID fullCopy() {
+    FIDAID tree = (FIDAID) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme FeatName.
+   * @param value The new value for the lexeme FeatName.
+   * @apilevel high-level
+   */
+  public void setFeatName(String value) {
+    tokenString_FeatName = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_FeatName;
+  /**
+   */
+  public int FeatNamestart;
+  /**
+   */
+  public int FeatNameend;
+  /**
+   * JastAdd-internal setter for lexeme FeatName using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme FeatName
+   * @apilevel internal
+   */
+  public void setFeatName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setFeatName is only valid for String lexemes");
+    tokenString_FeatName = (String)symbol.value;
+    FeatNamestart = symbol.getStart();
+    FeatNameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme FeatName.
+   * @return The value for the lexeme FeatName.
+   * @apilevel high-level
+   */
+  public String getFeatName() {
+    return tokenString_FeatName != null ? tokenString_FeatName : "";
+  }
+  /**
+   * Replaces the lexeme AttrName.
+   * @param value The new value for the lexeme AttrName.
+   * @apilevel high-level
+   */
+  public void setAttrName(String value) {
+    tokenString_AttrName = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_AttrName;
+  /**
+   */
+  public int AttrNamestart;
+  /**
+   */
+  public int AttrNameend;
+  /**
+   * JastAdd-internal setter for lexeme AttrName using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme AttrName
+   * @apilevel internal
+   */
+  public void setAttrName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setAttrName is only valid for String lexemes");
+    tokenString_AttrName = (String)symbol.value;
+    AttrNamestart = symbol.getStart();
+    AttrNameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme AttrName.
+   * @return The value for the lexeme AttrName.
+   * @apilevel high-level
+   */
+  public String getAttrName() {
+    return tokenString_AttrName != null ? tokenString_AttrName : "";
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

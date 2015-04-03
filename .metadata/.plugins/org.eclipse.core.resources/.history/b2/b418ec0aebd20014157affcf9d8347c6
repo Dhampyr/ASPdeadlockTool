@@ -1,0 +1,439 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:100
+ * @production ModifyMethodModifier : {@link Modifier} ::= <span class="component">{@link MethodImpl}</span>;
+
+ */
+public class ModifyMethodModifier extends Modifier implements Cloneable {
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1133
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        DynamicJavaGeneratorHelper.generateMethodImpl(stream, getMethodImpl());
+    }
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1136
+   */
+  public void generateJavaDynamicApplication(PrintStream stream, String className) {
+        String mName = JavaBackend.getMethodName(getMethodImpl().getMethodSig().getName());
+        stream.println("clsNew.removeMethod(\"" + mName + "\");");
+        stream.println("clsNew.addMethod(\"" + mName + "\", " + className + "." + mName + ".singleton());");
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:600
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("modifies ");
+        getMethodImpl().doPrettyPrint(stream, formatter);
+    }
+  /**
+   * @aspect DeltaModifierApplicator
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaModifierApplicator.jadd:295
+   */
+  public void applyTo(ClassDecl cd) throws DeltaModellingException {
+        MethodSig mysig = getMethodImpl().getMethodSig();
+
+        // in given ClassDecl: find MethodDecl that matches sig
+        int found = -1;
+        for (int i = 0; i < cd.getNumMethod(); i++) {
+            MethodSig sig = cd.getMethod(i).getMethodSig();
+            if (sig.matches(mysig)) {
+                found = i;
+                break;
+            }
+        }
+        if (found >= 0) {
+            // replace MethodImpl
+            MethodImpl method = getMethodImpl().fullCopy();
+            method.setFileName(getMethodImpl().getFileName());
+            cd.getMethods().setChild(method, found);
+        } else
+            throw new DeltaModellingWithNodeException(getMethodImpl().getMethodSig(), getDelta(), 
+                    " wants to modify method [" + mysig + "], which was not found in class [" + cd.qualifiedName() + "].");
+    }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:141
+   */
+  protected void applySubstitution(Map<String,Value> subst) throws DeltaModellingWithNodeException {
+        getMethodImpl().applySubstitution(subst);
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:55
+   */
+  protected void resolveOriginalCalls(
+            Collection<DeltaDecl> deltas) throws DeltaModellingException {
+        
+        for (Stmt stmt : getMethodImpl().getBlock().getStmts())
+            stmt.resolveOriginalCalls(this, deltas);
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:120
+   */
+  protected MethodImpl findOriginalMethod(
+            OriginalCall oc, 
+            Collection<DeltaDecl> deltas) throws DeltaModellingException {
+
+        String classid = targetQualifiedClassName();
+        MethodSig method = getMethodImpl().getMethodSig();
+        String methodid = getMethodImpl().getMethodSig().getName();
+        MethodImpl originalMethodCopy;
+        
+        if (oc instanceof TargetedOriginalCall) {
+            String targetDeltaID = ((TargetedOriginalCall) oc).getTarget().getName();
+
+            if ("core".equals(targetDeltaID)) {
+                originalMethodCopy = findOriginalInCore(method, classid);
+                return originalMethodCopy;
+            } else {
+                for (DeltaDecl delta : deltas) {
+                    if (delta.getName().equals(targetDeltaID)) {
+                        originalMethodCopy = findOriginalInDelta(method, classid, delta);
+                        return originalMethodCopy;
+                    }
+                }
+                throw new DeltaModellingException(getDelta(),"Delta " + targetDeltaID 
+                        + " is target of an original call, but has not yet been applied");
+            }
+            
+        } else {
+            // untargeted OriginalCall
+            originalMethodCopy = findOriginalInAppliedDeltasAndCore(method, classid, deltas);
+            return originalMethodCopy;
+        }
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:159
+   */
+  private MethodImpl findOriginalInAppliedDeltasAndCore(            
+            MethodSig method,
+            String classid, 
+            Collection<DeltaDecl> deltas) throws DeltaModellingException {
+
+        //System.out.println("*** searching for method " + classid + "." + method.getName());
+        
+        // search in list of applied deltas
+        for (DeltaDecl delta : deltas) {
+            try {
+                return findOriginalInDelta(method, classid, delta);
+            } catch(DeltaModellingException e) {
+                // continue search in next delta, then core
+                continue;
+            }
+        }
+        
+        // search in core classes
+        try {
+            return findOriginalInCore(method, classid);
+        } catch (DeltaModellingException e) {
+            // give up
+            throw new DeltaModellingException(getDelta(), ": Could not find original implementation of method " + classid 
+                    + "." + method.getName());
+        }
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:189
+   */
+  private MethodImpl findOriginalInDelta(            
+            MethodSig methodSig,
+            String classid, 
+            DeltaDecl delta) throws DeltaModellingException {
+        
+        //System.out.println("*** searching in delta " + delta.getName());
+        String methodid = methodSig.getName();
+        for (ModuleModifier cm : delta.getModuleModifiers()) {
+            if (cm.getName().equals(classid)) {
+                if (cm instanceof ModifyClassModifier) {
+                    for (Modifier m : ((ModifyClassModifier)cm).getModifiers()) {
+                        if (m instanceof AddMethodModifier) {
+                            MethodImpl method = ((AddMethodModifier)m).getMethodImpl();
+                            if (method.getMethodSig().getName().equals(methodid))
+                                return copyMethod(method, delta.getName());
+                        } else if (m instanceof ModifyMethodModifier) {
+                            MethodImpl method = ((ModifyMethodModifier)m).getMethodImpl();
+                            if (method.getMethodSig().getName().equals(methodid))
+                                return copyMethod(method, delta.getName());
+                        } else if (m instanceof RemoveMethodModifier) {
+                            if (((RemoveMethodModifier)m).getMethodSig().getName().equals(methodid))
+                                throw new DeltaModellingException(getDelta(),": Could not find original implementation of method " + classid + "." + methodid
+                                        + " -- it was removed by delta " + delta.getName());
+                        }
+                    }
+                } else if (cm instanceof AddClassModifier) {
+                    for (MethodImpl method : ((AddClassModifier)cm).getClassDecl().getMethods())
+                        if (method.getMethodSig().getName().equals(methodid))
+                            return copyMethod(method, delta.getName());
+                } else if (cm instanceof RemoveClassModifier) {
+                    throw new DeltaModellingException(getDelta(), ": Could not find original implementation of method " + classid + "." + methodid
+                            + " -- it was removed by delta " + delta.getName());
+                }
+            }
+        }
+        // not found
+        throw new DeltaModellingException(getDelta(), ": Could not find original implementation of method " + classid + "." + methodid
+                + " in delta " + delta.getName());
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:233
+   */
+  private MethodImpl findOriginalInCore(
+            MethodSig method,
+            String classid) throws DeltaModellingException {
+        ClassDecl coreClass = (ClassDecl) getDelta().getModel().lookup(new KindedName(Kind.CLASS, classid));
+        if (!coreClass.isUnknown()) {
+            MethodImpl coreMethod = coreClass.lookupMethod(method.getName());
+            if (coreMethod != null)
+                return copyMethod(coreMethod, "core");
+        }
+        // not found
+        throw new DeltaModellingException(getDelta(), ": Could not find original implementation of method " + classid + "." + method.getName()
+                + " in the core.");
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:256
+   */
+  public MethodImpl copyMethod(MethodImpl method, String nameSuffix) {
+        MethodImpl methodCopy = method.fullCopy();
+        methodCopy.getMethodSig().setName(method.getMethodSig().getName() + "$ORIGIN_" + nameSuffix); 
+        return methodCopy;
+    }
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:210
+   */
+  protected void printInfo(PrintStream stream)
+    {
+    	stream.print(this.getMethodImpl().getMethodSig());
+    }
+  /**
+   * @aspect PrettyPrint
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/PrettyPrint.jadd:108
+   */
+  public void prettyPrint(PrintWriter w, ABSFormatter f) {
+        super.prettyPrint(w, f);
+        w.print("(" + this.getMethodImpl().getMethodSig() + ")");       
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:169
+   */
+  public ModifyMethodModifier parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ModifyMethodModifier() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public ModifyMethodModifier(MethodImpl p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:19
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:25
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:37
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:43
+   */
+  public ModifyMethodModifier clone() throws CloneNotSupportedException {
+    ModifyMethodModifier node = (ModifyMethodModifier) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:52
+   */
+  public ModifyMethodModifier copy() {
+    try {
+      ModifyMethodModifier node = (ModifyMethodModifier) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:70
+   */
+  public ModifyMethodModifier fullCopy() {
+    ModifyMethodModifier tree = (ModifyMethodModifier) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the MethodImpl child.
+   * @param node The new node to replace the MethodImpl child.
+   * @apilevel high-level
+   */
+  public void setMethodImpl(MethodImpl node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the MethodImpl child.
+   * @return The current node used as the MethodImpl child.
+   * @apilevel high-level
+   */
+  public MethodImpl getMethodImpl() {
+    return (MethodImpl) getChild(0);
+  }
+  /**
+   * Retrieves the MethodImpl child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the MethodImpl child.
+   * @apilevel low-level
+   */
+  public MethodImpl getMethodImplNoTransform() {
+    return (MethodImpl) getChildNoTransform(0);
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:200
+   * @apilevel internal
+   */
+  public VarOrFieldDecl Define_VarOrFieldDecl_lookupVarOrFieldName(ASTNode caller, ASTNode child, String name, boolean fieldOnly) {
+    if (caller == getMethodImplNoTransform()) {
+      return locallookupVarOrFieldName(name,fieldOnly);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, caller, name, fieldOnly);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

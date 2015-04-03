@@ -7,10 +7,18 @@
 <fullyQualifiedTypeName name="java.io.FileNotFoundException"/>
 <fullyQualifiedTypeName name="asp.parser.ASPgrammarParser.ProgramContext"/>
 <fullyQualifiedTypeName name="asp.models.Model"/>
-<fullyQualifiedTypeName name="asp.models.ClassDecl"/>
-<fullyQualifiedTypeName name="asp.models.Declaration"/>
 <fullyQualifiedTypeName name="asp.models.Program"/>
-<fullyQualifiedTypeName name="java.util.LinkedList"/>
-<fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="asp.parser.ASPBaseListener"/>
+<fullyQualifiedTypeName name="org.antlr.v4.runtime.tree.ParseTreeWalker"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="asp.models.ClassDecl"/>
+<fullyQualifiedTypeName name="org.antlr.v4.parse.ANTLRParser.parserRule_return"/>
+<fullyQualifiedTypeName name="java.util.LinkedList"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Method"/>
+<fullyQualifiedTypeName name="asp.models.Method"/>
+<fullyQualifiedTypeName name="asp.models.Declaration"/>
+<fullyQualifiedTypeName name="asp.translator.Translator"/>
+<fullyQualifiedTypeName name="deadlock.analyser.Analyser"/>
+<fullyQualifiedTypeName name="autodeploy.Tester"/>
+<fullyQualifiedTypeName name="deadlock.analyser.Tester"/>
 </qualifiedTypeNameHistroy>

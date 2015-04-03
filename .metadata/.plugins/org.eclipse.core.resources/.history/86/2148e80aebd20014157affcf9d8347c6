@@ -1,0 +1,314 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:191
+ * @production ExpGuard : {@link Guard} ::= <span class="component">{@link PureExp}</span>;
+
+ */
+public class ExpGuard extends Guard implements Cloneable {
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:849
+   */
+  @Override
+  public boolean hasPoll(){
+    return true;
+  }
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:891
+   */
+  @Override
+  public void generateErlangCode(ErlangCodeStream preAwait,ErlangCodeStream ecs,Vars vars){
+    getPureExp().generateErlangCode(ecs,vars);
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:519
+   */
+  public void generateJavaGuard(PrintStream beforeAwaitStream, PrintStream stream) {
+        JavaGeneratorHelper.generateExprGuard(this, beforeAwaitStream, stream);
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:543
+   */
+  public void generateJavaGuardDynamic(PrintStream beforeAwaitStream, PrintStream stream) {
+        DynamicJavaGeneratorHelper.generateExprGuard(this, beforeAwaitStream, stream);
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:782
+   */
+  public void generateMaude(PrintStream stream) {
+        getPureExp().generateMaude(stream);
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:330
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        getPureExp().doPrettyPrint(stream, formatter);
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:950
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo) {
+        s.print("expGuard(");
+        getPureExp().generateProlog(s,reachInfo);
+        s.print(")");
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:81
+   */
+  public ExpGuard parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * Guard must observe something. "True" and "False" or implemented as a hack for now
+   * for those people that like to use it.
+   * TODO: If there's ever a warning infrastructure, this should probably be changed.
+   * @see PureExp#getFields(FieldUseInfo)
+   * @author stolz
+   * @aspect FieldUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/FieldAccesses.jrag:13
+   */
+  public void hasFieldAccess(SemanticErrorList e) {
+        final PureExp pe = getPureExp();
+        final FieldUseInfo info = getPureExp().getFields();
+        if ((!(pe instanceof DataConstructorExp && ("True".equals(((DataConstructorExp)pe).getConstructor()) || "False".equals(((DataConstructorExp)pe).getConstructor()))))
+                    && (info.fields.isEmpty() && !info.usesBuiltin))
+            e.add(new TypeError(this,ErrorMessage.AWAIT_TOO_PURE, ""));
+    }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:670
+   */
+  public void typeCheck(SemanticErrorList e) { 
+        PureExp exp = getPureExp();
+        // We'll only run "deeper" checks if the types check out. 
+        int size = e.size();
+        exp.typeCheck(e);
+        getPureExp().assertHasType(e,getModel().getBoolType());
+        if (e.size() == size)
+            hasFieldAccess(e); // check for visible change/builtin
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ExpGuard() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public ExpGuard(PureExp p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:19
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:25
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  public void flushCache() {
+    super.flushCache();
+    getModel_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:38
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:44
+   */
+  public ExpGuard clone() throws CloneNotSupportedException {
+    ExpGuard node = (ExpGuard) super.clone();
+    node.getModel_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:54
+   */
+  public ExpGuard copy() {
+    try {
+      ExpGuard node = (ExpGuard) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:72
+   */
+  public ExpGuard fullCopy() {
+    ExpGuard tree = (ExpGuard) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the PureExp child.
+   * @param node The new node to replace the PureExp child.
+   * @apilevel high-level
+   */
+  public void setPureExp(PureExp node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the PureExp child.
+   * @return The current node used as the PureExp child.
+   * @apilevel high-level
+   */
+  public PureExp getPureExp() {
+    return (PureExp) getChild(0);
+  }
+  /**
+   * Retrieves the PureExp child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the PureExp child.
+   * @apilevel low-level
+   */
+  public PureExp getPureExpNoTransform() {
+    return (PureExp) getChildNoTransform(0);
+  }
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:49
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

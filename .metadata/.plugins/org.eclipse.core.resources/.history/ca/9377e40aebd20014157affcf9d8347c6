@@ -1,0 +1,353 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:89
+ * @production AddClassModifier : {@link ClassModifier} ::= <span class="component">{@link ClassDecl}</span>;
+
+ */
+public class AddClassModifier extends ClassModifier implements Cloneable {
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1055
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        // FIXME generate _mod instead of _c class
+        // TODO delta application code
+        //DynamicJavaGeneratorHelper.generateClassDecl(stream, this.getClassDecl());
+        stream.println("// TODO " + this.getClass().getName());
+        stream.println("public static void apply() {}");
+  
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:621
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("adds ");
+        getClassDecl().doPrettyPrint(stream, formatter);
+    }
+  /**************************************************************************
+   * OOModifiers add/remove/modify classes or interfaces
+   * they are applied to Modules
+   * @aspect DeltaModifierApplicator
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaModifierApplicator.jadd:25
+   */
+  public void apply() throws DeltaModellingException {
+        ModuleDecl module = findModule();
+        ClassDecl cls = getClassDecl().fullCopy();
+        cls.setFileName(getClassDecl().getFileName());
+        cls.setName(getSimpleName());
+        module.getDecls().addChild(cls);
+    }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:114
+   */
+  protected void applySubstitution(Map<String,Value> subst) throws DeltaModellingWithNodeException  {
+        getClassDecl().applySubstitution(subst);
+    }
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:189
+   */
+  protected void printInfo(PrintStream stream)
+    {
+    	stream.print(this.getClassDecl().getName());
+    }
+  /**
+   * @aspect PrettyPrint
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/PrettyPrint.jadd:128
+   */
+  public void prettyPrintChildren(PrintWriter w, ABSFormatter f) {
+        w.print(getClassDecl().getName());
+        w.print(' ');
+        super.prettyPrintChildren(w,f);   
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:9
+   */
+  public AddClassModifier parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:956
+   */
+  protected void typeCheck(SemanticErrorList e) {
+        super.typeCheck(e);
+        //TODO
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public AddClassModifier() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public AddClassModifier(ClassDecl p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:19
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:25
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  public void flushCache() {
+    super.flushCache();
+    getName_visited = -1;
+    targetClassName_visited = -1;
+    targetQualifiedClassName_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:40
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:46
+   */
+  public AddClassModifier clone() throws CloneNotSupportedException {
+    AddClassModifier node = (AddClassModifier) super.clone();
+    node.getName_visited = -1;
+    node.targetClassName_visited = -1;
+    node.targetQualifiedClassName_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:58
+   */
+  public AddClassModifier copy() {
+    try {
+      AddClassModifier node = (AddClassModifier) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:76
+   */
+  public AddClassModifier fullCopy() {
+    AddClassModifier tree = (AddClassModifier) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the ClassDecl child.
+   * @param node The new node to replace the ClassDecl child.
+   * @apilevel high-level
+   */
+  public void setClassDecl(ClassDecl node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the ClassDecl child.
+   * @return The current node used as the ClassDecl child.
+   * @apilevel high-level
+   */
+  public ClassDecl getClassDecl() {
+    return (ClassDecl) getChild(0);
+  }
+  /**
+   * Retrieves the ClassDecl child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the ClassDecl child.
+   * @apilevel low-level
+   */
+  public ClassDecl getClassDeclNoTransform() {
+    return (ClassDecl) getChildNoTransform(0);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Name
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:17
+   */
+  public String getName() {
+    ASTNode$State state = state();
+    if (getName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getName_visited = state().boundariesCrossed;
+    try {  return this.getClassDecl().getName();  }
+    finally {
+      getName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int targetClassName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TargetClassName
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:44
+   */
+  public String targetClassName() {
+    ASTNode$State state = state();
+    if (targetClassName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: targetClassName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    targetClassName_visited = state().boundariesCrossed;
+    try {  return this.getSimpleName();  }
+    finally {
+      targetClassName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int targetQualifiedClassName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TargetQualifiedClassName
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:53
+   */
+  public String targetQualifiedClassName() {
+    ASTNode$State state = state();
+    if (targetQualifiedClassName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: targetQualifiedClassName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    targetQualifiedClassName_visited = state().boundariesCrossed;
+    try {  return this.qualifiedName();  }
+    finally {
+      targetQualifiedClassName_visited = -1;
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:209
+   * @apilevel internal
+   */
+  public ModuleDecl Define_ModuleDecl_getModuleDecl(ASTNode caller, ASTNode child) {
+    if (caller == getClassDeclNoTransform()) {
+      return findModule();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_ModuleDecl_getModuleDecl(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

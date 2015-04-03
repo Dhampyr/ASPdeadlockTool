@@ -1,0 +1,315 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:189
+ * @production AndGuard : {@link Guard} ::= <span class="component">Left:{@link Guard}</span> <span class="component">Right:{@link Guard}</span>;
+
+ */
+public class AndGuard extends Guard implements Cloneable {
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:844
+   */
+  @Override
+  public boolean hasPoll(){
+    return getLeft().hasPoll()||getRight().hasPoll();
+  }
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:864
+   */
+  @Override
+  public void generateErlangCode(ErlangCodeStream preAwait,ErlangCodeStream ecs,Vars vars){
+    getLeft().generateErlangCode( preAwait, ecs, vars);
+    if(getLeft().hasPoll()&&getRight().hasPoll())
+      ecs.print(" andalso ");
+    getRight().generateErlangCode( preAwait, ecs, vars) ;
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:505
+   */
+  public void generateJavaGuard(PrintStream beforeAwaitStream, PrintStream stream) {
+        stream.print("new " + JavaBackendConstants.ANDGUARD + "(");
+        getLeft().generateJavaGuard(beforeAwaitStream, stream);
+        stream.print(",");
+        getRight().generateJavaGuard(beforeAwaitStream, stream);
+        stream.print(")");
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:529
+   */
+  public void generateJavaGuardDynamic(PrintStream beforeAwaitStream, PrintStream stream) {
+        stream.print("new " + JavaBackendConstants.ANDGUARD + "(");
+        getLeft().generateJavaGuardDynamic(beforeAwaitStream, stream);
+        stream.print(",");
+        getRight().generateJavaGuardDynamic(beforeAwaitStream, stream);
+        stream.print(")");
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:774
+   */
+  public void generateMaude(PrintStream stream) {
+        stream.print("\"&&\"( ");
+        getLeft().generateMaude(stream);
+        stream.print(":: ");
+        getRight().generateMaude(stream);
+        stream.print(") ");
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:311
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        getLeft().doPrettyPrint(stream, formatter);
+        stream.print(" & ");
+        getRight().doPrettyPrint(stream, formatter);
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:938
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo) {
+        s.print("andGuard(");
+        getLeft().generateProlog(s,reachInfo);
+        s.print(",");
+        getRight().generateProlog(s,reachInfo);
+        s.print(")");
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:21
+   */
+  public AndGuard parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:658
+   */
+  public void typeCheck(SemanticErrorList e) { 
+        getLeft().typeCheck(e);
+        getRight().typeCheck(e);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public AndGuard() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[2];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public AndGuard(Guard p0, Guard p1) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:20
+   */
+  protected int numChildren() {
+    return 2;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:26
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:32
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:38
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:44
+   */
+  public AndGuard clone() throws CloneNotSupportedException {
+    AndGuard node = (AndGuard) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:53
+   */
+  public AndGuard copy() {
+    try {
+      AndGuard node = (AndGuard) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:71
+   */
+  public AndGuard fullCopy() {
+    AndGuard tree = (AndGuard) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the Left child.
+   * @param node The new node to replace the Left child.
+   * @apilevel high-level
+   */
+  public void setLeft(Guard node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the Left child.
+   * @return The current node used as the Left child.
+   * @apilevel high-level
+   */
+  public Guard getLeft() {
+    return (Guard) getChild(0);
+  }
+  /**
+   * Retrieves the Left child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Left child.
+   * @apilevel low-level
+   */
+  public Guard getLeftNoTransform() {
+    return (Guard) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the Right child.
+   * @param node The new node to replace the Right child.
+   * @apilevel high-level
+   */
+  public void setRight(Guard node) {
+    setChild(node, 1);
+  }
+  /**
+   * Retrieves the Right child.
+   * @return The current node used as the Right child.
+   * @apilevel high-level
+   */
+  public Guard getRight() {
+    return (Guard) getChild(1);
+  }
+  /**
+   * Retrieves the Right child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Right child.
+   * @apilevel low-level
+   */
+  public Guard getRightNoTransform() {
+    return (Guard) getChildNoTransform(1);
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

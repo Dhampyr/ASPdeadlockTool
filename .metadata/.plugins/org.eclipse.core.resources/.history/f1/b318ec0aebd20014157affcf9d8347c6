@@ -1,0 +1,406 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:94
+ * @production ModifyInterfaceModifier : {@link InterfaceModifier} ::= <span class="component">&lt;Name:String&gt;</span> <span class="component">{@link MethodSigModifier}*</span>;
+
+ */
+public class ModifyInterfaceModifier extends InterfaceModifier implements Cloneable {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:805
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("modifies interface ");
+        stream.print(getName());
+
+        formatter.beforeOpenBrace();
+        stream.println("{");
+        formatter.afterOpenBrace();
+
+        getMethodSigModifierList().doPrettyPrint(stream, formatter);
+
+        formatter.beforeCloseBrace();
+        stream.print("}");
+        formatter.afterCloseBrace();
+    }
+  /**
+   * @aspect DeltaModifierApplicator
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaModifierApplicator.jadd:83
+   */
+  public void apply() throws DeltaModellingException {
+        InterfaceDecl iface = this.findInterface();
+        // apply all modifiers
+        for (MethodSigModifier mod : this.getMethodSigModifiers()) {
+            mod.applyTo(iface);
+        }
+    }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:124
+   */
+  protected void applySubstitution(Map<String,Value> subst) {}
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:168
+   */
+  public ModifyInterfaceModifier parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:980
+   */
+  protected void typeCheck(SemanticErrorList e) {
+        super.typeCheck(e);
+        //TODO
+        
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ModifyInterfaceModifier() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public ModifyInterfaceModifier(String p0, List<MethodSigModifier> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @declaredat ASTNode:18
+   */
+  public ModifyInterfaceModifier(beaver.Symbol p0, List<MethodSigModifier> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:25
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:31
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:37
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:43
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:49
+   */
+  public ModifyInterfaceModifier clone() throws CloneNotSupportedException {
+    ModifyInterfaceModifier node = (ModifyInterfaceModifier) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:58
+   */
+  public ModifyInterfaceModifier copy() {
+    try {
+      ModifyInterfaceModifier node = (ModifyInterfaceModifier) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:76
+   */
+  public ModifyInterfaceModifier fullCopy() {
+    ModifyInterfaceModifier tree = (ModifyInterfaceModifier) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_Name;
+  /**
+   */
+  public int Namestart;
+  /**
+   */
+  public int Nameend;
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the MethodSigModifier list.
+   * @param list The new list node to be used as the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public void setMethodSigModifierList(List<MethodSigModifier> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the MethodSigModifier list.
+   * @return Number of children in the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public int getNumMethodSigModifier() {
+    return getMethodSigModifierList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the MethodSigModifier list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the MethodSigModifier list.
+   * @apilevel low-level
+   */
+  public int getNumMethodSigModifierNoTransform() {
+    return getMethodSigModifierListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the MethodSigModifier list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public MethodSigModifier getMethodSigModifier(int i) {
+    return (MethodSigModifier) getMethodSigModifierList().getChild(i);
+  }
+  /**
+   * Check whether the MethodSigModifier list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasMethodSigModifier() {
+    return getMethodSigModifierList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the MethodSigModifier list.
+   * @param node The element to append to the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public void addMethodSigModifier(MethodSigModifier node) {
+    List<MethodSigModifier> list = (parent == null || state == null) ? getMethodSigModifierListNoTransform() : getMethodSigModifierList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addMethodSigModifierNoTransform(MethodSigModifier node) {
+    List<MethodSigModifier> list = getMethodSigModifierListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the MethodSigModifier list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setMethodSigModifier(MethodSigModifier node, int i) {
+    List<MethodSigModifier> list = getMethodSigModifierList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the MethodSigModifier list.
+   * @return The node representing the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public List<MethodSigModifier> getMethodSigModifierList() {
+    List<MethodSigModifier> list = (List<MethodSigModifier>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the MethodSigModifier list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the MethodSigModifier list.
+   * @apilevel low-level
+   */
+  public List<MethodSigModifier> getMethodSigModifierListNoTransform() {
+    return (List<MethodSigModifier>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the MethodSigModifier list.
+   * @return The node representing the MethodSigModifier list.
+   * @apilevel high-level
+   */
+  public List<MethodSigModifier> getMethodSigModifiers() {
+    return getMethodSigModifierList();
+  }
+  /**
+   * Retrieves the MethodSigModifier list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the MethodSigModifier list.
+   * @apilevel low-level
+   */
+  public List<MethodSigModifier> getMethodSigModifiersNoTransform() {
+    return getMethodSigModifierListNoTransform();
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:11
+   * @apilevel internal
+   */
+  public Model Define_Model_getModel(ASTNode caller, ASTNode child) {
+    if (caller == getMethodSigModifierListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return this.getDelta().getModel();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Model_getModel(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:23
+   * @apilevel internal
+   */
+  public DeltaDecl Define_DeltaDecl_getDelta(ASTNode caller, ASTNode child) {
+    if (caller == getMethodSigModifierListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return this.getDelta();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_DeltaDecl_getDelta(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

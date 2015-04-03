@@ -1,0 +1,630 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/SQL.ast:8
+ * @production SqlSelectExp : {@link SqlExp} ::= <span class="component">&lt;Distinct:Boolean&gt;</span> <span class="component">{@link SqlAttrsDef}</span> <span class="component">{@link SqlRelationRef}</span> <span class="component">[{@link SqlCondition}]</span> <span class="component">SqlGroupingAttribute:{@link PureExp}*</span> <span class="component">{@link SqlOrderingAttribute}*</span>;
+
+ */
+public class SqlSelectExp extends SqlExp implements Cloneable {
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:49
+   */
+  private PureExp createDbExecutionTree() throws abs.frontend.sql.SqlRewritingException {
+        PureExp exp = getSqlRelationRef().createDbExecutionTree();
+        if (hasSqlCondition())
+            exp = getSqlCondition().createDbExecutionTree(exp);
+        exp = getSqlAttrsDef().createDbExecutionTree(exp, getSqlGroupingAttributes());
+        exp = createDbExecutionTreeForDuplicateDeletion(exp);
+        return createDbExecutionTreeForOrdering(exp);
+    }
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:344
+   */
+  private PureExp createDbExecutionTreeForDuplicateDeletion(PureExp exp) {
+        if (!getDistinct())
+            return exp;
+        return new DataConstructorExp(
+            Constants.DBLIB_NAME + ".UnaryExecutionNode",
+            new List<PureExp>().add(
+                new DataConstructorExp(
+                    Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".DuplicateDeletion",
+                    new List<PureExp>())).add(
+                exp));
+    }
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:356
+   */
+  private PureExp createDbExecutionTreeForOrdering(PureExp exp) {
+        int numAttributes = getSqlOrderingAttributes().numChildren();
+        if (numAttributes == 0)
+            return exp;
+        PureExp attributes = new DataConstructorExp(
+                Constants.STDLIB_NAME + ".Nil",
+                new List<PureExp>());
+        for (numAttributes--; numAttributes >= 0; numAttributes--) {
+            final SqlOrderingAttribute attribute = getSqlOrderingAttribute(numAttributes);
+            attributes = new DataConstructorExp(
+                    Constants.STDLIB_NAME + ".Cons",
+                    new List<PureExp>().add(
+                            attribute.createDbOrderingAttributePair()).add(
+                            attributes));
+        }
+        return new DataConstructorExp(
+                Constants.DBLIB_NAME + ".UnaryExecutionNode",
+                new List<PureExp>().add(
+                        new DataConstructorExp(
+                                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".Ordering",
+                                new List<PureExp>().add(attributes))).add(
+                        exp));
+    }
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:486
+   */
+  protected List<PureExp> createSqlDbMethodArguments(PureExp transactionExp) throws abs.frontend.sql.SqlRewritingException {
+        final List<PureExp> arguments = new List<PureExp>().add(createDbExecutionTree());
+        if (transactionExp != null)
+            arguments.add((PureExp) transactionExp.fullCopy());
+        return arguments;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public SqlSelectExp() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[5];
+    setChild(new Opt(), 2);
+    setChild(new List(), 3);
+    setChild(new List(), 4);
+  }
+  /**
+   * @declaredat ASTNode:16
+   */
+  public SqlSelectExp(Boolean p0, SqlAttrsDef p1, SqlRelationRef p2, Opt<SqlCondition> p3, List<PureExp> p4, List<SqlOrderingAttribute> p5) {
+    setDistinct(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+    setChild(p4, 3);
+    setChild(p5, 4);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:27
+   */
+  protected int numChildren() {
+    return 5;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:33
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:39
+   */
+  public void flushCache() {
+    super.flushCache();
+    getSqlReturnTypeUse_visited = -1;
+    getSqlDbMethodName_boolean_visited = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:47
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:53
+   */
+  public SqlSelectExp clone() throws CloneNotSupportedException {
+    SqlSelectExp node = (SqlSelectExp) super.clone();
+    node.getSqlReturnTypeUse_visited = -1;
+    node.getSqlDbMethodName_boolean_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:64
+   */
+  public SqlSelectExp copy() {
+    try {
+      SqlSelectExp node = (SqlSelectExp) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:82
+   */
+  public SqlSelectExp fullCopy() {
+    SqlSelectExp tree = (SqlSelectExp) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Distinct.
+   * @param value The new value for the lexeme Distinct.
+   * @apilevel high-level
+   */
+  public void setDistinct(Boolean value) {
+    tokenBoolean_Distinct = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected Boolean tokenBoolean_Distinct;
+  /**
+   * Retrieves the value for the lexeme Distinct.
+   * @return The value for the lexeme Distinct.
+   * @apilevel high-level
+   */
+  public Boolean getDistinct() {
+    return tokenBoolean_Distinct;
+  }
+  /**
+   * Replaces the SqlAttrsDef child.
+   * @param node The new node to replace the SqlAttrsDef child.
+   * @apilevel high-level
+   */
+  public void setSqlAttrsDef(SqlAttrsDef node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the SqlAttrsDef child.
+   * @return The current node used as the SqlAttrsDef child.
+   * @apilevel high-level
+   */
+  public SqlAttrsDef getSqlAttrsDef() {
+    return (SqlAttrsDef) getChild(0);
+  }
+  /**
+   * Retrieves the SqlAttrsDef child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the SqlAttrsDef child.
+   * @apilevel low-level
+   */
+  public SqlAttrsDef getSqlAttrsDefNoTransform() {
+    return (SqlAttrsDef) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the SqlRelationRef child.
+   * @param node The new node to replace the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public void setSqlRelationRef(SqlRelationRef node) {
+    setChild(node, 1);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public SqlRelationRef getSqlRelationRef() {
+    return (SqlRelationRef) getChild(1);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel low-level
+   */
+  public SqlRelationRef getSqlRelationRefNoTransform() {
+    return (SqlRelationRef) getChildNoTransform(1);
+  }
+  /**
+   * Replaces the optional node for the SqlCondition child. This is the <code>Opt</code>
+   * node containing the child SqlCondition, not the actual child!
+   * @param opt The new node to be used as the optional node for the SqlCondition child.
+   * @apilevel low-level
+   */
+  public void setSqlConditionOpt(Opt<SqlCondition> opt) {
+    setChild(opt, 2);
+  }
+  /**
+   * Replaces the (optional) SqlCondition child.
+   * @param node The new node to be used as the SqlCondition child.
+   * @apilevel high-level
+   */
+  public void setSqlCondition(SqlCondition node) {
+    getSqlConditionOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional SqlCondition child exists.
+   * @return {@code true} if the optional SqlCondition child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasSqlCondition() {
+    return getSqlConditionOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) SqlCondition child.
+   * @return The SqlCondition child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public SqlCondition getSqlCondition() {
+    return (SqlCondition) getSqlConditionOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the SqlCondition child. This is the <code>Opt</code> node containing the child SqlCondition, not the actual child!
+   * @return The optional node for child the SqlCondition child.
+   * @apilevel low-level
+   */
+  public Opt<SqlCondition> getSqlConditionOpt() {
+    return (Opt<SqlCondition>) getChild(2);
+  }
+  /**
+   * Retrieves the optional node for child SqlCondition. This is the <code>Opt</code> node containing the child SqlCondition, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child SqlCondition.
+   * @apilevel low-level
+   */
+  public Opt<SqlCondition> getSqlConditionOptNoTransform() {
+    return (Opt<SqlCondition>) getChildNoTransform(2);
+  }
+  /**
+   * Replaces the SqlGroupingAttribute list.
+   * @param list The new list node to be used as the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public void setSqlGroupingAttributeList(List<PureExp> list) {
+    setChild(list, 3);
+  }
+  /**
+   * Retrieves the number of children in the SqlGroupingAttribute list.
+   * @return Number of children in the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public int getNumSqlGroupingAttribute() {
+    return getSqlGroupingAttributeList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the SqlGroupingAttribute list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the SqlGroupingAttribute list.
+   * @apilevel low-level
+   */
+  public int getNumSqlGroupingAttributeNoTransform() {
+    return getSqlGroupingAttributeListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the SqlGroupingAttribute list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public PureExp getSqlGroupingAttribute(int i) {
+    return (PureExp) getSqlGroupingAttributeList().getChild(i);
+  }
+  /**
+   * Check whether the SqlGroupingAttribute list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasSqlGroupingAttribute() {
+    return getSqlGroupingAttributeList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the SqlGroupingAttribute list.
+   * @param node The element to append to the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public void addSqlGroupingAttribute(PureExp node) {
+    List<PureExp> list = (parent == null || state == null) ? getSqlGroupingAttributeListNoTransform() : getSqlGroupingAttributeList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addSqlGroupingAttributeNoTransform(PureExp node) {
+    List<PureExp> list = getSqlGroupingAttributeListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the SqlGroupingAttribute list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setSqlGroupingAttribute(PureExp node, int i) {
+    List<PureExp> list = getSqlGroupingAttributeList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the SqlGroupingAttribute list.
+   * @return The node representing the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getSqlGroupingAttributeList() {
+    List<PureExp> list = (List<PureExp>) getChild(3);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the SqlGroupingAttribute list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlGroupingAttribute list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getSqlGroupingAttributeListNoTransform() {
+    return (List<PureExp>) getChildNoTransform(3);
+  }
+  /**
+   * Retrieves the SqlGroupingAttribute list.
+   * @return The node representing the SqlGroupingAttribute list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getSqlGroupingAttributes() {
+    return getSqlGroupingAttributeList();
+  }
+  /**
+   * Retrieves the SqlGroupingAttribute list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlGroupingAttribute list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getSqlGroupingAttributesNoTransform() {
+    return getSqlGroupingAttributeListNoTransform();
+  }
+  /**
+   * Replaces the SqlOrderingAttribute list.
+   * @param list The new list node to be used as the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public void setSqlOrderingAttributeList(List<SqlOrderingAttribute> list) {
+    setChild(list, 4);
+  }
+  /**
+   * Retrieves the number of children in the SqlOrderingAttribute list.
+   * @return Number of children in the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public int getNumSqlOrderingAttribute() {
+    return getSqlOrderingAttributeList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the SqlOrderingAttribute list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the SqlOrderingAttribute list.
+   * @apilevel low-level
+   */
+  public int getNumSqlOrderingAttributeNoTransform() {
+    return getSqlOrderingAttributeListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the SqlOrderingAttribute list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public SqlOrderingAttribute getSqlOrderingAttribute(int i) {
+    return (SqlOrderingAttribute) getSqlOrderingAttributeList().getChild(i);
+  }
+  /**
+   * Check whether the SqlOrderingAttribute list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasSqlOrderingAttribute() {
+    return getSqlOrderingAttributeList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the SqlOrderingAttribute list.
+   * @param node The element to append to the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public void addSqlOrderingAttribute(SqlOrderingAttribute node) {
+    List<SqlOrderingAttribute> list = (parent == null || state == null) ? getSqlOrderingAttributeListNoTransform() : getSqlOrderingAttributeList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addSqlOrderingAttributeNoTransform(SqlOrderingAttribute node) {
+    List<SqlOrderingAttribute> list = getSqlOrderingAttributeListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the SqlOrderingAttribute list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setSqlOrderingAttribute(SqlOrderingAttribute node, int i) {
+    List<SqlOrderingAttribute> list = getSqlOrderingAttributeList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the SqlOrderingAttribute list.
+   * @return The node representing the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public List<SqlOrderingAttribute> getSqlOrderingAttributeList() {
+    List<SqlOrderingAttribute> list = (List<SqlOrderingAttribute>) getChild(4);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the SqlOrderingAttribute list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlOrderingAttribute list.
+   * @apilevel low-level
+   */
+  public List<SqlOrderingAttribute> getSqlOrderingAttributeListNoTransform() {
+    return (List<SqlOrderingAttribute>) getChildNoTransform(4);
+  }
+  /**
+   * Retrieves the SqlOrderingAttribute list.
+   * @return The node representing the SqlOrderingAttribute list.
+   * @apilevel high-level
+   */
+  public List<SqlOrderingAttribute> getSqlOrderingAttributes() {
+    return getSqlOrderingAttributeList();
+  }
+  /**
+   * Retrieves the SqlOrderingAttribute list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlOrderingAttribute list.
+   * @apilevel low-level
+   */
+  public List<SqlOrderingAttribute> getSqlOrderingAttributesNoTransform() {
+    return getSqlOrderingAttributeListNoTransform();
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getSqlReturnTypeUse_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:474
+   */
+  public ParametricDataTypeUse getSqlReturnTypeUse() {
+    ASTNode$State state = state();
+    if (getSqlReturnTypeUse_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getSqlReturnTypeUse in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getSqlReturnTypeUse_visited = state().boundariesCrossed;
+    try {  return new ParametricDataTypeUse(
+                Constants.DB_HELPERS_LIB_NAME + ".MaybeEx",
+                new List<Annotation>(),
+                new List<TypeUse>().add(new DataTypeUse(
+                    Constants.DB_STRUCTURE_LIB_NAME + ".Relation",
+                    new List<Annotation>())));  }
+    finally {
+      getSqlReturnTypeUse_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getSqlDbMethodName_boolean_visited;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:475
+   */
+  public String getSqlDbMethodName(boolean inTransaction) {
+    Object _parameters = Boolean.valueOf(inTransaction);
+    if(getSqlDbMethodName_boolean_visited == null) getSqlDbMethodName_boolean_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getSqlDbMethodName_boolean_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getSqlDbMethodName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getSqlDbMethodName_boolean_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {  return inTransaction ? "executeTreeInTransaction" : "executeTree";  }
+    finally {
+      getSqlDbMethodName_boolean_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

@@ -1,53 +1,57 @@
-Il programma ha le classi:
-Class: CpxSched
-I parametri sono: 
-I -> u
-I campi sono: 
-I metodi sono: 
+Starting deadlock analysis...
+checking with "CpxSched.CpxSched.m1"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.!init!"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m2"
+checking with "CpxSched.CpxSched.m3"
+checking with "CpxSched.CpxSched.m3"
+checking with "CpxSched.CpxSched.m3"
+checking with "CpxSched.CpxSched.m3"
+checking with "CpxSched.CpxSched.m3"
+checking with "CpxSched.CpxSched.!init!"
+checking with "CpxSched.CpxSched.run"
+checking with "ABS.StdLib.CpxSched.run"
+checking with "CpxSched.CpxSched.!init!"
+checking with "CpxSched.CpxSched.!init!"
+checking with "CpxSched.CpxSched.!init!"
+checking with "CpxSched.CpxSched.m1"
+checking with "ABS.DC.DeploymentComponent.available"
+checking with "ABS.DC.DeploymentComponent.load"
+checking with "ABS.DC.DeploymentComponent.total"
+checking with "ABS.DC.DeploymentComponent.transfer"
+checking with "ABS.DC.DeploymentComponent.decrementResources"
+checking with "ABS.DC.DeploymentComponent.incrementResources"
+checking with "ABS.DC.DeploymentComponent.decrementResources"
+checking with "ABS.DC.DeploymentComponent.incrementResources"
+checking with "ABS.DC.DeploymentComponent.!init!"
+checking with "ABS.DC.DeploymentComponent.run"
+checking with "ABS.StdLib.DeploymentComponent.run"
+checking with "ABS.StdLib.Runtime.getProductLine"
+checking with "ABS.Meta.Runtime.getProductLine"
+checking with "ABS.StdLib.Runtime.!init!"
+checking with "ABS.Meta.Runtime.!init!"
+checking with "ABS.StdLib.Runtime.run"
+checking with "ABS.Meta.Runtime.run"
+checking with "ABS.Scheduler.Runtime.run"
+### LOCK INFORMATION RESULTED BY THE ANALYSIS ###
 
- Metodo m_1 id m_1_0:
-tipo di ritorno: Int
-I parametri sono: 
-B -> y
-H -> n
-Il corpo é: 
-Le variabili sono: 
-Int -> g
-Int -> h
-0) ITE
-1) ITE
-2) Return
-
- Metodo m2 id m2_0:
-tipo di ritorno: Int
-I parametri sono: 
-I -> z
-Il corpo é: 
-Le variabili sono: 
-Int -> w
-Int -> g
-I -> y
-Int -> h
-0) y --> I
-1) ITE
-2) ITE
-3) h --> Int
-4) w --> Int
-5) Return
-
- Metodo m3 id m3_0:
-tipo di ritorno: Int
-I parametri sono: 
-Il corpo é: 
-Le variabili sono: 
-0) Return
-La main funcrion é:
-Le variabili sono: 
-Int -> w
-I -> z
-I -> y
-I -> x
-0) x --> I
-1) y --> I
-2) z --> I
-3) w --> Int
+Possible Deadlock in Main:    false
+Current Version:              Fix Point 2.0
+Analysis Duration:            67ms

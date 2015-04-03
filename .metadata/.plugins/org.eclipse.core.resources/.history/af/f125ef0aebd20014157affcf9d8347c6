@@ -1,0 +1,437 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/SQL.ast:12
+ * @production SqlUpdateExp : {@link SqlModifyExp} ::= <span class="component">{@link SqlRelationRef}</span> <span class="component">{@link SqlAttrAssignment}*</span> <span class="component">[{@link SqlCondition}]</span>;
+
+ */
+public class SqlUpdateExp extends SqlModifyExp implements Cloneable {
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:555
+   */
+  protected List<PureExp> createSqlDbMethodArguments(PureExp transactionExp) throws abs.frontend.sql.SqlRewritingException {
+        final PureExp relationalModification = new DataConstructorExp(
+                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".Update",
+                new List<PureExp>().add(
+                        hasSqlCondition() ?
+                            getSqlCondition().createDbSelectionConditionExp() :
+                            new DataConstructorExp(
+                                    Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".NoCondition",
+                                    new List<PureExp>())).add(
+                        createDbAttrFunctionMap()));
+        final List<PureExp> arguments = new List<PureExp>();
+        arguments.add(modifiesDb() ?
+                new DataConstructorExp(
+                    Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".RelationalModification",
+                    new List<PureExp>().add(
+                        new StringLiteral(((SqlDbRelationRef) getSqlRelationRef()).getRelationName())).add(
+                        relationalModification)) :
+                new DataConstructorExp(
+                    Constants.DBLIB_NAME + ".UnaryExecutionNode",
+                    new List<PureExp>().add(
+                        new DataConstructorExp(
+                            Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".Modification",
+                            new List<PureExp>().add(relationalModification))).add(
+                        CompilerUtils.copyPosition(getSqlRelationRef(), new DataConstructorExp(
+                            Constants.DBLIB_NAME + ".DirectRelationLeaf",
+                            new List<PureExp>().add(
+                                ((SqlVarOrFieldRelationRef) getSqlRelationRef()).getVarOrFieldUse()))))));
+        if (transactionExp != null)
+            arguments.add((PureExp) transactionExp.fullCopy());
+        return arguments;
+    }
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:587
+   */
+  private PureExp createDbAttrFunctionMap() throws abs.frontend.sql.SqlRewritingException {
+        PureExp functions = new DataConstructorExp("EmptyMap", new List<PureExp>());
+        for (int i = getNumSqlAttrAssignment() - 1; i >= 0; i--)
+            functions = new DataConstructorExp(
+                "InsertAssoc",
+                new List<PureExp>().add(
+                    new DataConstructorExp("Pair", new List<PureExp>().add(
+                        new DataConstructorExp(
+                                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".AttributeRefByName",
+                                new List<PureExp>().add(getSqlAttrAssignment(i).getAttrRef()))).add(
+                        getSqlAttrAssignment(i).getSqlTupleScalarFunction().createDbTupleScalarFunctionExp()))).add(
+                    functions));
+        return functions;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public SqlUpdateExp() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[3];
+    setChild(new List(), 1);
+    setChild(new Opt(), 2);
+  }
+  /**
+   * @declaredat ASTNode:15
+   */
+  public SqlUpdateExp(SqlRelationRef p0, List<SqlAttrAssignment> p1, Opt<SqlCondition> p2) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+    setChild(p2, 2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:23
+   */
+  protected int numChildren() {
+    return 3;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:29
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:35
+   */
+  public void flushCache() {
+    super.flushCache();
+    modifiesDb_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:42
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:48
+   */
+  public SqlUpdateExp clone() throws CloneNotSupportedException {
+    SqlUpdateExp node = (SqlUpdateExp) super.clone();
+    node.modifiesDb_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:58
+   */
+  public SqlUpdateExp copy() {
+    try {
+      SqlUpdateExp node = (SqlUpdateExp) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:76
+   */
+  public SqlUpdateExp fullCopy() {
+    SqlUpdateExp tree = (SqlUpdateExp) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the SqlRelationRef child.
+   * @param node The new node to replace the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public void setSqlRelationRef(SqlRelationRef node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public SqlRelationRef getSqlRelationRef() {
+    return (SqlRelationRef) getChild(0);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel low-level
+   */
+  public SqlRelationRef getSqlRelationRefNoTransform() {
+    return (SqlRelationRef) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the SqlAttrAssignment list.
+   * @param list The new list node to be used as the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public void setSqlAttrAssignmentList(List<SqlAttrAssignment> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the SqlAttrAssignment list.
+   * @return Number of children in the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public int getNumSqlAttrAssignment() {
+    return getSqlAttrAssignmentList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the SqlAttrAssignment list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the SqlAttrAssignment list.
+   * @apilevel low-level
+   */
+  public int getNumSqlAttrAssignmentNoTransform() {
+    return getSqlAttrAssignmentListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the SqlAttrAssignment list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public SqlAttrAssignment getSqlAttrAssignment(int i) {
+    return (SqlAttrAssignment) getSqlAttrAssignmentList().getChild(i);
+  }
+  /**
+   * Check whether the SqlAttrAssignment list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasSqlAttrAssignment() {
+    return getSqlAttrAssignmentList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the SqlAttrAssignment list.
+   * @param node The element to append to the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public void addSqlAttrAssignment(SqlAttrAssignment node) {
+    List<SqlAttrAssignment> list = (parent == null || state == null) ? getSqlAttrAssignmentListNoTransform() : getSqlAttrAssignmentList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addSqlAttrAssignmentNoTransform(SqlAttrAssignment node) {
+    List<SqlAttrAssignment> list = getSqlAttrAssignmentListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the SqlAttrAssignment list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setSqlAttrAssignment(SqlAttrAssignment node, int i) {
+    List<SqlAttrAssignment> list = getSqlAttrAssignmentList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the SqlAttrAssignment list.
+   * @return The node representing the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public List<SqlAttrAssignment> getSqlAttrAssignmentList() {
+    List<SqlAttrAssignment> list = (List<SqlAttrAssignment>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the SqlAttrAssignment list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlAttrAssignment list.
+   * @apilevel low-level
+   */
+  public List<SqlAttrAssignment> getSqlAttrAssignmentListNoTransform() {
+    return (List<SqlAttrAssignment>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the SqlAttrAssignment list.
+   * @return The node representing the SqlAttrAssignment list.
+   * @apilevel high-level
+   */
+  public List<SqlAttrAssignment> getSqlAttrAssignments() {
+    return getSqlAttrAssignmentList();
+  }
+  /**
+   * Retrieves the SqlAttrAssignment list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlAttrAssignment list.
+   * @apilevel low-level
+   */
+  public List<SqlAttrAssignment> getSqlAttrAssignmentsNoTransform() {
+    return getSqlAttrAssignmentListNoTransform();
+  }
+  /**
+   * Replaces the optional node for the SqlCondition child. This is the <code>Opt</code>
+   * node containing the child SqlCondition, not the actual child!
+   * @param opt The new node to be used as the optional node for the SqlCondition child.
+   * @apilevel low-level
+   */
+  public void setSqlConditionOpt(Opt<SqlCondition> opt) {
+    setChild(opt, 2);
+  }
+  /**
+   * Replaces the (optional) SqlCondition child.
+   * @param node The new node to be used as the SqlCondition child.
+   * @apilevel high-level
+   */
+  public void setSqlCondition(SqlCondition node) {
+    getSqlConditionOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional SqlCondition child exists.
+   * @return {@code true} if the optional SqlCondition child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasSqlCondition() {
+    return getSqlConditionOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) SqlCondition child.
+   * @return The SqlCondition child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public SqlCondition getSqlCondition() {
+    return (SqlCondition) getSqlConditionOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the SqlCondition child. This is the <code>Opt</code> node containing the child SqlCondition, not the actual child!
+   * @return The optional node for child the SqlCondition child.
+   * @apilevel low-level
+   */
+  public Opt<SqlCondition> getSqlConditionOpt() {
+    return (Opt<SqlCondition>) getChild(2);
+  }
+  /**
+   * Retrieves the optional node for child SqlCondition. This is the <code>Opt</code> node containing the child SqlCondition, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child SqlCondition.
+   * @apilevel low-level
+   */
+  public Opt<SqlCondition> getSqlConditionOptNoTransform() {
+    return (Opt<SqlCondition>) getChildNoTransform(2);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int modifiesDb_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:493
+   */
+  public boolean modifiesDb() {
+    ASTNode$State state = state();
+    if (modifiesDb_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: modifiesDb in class: org.jastadd.ast.AST.SynDecl");
+    }
+    modifiesDb_visited = state().boundariesCrossed;
+    try {  return getSqlRelationRef() instanceof SqlDbRelationRef;  }
+    finally {
+      modifiesDb_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

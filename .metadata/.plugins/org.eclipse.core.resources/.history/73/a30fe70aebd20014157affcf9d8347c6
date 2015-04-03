@@ -1,0 +1,1352 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:13
+ * @production CompilationUnit : {@link ASTNode} ::= <span class="component">&lt;Name:String&gt;</span> <span class="component">{@link ModuleDecl}*</span> <span class="component">{@link DeltaDecl}*</span> <span class="component">{@link UpdateDecl}*</span> <span class="component">[{@link ProductLine}]</span> <span class="component">{@link Product}*</span> <span class="component">{@link FeatureDecl}*</span> <span class="component">{@link FExt}*</span>;
+
+ */
+public class CompilationUnit extends ASTNode<ASTNode> implements Cloneable, HasCogs {
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:958
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo) {
+        this.getModuleDecls().generateProlog(s,reachInfo);
+    }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:75
+   */
+  public void dropAttributes() {
+//    setFExtList(new List<FExt>());
+    for (FeatureDecl f: getFeatureDecls())
+        f.dropAttributes();
+    for (FExt f: getFExts())
+        f.dropAttributes();
+  }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:152
+   */
+  public Constraint collectConstraints(ChocoSolver s) {
+	  for (int i = 0; i < getNumFeatureDecl(); i++) {
+	    s.forceTrue(getFeatureDecl(i).getName());
+	  }
+	  super.collectConstraints(s);
+	  return Choco.TRUE;
+	}
+  /**
+   * @aspect CollectParents
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CollectParents.jadd:32
+   */
+  public void collectParents(Set<String> newParents) {
+    // and stop going up
+  }
+  /**
+   * @aspect Visualization
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Visualization.jadd:20
+   */
+  public void printFM(String indentation) {
+        System.out.println(indentation + getName());
+    	for (FeatureDecl fdecl : getFeatureDeclList()) {
+        	fdecl.printFM(indentation + "\t");
+    	}
+  }
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:6
+   */
+  private java.util.List<ParserError> parserErrors;
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:9
+   */
+  public void setParserErrors(java.util.List<ParserError> errors) {
+    	parserErrors = errors;
+    }
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:13
+   */
+  public boolean hasParserErrors() {
+		return !getParserErrors().isEmpty();
+	}
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:17
+   */
+  public java.util.List<ParserError> getParserErrors() {
+		return parserErrors;
+	}
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:52
+   */
+  public CompilationUnit parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:64
+   */
+  public void refined_TypeChecker_CompilationUnit_typeCheck(SemanticErrorList e) {
+        for (ModuleDecl d : getModuleDecls()) {
+            d.typeCheck(e);
+        }
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public CompilationUnit() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[7];
+    setChild(new List(), 0);
+    setChild(new List(), 1);
+    setChild(new List(), 2);
+    setChild(new Opt(), 3);
+    setChild(new List(), 4);
+    setChild(new List(), 5);
+    setChild(new List(), 6);
+  }
+  /**
+   * @declaredat ASTNode:20
+   */
+  public CompilationUnit(String p0, List<ModuleDecl> p1, List<DeltaDecl> p2, List<UpdateDecl> p3, Opt<ProductLine> p4, List<Product> p5, List<FeatureDecl> p6, List<FExt> p7) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+    setChild(p4, 3);
+    setChild(p5, 4);
+    setChild(p6, 5);
+    setChild(p7, 6);
+  }
+  /**
+   * @declaredat ASTNode:30
+   */
+  public CompilationUnit(beaver.Symbol p0, List<ModuleDecl> p1, List<DeltaDecl> p2, List<UpdateDecl> p3, Opt<ProductLine> p4, List<Product> p5, List<FeatureDecl> p6, List<FExt> p7) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+    setChild(p4, 3);
+    setChild(p5, 4);
+    setChild(p6, 5);
+    setChild(p7, 6);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:43
+   */
+  protected int numChildren() {
+    return 7;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:49
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:55
+   */
+  public void flushCache() {
+    super.flushCache();
+    getNumberOfNewCogExpr_visited = -1;
+    getNumberOfNewCogExpr_computed = false;
+    getMainBlock_visited = -1;
+    getMainBlock_computed = false;
+    getMainBlock_value = null;
+    getMainBlock_String_visited = null;
+    getMainBlock_String_values = null;
+    hasMainBlock_visited = -1;
+    hasMainBlock_String_visited = null;
+    hasMainBlock_String_values = null;
+    getFileName_visited = -1;
+    getNonLeafs_visited = -1;
+    lookupModule_String_visited = null;
+    getModel_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:75
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:81
+   */
+  public CompilationUnit clone() throws CloneNotSupportedException {
+    CompilationUnit node = (CompilationUnit) super.clone();
+    node.getNumberOfNewCogExpr_visited = -1;
+    node.getNumberOfNewCogExpr_computed = false;
+    node.getMainBlock_visited = -1;
+    node.getMainBlock_computed = false;
+    node.getMainBlock_value = null;
+    node.getMainBlock_String_visited = null;
+    node.getMainBlock_String_values = null;
+    node.hasMainBlock_visited = -1;
+    node.hasMainBlock_String_visited = null;
+    node.hasMainBlock_String_values = null;
+    node.getFileName_visited = -1;
+    node.getNonLeafs_visited = -1;
+    node.lookupModule_String_visited = null;
+    node.getModel_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:104
+   */
+  public CompilationUnit copy() {
+    try {
+      CompilationUnit node = (CompilationUnit) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:122
+   */
+  public CompilationUnit fullCopy() {
+    CompilationUnit tree = (CompilationUnit) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_Name;
+  /**
+   */
+  public int Namestart;
+  /**
+   */
+  public int Nameend;
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the ModuleDecl list.
+   * @param list The new list node to be used as the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public void setModuleDeclList(List<ModuleDecl> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the ModuleDecl list.
+   * @return Number of children in the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public int getNumModuleDecl() {
+    return getModuleDeclList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the ModuleDecl list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the ModuleDecl list.
+   * @apilevel low-level
+   */
+  public int getNumModuleDeclNoTransform() {
+    return getModuleDeclListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the ModuleDecl list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public ModuleDecl getModuleDecl(int i) {
+    return (ModuleDecl) getModuleDeclList().getChild(i);
+  }
+  /**
+   * Check whether the ModuleDecl list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasModuleDecl() {
+    return getModuleDeclList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the ModuleDecl list.
+   * @param node The element to append to the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public void addModuleDecl(ModuleDecl node) {
+    List<ModuleDecl> list = (parent == null || state == null) ? getModuleDeclListNoTransform() : getModuleDeclList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addModuleDeclNoTransform(ModuleDecl node) {
+    List<ModuleDecl> list = getModuleDeclListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the ModuleDecl list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setModuleDecl(ModuleDecl node, int i) {
+    List<ModuleDecl> list = getModuleDeclList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the ModuleDecl list.
+   * @return The node representing the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public List<ModuleDecl> getModuleDeclList() {
+    List<ModuleDecl> list = (List<ModuleDecl>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the ModuleDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the ModuleDecl list.
+   * @apilevel low-level
+   */
+  public List<ModuleDecl> getModuleDeclListNoTransform() {
+    return (List<ModuleDecl>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the ModuleDecl list.
+   * @return The node representing the ModuleDecl list.
+   * @apilevel high-level
+   */
+  public List<ModuleDecl> getModuleDecls() {
+    return getModuleDeclList();
+  }
+  /**
+   * Retrieves the ModuleDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the ModuleDecl list.
+   * @apilevel low-level
+   */
+  public List<ModuleDecl> getModuleDeclsNoTransform() {
+    return getModuleDeclListNoTransform();
+  }
+  /**
+   * Replaces the DeltaDecl list.
+   * @param list The new list node to be used as the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public void setDeltaDeclList(List<DeltaDecl> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the DeltaDecl list.
+   * @return Number of children in the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public int getNumDeltaDecl() {
+    return getDeltaDeclList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the DeltaDecl list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the DeltaDecl list.
+   * @apilevel low-level
+   */
+  public int getNumDeltaDeclNoTransform() {
+    return getDeltaDeclListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the DeltaDecl list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public DeltaDecl getDeltaDecl(int i) {
+    return (DeltaDecl) getDeltaDeclList().getChild(i);
+  }
+  /**
+   * Check whether the DeltaDecl list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasDeltaDecl() {
+    return getDeltaDeclList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the DeltaDecl list.
+   * @param node The element to append to the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public void addDeltaDecl(DeltaDecl node) {
+    List<DeltaDecl> list = (parent == null || state == null) ? getDeltaDeclListNoTransform() : getDeltaDeclList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addDeltaDeclNoTransform(DeltaDecl node) {
+    List<DeltaDecl> list = getDeltaDeclListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the DeltaDecl list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setDeltaDecl(DeltaDecl node, int i) {
+    List<DeltaDecl> list = getDeltaDeclList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the DeltaDecl list.
+   * @return The node representing the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public List<DeltaDecl> getDeltaDeclList() {
+    List<DeltaDecl> list = (List<DeltaDecl>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the DeltaDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DeltaDecl list.
+   * @apilevel low-level
+   */
+  public List<DeltaDecl> getDeltaDeclListNoTransform() {
+    return (List<DeltaDecl>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the DeltaDecl list.
+   * @return The node representing the DeltaDecl list.
+   * @apilevel high-level
+   */
+  public List<DeltaDecl> getDeltaDecls() {
+    return getDeltaDeclList();
+  }
+  /**
+   * Retrieves the DeltaDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DeltaDecl list.
+   * @apilevel low-level
+   */
+  public List<DeltaDecl> getDeltaDeclsNoTransform() {
+    return getDeltaDeclListNoTransform();
+  }
+  /**
+   * Replaces the UpdateDecl list.
+   * @param list The new list node to be used as the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public void setUpdateDeclList(List<UpdateDecl> list) {
+    setChild(list, 2);
+  }
+  /**
+   * Retrieves the number of children in the UpdateDecl list.
+   * @return Number of children in the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public int getNumUpdateDecl() {
+    return getUpdateDeclList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the UpdateDecl list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the UpdateDecl list.
+   * @apilevel low-level
+   */
+  public int getNumUpdateDeclNoTransform() {
+    return getUpdateDeclListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the UpdateDecl list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public UpdateDecl getUpdateDecl(int i) {
+    return (UpdateDecl) getUpdateDeclList().getChild(i);
+  }
+  /**
+   * Check whether the UpdateDecl list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasUpdateDecl() {
+    return getUpdateDeclList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the UpdateDecl list.
+   * @param node The element to append to the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public void addUpdateDecl(UpdateDecl node) {
+    List<UpdateDecl> list = (parent == null || state == null) ? getUpdateDeclListNoTransform() : getUpdateDeclList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addUpdateDeclNoTransform(UpdateDecl node) {
+    List<UpdateDecl> list = getUpdateDeclListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the UpdateDecl list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setUpdateDecl(UpdateDecl node, int i) {
+    List<UpdateDecl> list = getUpdateDeclList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the UpdateDecl list.
+   * @return The node representing the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public List<UpdateDecl> getUpdateDeclList() {
+    List<UpdateDecl> list = (List<UpdateDecl>) getChild(2);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the UpdateDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the UpdateDecl list.
+   * @apilevel low-level
+   */
+  public List<UpdateDecl> getUpdateDeclListNoTransform() {
+    return (List<UpdateDecl>) getChildNoTransform(2);
+  }
+  /**
+   * Retrieves the UpdateDecl list.
+   * @return The node representing the UpdateDecl list.
+   * @apilevel high-level
+   */
+  public List<UpdateDecl> getUpdateDecls() {
+    return getUpdateDeclList();
+  }
+  /**
+   * Retrieves the UpdateDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the UpdateDecl list.
+   * @apilevel low-level
+   */
+  public List<UpdateDecl> getUpdateDeclsNoTransform() {
+    return getUpdateDeclListNoTransform();
+  }
+  /**
+   * Replaces the optional node for the ProductLine child. This is the <code>Opt</code>
+   * node containing the child ProductLine, not the actual child!
+   * @param opt The new node to be used as the optional node for the ProductLine child.
+   * @apilevel low-level
+   */
+  public void setProductLineOpt(Opt<ProductLine> opt) {
+    setChild(opt, 3);
+  }
+  /**
+   * Replaces the (optional) ProductLine child.
+   * @param node The new node to be used as the ProductLine child.
+   * @apilevel high-level
+   */
+  public void setProductLine(ProductLine node) {
+    getProductLineOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional ProductLine child exists.
+   * @return {@code true} if the optional ProductLine child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasProductLine() {
+    return getProductLineOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) ProductLine child.
+   * @return The ProductLine child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public ProductLine getProductLine() {
+    return (ProductLine) getProductLineOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the ProductLine child. This is the <code>Opt</code> node containing the child ProductLine, not the actual child!
+   * @return The optional node for child the ProductLine child.
+   * @apilevel low-level
+   */
+  public Opt<ProductLine> getProductLineOpt() {
+    return (Opt<ProductLine>) getChild(3);
+  }
+  /**
+   * Retrieves the optional node for child ProductLine. This is the <code>Opt</code> node containing the child ProductLine, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child ProductLine.
+   * @apilevel low-level
+   */
+  public Opt<ProductLine> getProductLineOptNoTransform() {
+    return (Opt<ProductLine>) getChildNoTransform(3);
+  }
+  /**
+   * Replaces the Product list.
+   * @param list The new list node to be used as the Product list.
+   * @apilevel high-level
+   */
+  public void setProductList(List<Product> list) {
+    setChild(list, 4);
+  }
+  /**
+   * Retrieves the number of children in the Product list.
+   * @return Number of children in the Product list.
+   * @apilevel high-level
+   */
+  public int getNumProduct() {
+    return getProductList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Product list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Product list.
+   * @apilevel low-level
+   */
+  public int getNumProductNoTransform() {
+    return getProductListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Product list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Product list.
+   * @apilevel high-level
+   */
+  public Product getProduct(int i) {
+    return (Product) getProductList().getChild(i);
+  }
+  /**
+   * Check whether the Product list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasProduct() {
+    return getProductList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Product list.
+   * @param node The element to append to the Product list.
+   * @apilevel high-level
+   */
+  public void addProduct(Product node) {
+    List<Product> list = (parent == null || state == null) ? getProductListNoTransform() : getProductList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addProductNoTransform(Product node) {
+    List<Product> list = getProductListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Product list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setProduct(Product node, int i) {
+    List<Product> list = getProductList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Product list.
+   * @return The node representing the Product list.
+   * @apilevel high-level
+   */
+  public List<Product> getProductList() {
+    List<Product> list = (List<Product>) getChild(4);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Product list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Product list.
+   * @apilevel low-level
+   */
+  public List<Product> getProductListNoTransform() {
+    return (List<Product>) getChildNoTransform(4);
+  }
+  /**
+   * Retrieves the Product list.
+   * @return The node representing the Product list.
+   * @apilevel high-level
+   */
+  public List<Product> getProducts() {
+    return getProductList();
+  }
+  /**
+   * Retrieves the Product list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Product list.
+   * @apilevel low-level
+   */
+  public List<Product> getProductsNoTransform() {
+    return getProductListNoTransform();
+  }
+  /**
+   * Replaces the FeatureDecl list.
+   * @param list The new list node to be used as the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public void setFeatureDeclList(List<FeatureDecl> list) {
+    setChild(list, 5);
+  }
+  /**
+   * Retrieves the number of children in the FeatureDecl list.
+   * @return Number of children in the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public int getNumFeatureDecl() {
+    return getFeatureDeclList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the FeatureDecl list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the FeatureDecl list.
+   * @apilevel low-level
+   */
+  public int getNumFeatureDeclNoTransform() {
+    return getFeatureDeclListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the FeatureDecl list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public FeatureDecl getFeatureDecl(int i) {
+    return (FeatureDecl) getFeatureDeclList().getChild(i);
+  }
+  /**
+   * Check whether the FeatureDecl list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasFeatureDecl() {
+    return getFeatureDeclList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the FeatureDecl list.
+   * @param node The element to append to the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public void addFeatureDecl(FeatureDecl node) {
+    List<FeatureDecl> list = (parent == null || state == null) ? getFeatureDeclListNoTransform() : getFeatureDeclList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addFeatureDeclNoTransform(FeatureDecl node) {
+    List<FeatureDecl> list = getFeatureDeclListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the FeatureDecl list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setFeatureDecl(FeatureDecl node, int i) {
+    List<FeatureDecl> list = getFeatureDeclList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the FeatureDecl list.
+   * @return The node representing the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public List<FeatureDecl> getFeatureDeclList() {
+    List<FeatureDecl> list = (List<FeatureDecl>) getChild(5);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the FeatureDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the FeatureDecl list.
+   * @apilevel low-level
+   */
+  public List<FeatureDecl> getFeatureDeclListNoTransform() {
+    return (List<FeatureDecl>) getChildNoTransform(5);
+  }
+  /**
+   * Retrieves the FeatureDecl list.
+   * @return The node representing the FeatureDecl list.
+   * @apilevel high-level
+   */
+  public List<FeatureDecl> getFeatureDecls() {
+    return getFeatureDeclList();
+  }
+  /**
+   * Retrieves the FeatureDecl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the FeatureDecl list.
+   * @apilevel low-level
+   */
+  public List<FeatureDecl> getFeatureDeclsNoTransform() {
+    return getFeatureDeclListNoTransform();
+  }
+  /**
+   * Replaces the FExt list.
+   * @param list The new list node to be used as the FExt list.
+   * @apilevel high-level
+   */
+  public void setFExtList(List<FExt> list) {
+    setChild(list, 6);
+  }
+  /**
+   * Retrieves the number of children in the FExt list.
+   * @return Number of children in the FExt list.
+   * @apilevel high-level
+   */
+  public int getNumFExt() {
+    return getFExtList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the FExt list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the FExt list.
+   * @apilevel low-level
+   */
+  public int getNumFExtNoTransform() {
+    return getFExtListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the FExt list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the FExt list.
+   * @apilevel high-level
+   */
+  public FExt getFExt(int i) {
+    return (FExt) getFExtList().getChild(i);
+  }
+  /**
+   * Check whether the FExt list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasFExt() {
+    return getFExtList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the FExt list.
+   * @param node The element to append to the FExt list.
+   * @apilevel high-level
+   */
+  public void addFExt(FExt node) {
+    List<FExt> list = (parent == null || state == null) ? getFExtListNoTransform() : getFExtList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addFExtNoTransform(FExt node) {
+    List<FExt> list = getFExtListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the FExt list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setFExt(FExt node, int i) {
+    List<FExt> list = getFExtList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the FExt list.
+   * @return The node representing the FExt list.
+   * @apilevel high-level
+   */
+  public List<FExt> getFExtList() {
+    List<FExt> list = (List<FExt>) getChild(6);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the FExt list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the FExt list.
+   * @apilevel low-level
+   */
+  public List<FExt> getFExtListNoTransform() {
+    return (List<FExt>) getChildNoTransform(6);
+  }
+  /**
+   * Retrieves the FExt list.
+   * @return The node representing the FExt list.
+   * @apilevel high-level
+   */
+  public List<FExt> getFExts() {
+    return getFExtList();
+  }
+  /**
+   * Retrieves the FExt list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the FExt list.
+   * @apilevel low-level
+   */
+  public List<FExt> getFExtsNoTransform() {
+    return getFExtListNoTransform();
+  }
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:922
+   */
+    public void typeCheck(SemanticErrorList e) {
+        refined_TypeChecker_CompilationUnit_typeCheck(e);
+        for (DeltaDecl d : getDeltaDecls()) {
+            d.typeCheck(e);
+        }
+        for (Product p : getProducts()) {
+            p.typeCheck(e);
+        }
+        if (hasProductLine())
+            getProductLine().typeCheck(e);
+    }
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getNumberOfNewCogExpr_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_value;
+  /**
+   * @attribute syn
+   * @aspect NewExpCounter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/NewExprCounter.jrag:24
+   */
+  public int getNumberOfNewCogExpr() {
+    if(getNumberOfNewCogExpr_computed) {
+      return getNumberOfNewCogExpr_value;
+    }
+    ASTNode$State state = state();
+    if (getNumberOfNewCogExpr_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNumberOfNewCogExpr in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getNumberOfNewCogExpr_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getNumberOfNewCogExpr_value = getNumberOfNewCogExpr_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getNumberOfNewCogExpr_computed = true;
+    } else {
+    }
+
+    getNumberOfNewCogExpr_visited = -1;
+    return getNumberOfNewCogExpr_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private int getNumberOfNewCogExpr_compute() {  return super.getNumberOfNewCogExpr();  }
+  /**
+   * @apilevel internal
+   */
+  protected int getMainBlock_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getMainBlock_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Block getMainBlock_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:166
+   */
+  public Block getMainBlock() {
+    if(getMainBlock_computed) {
+      return getMainBlock_value;
+    }
+    ASTNode$State state = state();
+    if (getMainBlock_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getMainBlock_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getMainBlock_value = getMainBlock_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getMainBlock_computed = true;
+    } else {
+    }
+
+    getMainBlock_visited = -1;
+    return getMainBlock_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Block getMainBlock_compute() {
+          for (ModuleDecl m: getModuleDecls()) {
+              if (m.hasBlock())
+                  return m.getBlock();
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getMainBlock_String_visited;
+  protected java.util.Map getMainBlock_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:174
+   */
+  public Block getMainBlock(String moduleName) {
+    Object _parameters = moduleName;
+    if(getMainBlock_String_visited == null) getMainBlock_String_visited = new java.util.HashMap(4);
+    if(getMainBlock_String_values == null) getMainBlock_String_values = new java.util.HashMap(4);
+    if(getMainBlock_String_values.containsKey(_parameters)) {
+      return (Block)getMainBlock_String_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getMainBlock_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getMainBlock_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Block getMainBlock_String_value = getMainBlock_compute(moduleName);
+    if(isFinal && num == state().boundariesCrossed) {
+      getMainBlock_String_values.put(_parameters, getMainBlock_String_value);
+    } else {
+    }
+
+    getMainBlock_String_visited.remove(_parameters);
+    return getMainBlock_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Block getMainBlock_compute(String moduleName) {
+          for (ModuleDecl m : getModuleDecls()) {
+              if (m.getName().equals(moduleName) && m.hasBlock())
+                  return m.getBlock();
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int hasMainBlock_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:185
+   */
+  public boolean hasMainBlock() {
+    ASTNode$State state = state();
+    if (hasMainBlock_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: hasMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    hasMainBlock_visited = state().boundariesCrossed;
+    try {  return getMainBlock() != null;  }
+    finally {
+      hasMainBlock_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map hasMainBlock_String_visited;
+  protected java.util.Map hasMainBlock_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:186
+   */
+  public boolean hasMainBlock(String mainBlock) {
+    Object _parameters = mainBlock;
+    if(hasMainBlock_String_visited == null) hasMainBlock_String_visited = new java.util.HashMap(4);
+    if(hasMainBlock_String_values == null) hasMainBlock_String_values = new java.util.HashMap(4);
+    if(hasMainBlock_String_values.containsKey(_parameters)) {
+      return ((Boolean)hasMainBlock_String_values.get(_parameters)).booleanValue();
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(hasMainBlock_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: hasMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    hasMainBlock_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    boolean hasMainBlock_String_value = hasMainBlock_compute(mainBlock);
+    if(isFinal && num == state().boundariesCrossed) {
+      hasMainBlock_String_values.put(_parameters, Boolean.valueOf(hasMainBlock_String_value));
+    } else {
+    }
+
+    hasMainBlock_String_visited.remove(_parameters);
+    return hasMainBlock_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean hasMainBlock_compute(String mainBlock) {  return getMainBlock(mainBlock) != null;  }
+  /**
+   * @apilevel internal
+   */
+  protected int getFileName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:509
+   */
+  public String getFileName() {
+    ASTNode$State state = state();
+    if (getFileName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getFileName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFileName_visited = state().boundariesCrossed;
+    try {  return getName();  }
+    finally {
+      getFileName_visited = -1;
+    }
+  }
+  /**
+   * @attribute inh
+   * @aspect VerifyLeafs
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/verifyLeafs.jadd:19
+   */
+  public Set<String> getNonLeafs() {
+    ASTNode$State state = state();
+    if (getNonLeafs_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNonLeafs in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getNonLeafs_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Set<String> getNonLeafs_value = getParent().Define_Set_String__getNonLeafs(this, null);
+
+    getNonLeafs_visited = -1;
+    return getNonLeafs_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getNonLeafs_visited = -1;
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:238
+   */
+  public ModuleDecl lookupModule(String name) {
+    Object _parameters = name;
+    if(lookupModule_String_visited == null) lookupModule_String_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupModule_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupModule in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookupModule_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    ModuleDecl lookupModule_String_value = getParent().Define_ModuleDecl_lookupModule(this, null, name);
+
+    lookupModule_String_visited.remove(_parameters);
+    return lookupModule_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupModule_String_visited;
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:44
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/verifyLeafs.jadd:27
+   * @apilevel internal
+   */
+  public Set<String> Define_Set_String__getNonLeafs(ASTNode caller, ASTNode child) {
+    if (caller == getFExtListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return getNonLeafs();
+    }
+    else if (caller == getFeatureDeclListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return getNonLeafs();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Set_String__getNonLeafs(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:241
+   * @apilevel internal
+   */
+  public ModuleDecl Define_ModuleDecl_lookupModule(ASTNode caller, ASTNode child, String name) {
+    if (caller == getModuleDeclListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return lookupModule(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_ModuleDecl_lookupModule(this, caller, name);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

@@ -1,0 +1,392 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:323
+ * @production Reconfiguration : {@link ASTNode} ::= <span class="component">&lt;TargetProductID:String&gt;</span> <span class="component">{@link DeltaID}*</span> <span class="component">&lt;UpdateID:String&gt;</span>;
+
+ */
+public class Reconfiguration extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1165
+   */
+  public void generateJavaCodeDynamic(JavaCode.Package pkg, Product currentP, HashMap<String, Product> allProducts)
+            throws IOException, JavaCodeGenerationException {
+        PrintStream stream = null;
+        String generatedJavaClassName = JavaBackend.getReconfigurationName(currentP.getName(), getTargetProductID());
+        
+        try {
+            File file = pkg.createJavaFile(generatedJavaClassName);
+            stream = new JavaCodeStream(new BufferedOutputStream(new FileOutputStream(file)));
+            // gen header
+            stream.println("package " + pkg.packageName + ";");
+            stream.println("public class " + generatedJavaClassName + " {");
+            DynamicJavaGeneratorHelper.generateReconfiguration(stream, this, currentP, allProducts);
+            stream.println("}");
+        } finally {
+            if (stream != null)
+                stream.close();
+        }
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public Reconfiguration() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public Reconfiguration(String p0, List<DeltaID> p1, String p2) {
+    setTargetProductID(p0);
+    setChild(p1, 0);
+    setUpdateID(p2);
+  }
+  /**
+   * @declaredat ASTNode:19
+   */
+  public Reconfiguration(beaver.Symbol p0, List<DeltaID> p1, beaver.Symbol p2) {
+    setTargetProductID(p0);
+    setChild(p1, 0);
+    setUpdateID(p2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:27
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:33
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:39
+   */
+  public void flushCache() {
+    super.flushCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:45
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:51
+   */
+  public Reconfiguration clone() throws CloneNotSupportedException {
+    Reconfiguration node = (Reconfiguration) super.clone();
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:60
+   */
+  public Reconfiguration copy() {
+    try {
+      Reconfiguration node = (Reconfiguration) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:78
+   */
+  public Reconfiguration fullCopy() {
+    Reconfiguration tree = (Reconfiguration) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme TargetProductID.
+   * @param value The new value for the lexeme TargetProductID.
+   * @apilevel high-level
+   */
+  public void setTargetProductID(String value) {
+    tokenString_TargetProductID = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_TargetProductID;
+  /**
+   */
+  public int TargetProductIDstart;
+  /**
+   */
+  public int TargetProductIDend;
+  /**
+   * JastAdd-internal setter for lexeme TargetProductID using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme TargetProductID
+   * @apilevel internal
+   */
+  public void setTargetProductID(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setTargetProductID is only valid for String lexemes");
+    tokenString_TargetProductID = (String)symbol.value;
+    TargetProductIDstart = symbol.getStart();
+    TargetProductIDend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme TargetProductID.
+   * @return The value for the lexeme TargetProductID.
+   * @apilevel high-level
+   */
+  public String getTargetProductID() {
+    return tokenString_TargetProductID != null ? tokenString_TargetProductID : "";
+  }
+  /**
+   * Replaces the DeltaID list.
+   * @param list The new list node to be used as the DeltaID list.
+   * @apilevel high-level
+   */
+  public void setDeltaIDList(List<DeltaID> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the DeltaID list.
+   * @return Number of children in the DeltaID list.
+   * @apilevel high-level
+   */
+  public int getNumDeltaID() {
+    return getDeltaIDList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the DeltaID list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the DeltaID list.
+   * @apilevel low-level
+   */
+  public int getNumDeltaIDNoTransform() {
+    return getDeltaIDListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the DeltaID list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the DeltaID list.
+   * @apilevel high-level
+   */
+  public DeltaID getDeltaID(int i) {
+    return (DeltaID) getDeltaIDList().getChild(i);
+  }
+  /**
+   * Check whether the DeltaID list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasDeltaID() {
+    return getDeltaIDList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the DeltaID list.
+   * @param node The element to append to the DeltaID list.
+   * @apilevel high-level
+   */
+  public void addDeltaID(DeltaID node) {
+    List<DeltaID> list = (parent == null || state == null) ? getDeltaIDListNoTransform() : getDeltaIDList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addDeltaIDNoTransform(DeltaID node) {
+    List<DeltaID> list = getDeltaIDListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the DeltaID list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setDeltaID(DeltaID node, int i) {
+    List<DeltaID> list = getDeltaIDList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the DeltaID list.
+   * @return The node representing the DeltaID list.
+   * @apilevel high-level
+   */
+  public List<DeltaID> getDeltaIDList() {
+    List<DeltaID> list = (List<DeltaID>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the DeltaID list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DeltaID list.
+   * @apilevel low-level
+   */
+  public List<DeltaID> getDeltaIDListNoTransform() {
+    return (List<DeltaID>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the DeltaID list.
+   * @return The node representing the DeltaID list.
+   * @apilevel high-level
+   */
+  public List<DeltaID> getDeltaIDs() {
+    return getDeltaIDList();
+  }
+  /**
+   * Retrieves the DeltaID list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DeltaID list.
+   * @apilevel low-level
+   */
+  public List<DeltaID> getDeltaIDsNoTransform() {
+    return getDeltaIDListNoTransform();
+  }
+  /**
+   * Replaces the lexeme UpdateID.
+   * @param value The new value for the lexeme UpdateID.
+   * @apilevel high-level
+   */
+  public void setUpdateID(String value) {
+    tokenString_UpdateID = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_UpdateID;
+  /**
+   */
+  public int UpdateIDstart;
+  /**
+   */
+  public int UpdateIDend;
+  /**
+   * JastAdd-internal setter for lexeme UpdateID using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme UpdateID
+   * @apilevel internal
+   */
+  public void setUpdateID(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setUpdateID is only valid for String lexemes");
+    tokenString_UpdateID = (String)symbol.value;
+    UpdateIDstart = symbol.getStart();
+    UpdateIDend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme UpdateID.
+   * @return The value for the lexeme UpdateID.
+   * @apilevel high-level
+   */
+  public String getUpdateID() {
+    return tokenString_UpdateID != null ? tokenString_UpdateID : "";
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

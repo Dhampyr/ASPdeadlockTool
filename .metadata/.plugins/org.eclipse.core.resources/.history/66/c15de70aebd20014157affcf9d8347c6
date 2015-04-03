@@ -1,0 +1,699 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:39
+ * @production DataConstructor : {@link BehaviorDecl} ::= <span class="component">&lt;Name:String&gt;</span> <span class="component">ConstructorArg:{@link ConstructorArg}*</span>;
+
+ */
+public class DataConstructor extends BehaviorDecl implements Cloneable, HasTypes {
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:107
+   */
+  public void generateJava(PrintStream stream) {
+        String constructorClassName = JavaBackend.getConstructorName(this);
+        DataTypeDecl dataTypeDecl = ((DataTypeType)getType()).getDecl();
+        JavaGeneratorHelper.generateHelpLine(this,stream);
+
+        stream.print("public final class " + constructorClassName);
+        JavaGeneratorHelper.generateTypeParameters(stream,dataTypeDecl, true);
+        stream.print(" extends " + dataTypeDecl.getName());
+        JavaGeneratorHelper.generateTypeParameters(stream,dataTypeDecl, false);
+
+        stream.println(" {");
+
+        int i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.print("public final ");
+            stream.println(JavaBackend.getJavaType(u) + " arg" + i + ";");
+            stream.println("public " + JavaBackend.getJavaType(u) + " getArg" + i + "() { return arg" + i + "; }");
+            i++;
+        }
+
+        stream.print("public " + constructorClassName + "(");
+        boolean first = true;
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            if (first)
+                first = false;
+            else
+                stream.print(", ");
+            stream.print("final ");
+            stream.print(JavaBackend.getJavaType(u) + " arg" + i);
+            i++;
+        }
+        stream.println(") {");
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("this.arg" + i + " = arg" + i + ";");
+            i++;
+        }
+        stream.println("}");
+
+        stream.print("protected " + ABSValue.class.getName() + "[] getArgs() { return new " + ABSValue.class.getName() + "[] { ");
+        i=0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            if (i > 0)
+                stream.print(", ");
+            stream.print("this.arg" + i);
+            i++;
+        }
+        stream.println(" }; }");
+
+        stream.println("public java.lang.String getConstructorName() { return \"" + getName() + "\";} ");
+
+        // eq method
+        stream.println("public " + ABSBool.class.getName() + " eq(" + ABSValue.class.getName() + " o) {");
+        stream.println("if (! (o instanceof " + constructorClassName + ")) return " + ABSBool.class.getName() + ".FALSE;");
+        stream.println(constructorClassName + " other = (" + constructorClassName + ") o;");
+
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("if (!this.arg" + i + ".eq(other.arg" + i + ").toBoolean()) return " + ABSBool.class.getName() + ".FALSE;");
+            i++;
+        }
+
+        stream.println("return " + ABSBool.class.getName() + ".TRUE;");
+        stream.println("}");
+
+        // match method
+        stream.println("public boolean match(" + PatternConstructor.class.getName() + " c, " + PatternBinding.class.getName() + " b) {");
+        stream.println("if (!c.constructorClass.equals(this.getClass())) return false;");
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("if (!c.subpattern[" + i + "].match(this.arg" + i + ", b)) return false;");
+            i++;
+        }
+        stream.println("return true;");
+        stream.println("}");
+
+
+        stream.println("}");
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:144
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        String constructorClassName = JavaBackend.getConstructorName(this);
+        DataTypeDecl dataTypeDecl = ((DataTypeType)getType()).getDecl();
+        DynamicJavaGeneratorHelper.generateHelpLine(this,stream);
+
+        stream.print("public final class " + constructorClassName);
+        DynamicJavaGeneratorHelper.generateTypeParameters(stream,dataTypeDecl, true);
+        stream.print(" extends " + dataTypeDecl.getName());
+        DynamicJavaGeneratorHelper.generateTypeParameters(stream,dataTypeDecl, false);
+
+        stream.println(" {");
+
+        int i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.print("public final ");
+            stream.println(JavaBackend.getJavaType(u) + " arg" + i + ";");
+            stream.println("public " + JavaBackend.getJavaType(u) + " getArg" + i + "() { return arg" + i + "; }");
+            i++;
+        }
+
+        stream.println("public " + constructorClassName + "(");
+        boolean first = true;
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            if (first)
+                first = false;
+            else
+                stream.println(",");
+            stream.print("final ");
+            stream.print(JavaBackend.getJavaType(u) + " arg" + i);
+            i++;
+        }
+        stream.println(")");
+        stream.println("{");
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("this.arg" + i + " = arg" + i + ";");
+            i++;
+        }
+        stream.println("}");
+
+        stream.print("protected " + ABSValue.class.getName() + "[] getArgs() { return new " + ABSValue.class.getName() + "[] { ");
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            if (i > 0)
+                stream.print(", ");
+            stream.print("this.arg" + i);
+            i++;
+        }
+        stream.println(" }; }");
+
+        stream.println("public java.lang.String getConstructorName() { return \"" + getName() + "\"; }");
+
+        // eq method
+        stream.println("public " + ABSBool.class.getName() + " eq(" + ABSValue.class.getName() + " o) {");
+        stream.println("if (! (o instanceof " + constructorClassName + ")) return " + ABSBool.class.getName() + ".FALSE;");
+        stream.println(constructorClassName + " other = (" + constructorClassName + ") o;");
+
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("if (!this.arg" + i + ".eq(other.arg" + i + ").toBoolean()) return " + ABSBool.class.getName() + ".FALSE;");
+            i++;
+        }
+
+        stream.println("return " + ABSBool.class.getName() + ".TRUE;");
+        stream.println("}");
+
+        // match method
+        stream.println("public boolean match(" + PatternConstructor.class.getName() + " c, " + PatternBinding.class.getName() + " b) {");
+        stream.println("if (!c.constructorClass.equals(this.getClass())) return false;");
+        i = 0;
+        for (ConstructorArg u : getConstructorArgs()) {
+            stream.println("if (!c.subpattern[" + i + "].match(this.arg" + i + ", b)) return false;");
+            i++;
+        }
+        stream.println("return true;");
+        stream.println("}");
+
+
+        stream.println("}");
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:63
+   */
+  public void generateMaude(PrintStream stream) { }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:842
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print(getName());
+        if (getNumConstructorArg() > 0) {
+            stream.print("(");
+            getConstructorArgList().doPrettyPrint(stream, formatter, ",");
+            stream.print(")");
+        }
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:61
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        s.print(quote(getName()));
+        List<?> uses = (List<?>) getChild(0); // ? = DataTypeUse
+        int n = uses.getNumChild();
+        if (n == 0) return;
+        else {
+            s.print("(");
+            for (int i = 0; i < n; i++){
+                uses.getChild(i).generateProlog(s,reachInfo);
+                if (i != n-1) s.print(",");
+            }
+            s.print(")");
+        }
+    }
+  /**
+   * @aspect DumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/DumpTree.jadd:45
+   */
+  public void dumpTree(String indent, java.io.PrintStream pStream) {
+	   	pStream.println(indent + this.toString() + "\t\t" +  this.getName());
+		String childIndent = indent + "  ";
+		for(int i = 0; i < getNumChild(); i++)
+			getChildNoTransform(i).dumpTree(childIndent, pStream);
+		
+	}
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:121
+   */
+  protected void printInfo(PrintStream stream)
+    {
+        stream.print(this.getName());
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:58
+   */
+  public DataConstructor parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:390
+   */
+  public void refined_TypeChecker_DataConstructor_typeCheck(SemanticErrorList e) {
+        for (ConstructorArg d : getConstructorArgs()) {
+            d.typeCheck(e);
+        }
+    }
+  /**
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:216
+   */
+  public ExceptionDecl exceptionDecl = null;
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:385
+   */
+  public java.util.List<Type> getTypes() { return TypeCheckerHelper.getTypes(getConstructorArgs()); }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:381
+   */
+  public java.util.List<Type> applyBindings(Map<TypeParameter, Type> binding) {
+		return TypeCheckerHelper.applyBindings(binding, getTypes());
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:416
+   */
+  public Map<TypeParameter, Type> getTypeParamBinding(ASTNode<?> node, java.util.List<Type> args) {
+        Map<TypeParameter, Type> binding = new HashMap<TypeParameter, Type>();
+        TypeCheckerHelper.addTypeParamBinding(node, binding, getTypes(), args);
+        return binding;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public DataConstructor() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public DataConstructor(String p0, List<ConstructorArg> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @declaredat ASTNode:18
+   */
+  public DataConstructor(beaver.Symbol p0, List<ConstructorArg> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:25
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:31
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:37
+   */
+  public void flushCache() {
+    super.flushCache();
+    isDataConstructor_visited = -1;
+    getType_visited = -1;
+    getType_computed = false;
+    getType_value = null;
+    getDataTypeDecl_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:48
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:54
+   */
+  public DataConstructor clone() throws CloneNotSupportedException {
+    DataConstructor node = (DataConstructor) super.clone();
+    node.isDataConstructor_visited = -1;
+    node.getType_visited = -1;
+    node.getType_computed = false;
+    node.getType_value = null;
+    node.getDataTypeDecl_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:68
+   */
+  public DataConstructor copy() {
+    try {
+      DataConstructor node = (DataConstructor) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:86
+   */
+  public DataConstructor fullCopy() {
+    DataConstructor tree = (DataConstructor) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the ConstructorArg list.
+   * @param list The new list node to be used as the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public void setConstructorArgList(List<ConstructorArg> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the ConstructorArg list.
+   * @return Number of children in the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public int getNumConstructorArg() {
+    return getConstructorArgList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the ConstructorArg list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the ConstructorArg list.
+   * @apilevel low-level
+   */
+  public int getNumConstructorArgNoTransform() {
+    return getConstructorArgListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the ConstructorArg list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public ConstructorArg getConstructorArg(int i) {
+    return (ConstructorArg) getConstructorArgList().getChild(i);
+  }
+  /**
+   * Check whether the ConstructorArg list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasConstructorArg() {
+    return getConstructorArgList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the ConstructorArg list.
+   * @param node The element to append to the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public void addConstructorArg(ConstructorArg node) {
+    List<ConstructorArg> list = (parent == null || state == null) ? getConstructorArgListNoTransform() : getConstructorArgList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addConstructorArgNoTransform(ConstructorArg node) {
+    List<ConstructorArg> list = getConstructorArgListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the ConstructorArg list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setConstructorArg(ConstructorArg node, int i) {
+    List<ConstructorArg> list = getConstructorArgList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the ConstructorArg list.
+   * @return The node representing the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public List<ConstructorArg> getConstructorArgList() {
+    List<ConstructorArg> list = (List<ConstructorArg>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the ConstructorArg list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the ConstructorArg list.
+   * @apilevel low-level
+   */
+  public List<ConstructorArg> getConstructorArgListNoTransform() {
+    return (List<ConstructorArg>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the ConstructorArg list.
+   * @return The node representing the ConstructorArg list.
+   * @apilevel high-level
+   */
+  public List<ConstructorArg> getConstructorArgs() {
+    return getConstructorArgList();
+  }
+  /**
+   * Retrieves the ConstructorArg list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the ConstructorArg list.
+   * @apilevel low-level
+   */
+  public List<ConstructorArg> getConstructorArgsNoTransform() {
+    return getConstructorArgListNoTransform();
+  }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:263
+   */
+    public void typeCheck(SemanticErrorList s) {
+        int size = s.size();
+        refined_TypeChecker_DataConstructor_typeCheck(s);
+        if (s.size() > size) return;
+        // to guarantee type annotation:
+        getType();
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:73
+   */
+  private Type refined_Typing_DataConstructor_getType()
+{ return getDataTypeDecl().getType(); }
+  /**
+   * @apilevel internal
+   */
+  protected int isDataConstructor_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:16
+   */
+  public boolean isDataConstructor() {
+    ASTNode$State state = state();
+    if (isDataConstructor_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: isDataConstructor in class: org.jastadd.ast.AST.SynDecl");
+    }
+    isDataConstructor_visited = state().boundariesCrossed;
+    try {  return true;  }
+    finally {
+      isDataConstructor_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getType_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Type getType_value;
+  /**
+   * @attribute syn
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:51
+   */
+  public Type getType() {
+    if(getType_computed) {
+      return getType_value;
+    }
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getType_value = getType_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getType_computed = true;
+    } else {
+    }
+
+    getType_visited = -1;
+    return getType_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Type getType_compute() {
+          Type t = refined_Typing_DataConstructor_getType();        
+          for (ConstructorArg du : getConstructorArgs()) {
+              getModel().getTypeExt().annotateType(du.getType(),du,du);
+          }
+  //        getModel().getTypeExt().annotateType(t, this, this);
+          return t;
+      }
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:378
+   */
+  public DataTypeDecl getDataTypeDecl() {
+    ASTNode$State state = state();
+    if (getDataTypeDecl_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDataTypeDecl in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getDataTypeDecl_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    DataTypeDecl getDataTypeDecl_value = getParent().Define_DataTypeDecl_getDataTypeDecl(this, null);
+
+    getDataTypeDecl_visited = -1;
+    return getDataTypeDecl_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getDataTypeDecl_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

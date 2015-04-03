@@ -1,0 +1,769 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:119
+ * @production MethodImpl : {@link ASTNode} ::= <span class="component">{@link MethodSig}</span> <span class="component">{@link Block}</span> <span class="component">&lt;Critical:boolean&gt;</span>;
+
+ */
+public class MethodImpl extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:230
+   */
+  public void generateJava(PrintStream stream) {
+        JavaGeneratorHelper.generateMethodImpl(stream, this);
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:269
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        DynamicJavaGeneratorHelper.generateMethodImpl(stream, this);
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:591
+   */
+  public void generateMaude(PrintStream stream) {
+        boolean inlist = false;
+        MethodSig sig = getMethodSig();
+        PureExp cost = CompilerUtils.getAnnotationValue(sig.getAnnotationList(), "Cost");
+        stream.print("< '" + sig.getName() + " : Method | Param: ");
+        if (sig.getNumParam() == 0) {
+            stream.print("noVid");
+        } else {
+            stream.print("(");
+            for (ParamDecl param : sig.getParams()) {
+                if (inlist) stream.print(", "); else inlist = true;
+                stream.print("'" + param.getName() + "");
+            }
+            stream.print(")");
+        }
+        stream.print(",\n      Cost: ");
+        if (cost == null) {
+            stream.print("\"ABS.StdLib.Duration\"[\"num\"[0]] ");
+        } else {
+            cost.generateMaude(stream);
+        }
+        stream.print(",\n      Code: ");
+        if (getCritical()) stream.print("assign( '.nbcr ; \"+\"( '.nbcr :: \"num\"[1] ) ) ; "); // (Component Model) //
+        if (getBlock().getNumStmt() == 0) {
+            stream.print("return( null ) ");
+        } else {
+            inlist = false;    // value valid for statement emission as well
+            for (Stmt stmt : getBlock().getStmts()) {
+                if (inlist) stream.print("; "); else inlist = true;
+                stmt.generateMaude(stream);
+            }
+            // KLUDGE (rs 2010-06-15): Emit this for "Unit" methods for
+            // now, since we don't have an empty `return' statement
+            // currently.  Ideally we should flow-analyze where to
+            // insert a dummy return statement for Void methods, and
+            // give warnings about control paths not returning values
+            // otherwise.
+            Access returnType = sig.getReturnType();
+            if (returnType instanceof IdUse
+                && ((IdUse)returnType).getName().equals("Unit"))
+            {
+                stream.print("; ");
+                stream.print("return( null ) ");
+            }
+        }
+        if (getCritical()) stream.print(" ; assign( '.nbcr ; \"-\"( '.nbcr :: \"num\"[1] ) ) "); // (Component Model) //
+        stream.print("> ");
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:778
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        getMethodSig().doPrettyPrint(stream, formatter);
+        getBlock().doPrettyPrint(stream, formatter);
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:677
+   */
+  public void printContextInformation(PrintStream s){
+    	s.print("[");
+        if(this.getModuleDecl()!=null){
+    	    s.print("programLocation('" +this.getModuleDecl().getName()+"',"+ this.getLine( this.getStart())+","+this.getLine(this.getEnd())+")");
+    	}
+    	s.print("]");
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:684
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo,String quotedClass){
+        //generates "methodImpl(methodSig,className,annotationsList,block)."
+       if(reachInfo==null || reachInfo.isReachable(this)){
+	        s.print("methodImpl(");
+	        getChild(0).generateProlog(s,reachInfo);
+	        s.print(","+quotedClass+",");
+	        
+	        List<Annotation> anns = ((MethodSig) getChild(0)).getAnnotations();
+	        int n = anns.getNumChild();
+	        s.print("[");
+	        for (int i = 0; i < n; i++){
+	            anns.getChild(i).generateProlog(s,reachInfo);
+	            if (i != n-1) s.print(",");
+	        }
+	        s.print("],");
+	        
+	        getChild(1).generateProlog(s,reachInfo);
+	        s.print(",");
+            this.printContextInformation(s);
+	        s.println(").");      
+        }  
+    }
+  /**
+   * @aspect collectReachableCode
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/collectReachableCode.jadd:50
+   */
+  public void collectReachableCode(ReachabilityInformation reachInfo){
+        if(reachInfo.isReachable(this)){
+            if(reachInfo.setProcessed(this))
+                super.collectReachableCode(reachInfo);
+        }
+    }
+  /**
+   * @aspect DeltaParameterSubstitution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaParameterSubstitution.jadd:180
+   */
+  @Override
+    protected void applySubstitution(Map<String,Value> subst) throws DeltaModellingWithNodeException {
+        HashMap<String,Value> subst2 = new HashMap<String,Value>(subst);
+        getMethodSig().updateSubstitution(subst2);
+        getBlock().applySubstitution(subst2);
+    }
+  /**
+   * @aspect SQL
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/Sql.jadd:68
+   */
+  public void collectErrors(SemanticErrorList c) {
+        super.collectErrors(c);
+        if (getNodeWithAnnotation("SqlProc") != null && getInheritedAnnotationValue("DatabaseConnection") == null)
+            c.add(new SemanticError(getMethodSig(), ErrorMessage.SQL_PROC_WITHOUT_CONNECTION, getMethodSig().getName()));
+    }
+  /**
+   * @aspect SqlHelpers
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlHelpers.jadd:67
+   */
+  public String getUnusedVarName(final Set<? super String> occupiedNames, final String pattern) {
+        String name;
+        final Block block = getBlock();
+        final int numStmt = block.getNumStmt();
+        final Stmt lastStmt = numStmt > 0 ? block.getStmt(numStmt - 1) : null;
+        int i = 1;
+        do {
+            name = String.format(pattern, i == 1 ? "" : Integer.toString(i));
+            i++;
+        } while ((lastStmt == null ?
+                    lookupVarOrFieldName(name, false) :
+                    lastStmt.lookupVarOrFieldName(name, false)) != null ||
+                !occupiedNames.add(name));
+        return name;
+    }
+  /**
+   * @aspect SqlProc
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:19
+   */
+  private boolean isAllowedSqlProcType(String returnType) {
+        return (Constants.STDLIB_NAME + ".Unit").equals(returnType) ||
+                (Constants.DBLIB_NAME + ".DatabaseInterfaceDatum").equals(returnType);
+                
+    }
+  /**
+   * @aspect SqlProc
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:25
+   */
+  private boolean sqlProcRewriteDone = false;
+  /**
+   * @aspect SqlProc
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:81
+   */
+  private Stmt createSqlTransmissionDelay(PureExp dbConnection, String dataVarName) {
+        return new ExpressionStmt(
+            new List<Annotation>(),
+            CompilerUtils.copyPosition(dbConnection, new SyncCall(
+                (PureExp) dbConnection.fullCopy(),
+                "transmissionDelay",
+                new List<PureExp>().add(new VarUse(dataVarName)))));
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:148
+   */
+  public MethodImpl parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * Proxy.
+   * @see {@link MethodImpl#getType()}
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:430
+   */
+  public Type getType() { return getMethodSig().getType(); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:432
+   */
+  public void refined_TypeChecker_MethodImpl_typeCheck(SemanticErrorList e) {
+        Block b = getBlock();
+        MethodSig sig = getMethodSig();
+        int nerrors = e.size();
+        sig.typeCheck(e);
+        b.typeCheck(e);
+
+        if (sig.getName().equals("run")) {
+            TypeCheckerHelper.typeCheckRunMethodSig(e, sig);
+        }
+
+        Type lastType = getModel().getUnitType();
+        ASTNode<?> errorNode = this;
+        if (b.getNumStmt() > 0) {
+            Stmt lastStmt = b.getStmt(b.getNumStmt()-1); 
+            lastType = lastStmt.getType();
+
+            // otherwise check is already done in ReturnStmt
+            if (lastStmt instanceof ReturnStmt)
+                return;
+            errorNode = lastStmt;
+        }
+
+        if (!lastType.isAssignable(sig.getReturnType().getType())) {
+            e.add(new TypeError(errorNode,ErrorMessage.CANNOT_ASSIGN,lastType,sig.getReturnType().getType()));
+        }
+
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public MethodImpl() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[2];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public MethodImpl(MethodSig p0, Block p1, boolean p2) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+    setCritical(p2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:21
+   */
+  protected int numChildren() {
+    return 2;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:27
+   */
+  public boolean mayHaveRewrite() {
+    return true;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:33
+   */
+  public void flushCache() {
+    super.flushCache();
+    isForeign_visited = -1;
+    isForeign_computed = false;
+    locallookupVarOrFieldName_String_boolean_visited = null;
+    locallookupVarOrFieldName_String_boolean_values = null;
+    getNodeAnnotations_visited = -1;
+    sqlProcMethodImplRewriteRequired_visited = -1;
+    lookupVarOrFieldName_String_boolean_visited = null;
+    getModel_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:47
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:53
+   */
+  public MethodImpl clone() throws CloneNotSupportedException {
+    MethodImpl node = (MethodImpl) super.clone();
+    node.isForeign_visited = -1;
+    node.isForeign_computed = false;
+    node.locallookupVarOrFieldName_String_boolean_visited = null;
+    node.locallookupVarOrFieldName_String_boolean_values = null;
+    node.getNodeAnnotations_visited = -1;
+    node.sqlProcMethodImplRewriteRequired_visited = -1;
+    node.lookupVarOrFieldName_String_boolean_visited = null;
+    node.getModel_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:70
+   */
+  public MethodImpl copy() {
+    try {
+      MethodImpl node = (MethodImpl) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:88
+   */
+  public MethodImpl fullCopy() {
+    MethodImpl tree = (MethodImpl) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the MethodSig child.
+   * @param node The new node to replace the MethodSig child.
+   * @apilevel high-level
+   */
+  public void setMethodSig(MethodSig node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the MethodSig child.
+   * @return The current node used as the MethodSig child.
+   * @apilevel high-level
+   */
+  public MethodSig getMethodSig() {
+    return (MethodSig) getChild(0);
+  }
+  /**
+   * Retrieves the MethodSig child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the MethodSig child.
+   * @apilevel low-level
+   */
+  public MethodSig getMethodSigNoTransform() {
+    return (MethodSig) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the Block child.
+   * @param node The new node to replace the Block child.
+   * @apilevel high-level
+   */
+  public void setBlock(Block node) {
+    setChild(node, 1);
+  }
+  /**
+   * Retrieves the Block child.
+   * @return The current node used as the Block child.
+   * @apilevel high-level
+   */
+  public Block getBlock() {
+    return (Block) getChild(1);
+  }
+  /**
+   * Retrieves the Block child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Block child.
+   * @apilevel low-level
+   */
+  public Block getBlockNoTransform() {
+    return (Block) getChildNoTransform(1);
+  }
+  /**
+   * Replaces the lexeme Critical.
+   * @param value The new value for the lexeme Critical.
+   * @apilevel high-level
+   */
+  public void setCritical(boolean value) {
+    tokenboolean_Critical = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected boolean tokenboolean_Critical;
+  /**
+   * Retrieves the value for the lexeme Critical.
+   * @return The value for the lexeme Critical.
+   * @apilevel high-level
+   */
+  public boolean getCritical() {
+    return tokenboolean_Critical;
+  }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:256
+   */
+    public void typeCheck(SemanticErrorList s) {
+        int size = s.size();
+        refined_TypeChecker_MethodImpl_typeCheck(s);
+        if (s.size() > size) return;
+        getModel().getTypeExt().checkMethodImpl(this);
+    }
+  /**
+   * @apilevel internal
+   */
+  protected int isForeign_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isForeign_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isForeign_value;
+  /**
+   * @attribute syn
+   * @aspect FLIAnnotation
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FLIAnnotation.jrag:7
+   */
+  public boolean isForeign() {
+    if(isForeign_computed) {
+      return isForeign_value;
+    }
+    ASTNode$State state = state();
+    if (isForeign_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: isForeign in class: org.jastadd.ast.AST.SynDecl");
+    }
+    isForeign_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    isForeign_value = isForeign_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      isForeign_computed = true;
+    } else {
+    }
+
+    isForeign_visited = -1;
+    return isForeign_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean isForeign_compute() {
+          if (!AnnotationHelper.getAnnotationsOfType(getMethodSig().getAnnotations(),"ABS.FLI.FLIAnnotation").isEmpty())
+              return true;
+          Decl d = getContextDecl();
+          if (d.isUnknown())
+              return false; // A MethodImpl's context can also be a Modifier in which case it is not a Decl
+          else
+              return ((ClassDecl) d).isForeign();
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map locallookupVarOrFieldName_String_boolean_visited;
+  protected java.util.Map locallookupVarOrFieldName_String_boolean_values;
+  /**
+   * @attribute syn
+   * @aspect VarResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:203
+   */
+  public VarOrFieldDecl locallookupVarOrFieldName(String name, boolean fieldOnly) {
+    java.util.List _parameters = new java.util.ArrayList(2);
+    _parameters.add(name);
+    _parameters.add(Boolean.valueOf(fieldOnly));
+    if(locallookupVarOrFieldName_String_boolean_visited == null) locallookupVarOrFieldName_String_boolean_visited = new java.util.HashMap(4);
+    if(locallookupVarOrFieldName_String_boolean_values == null) locallookupVarOrFieldName_String_boolean_values = new java.util.HashMap(4);
+    if(locallookupVarOrFieldName_String_boolean_values.containsKey(_parameters)) {
+      return (VarOrFieldDecl)locallookupVarOrFieldName_String_boolean_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(locallookupVarOrFieldName_String_boolean_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: locallookupVarOrFieldName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    locallookupVarOrFieldName_String_boolean_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    VarOrFieldDecl locallookupVarOrFieldName_String_boolean_value = locallookupVarOrFieldName_compute(name, fieldOnly);
+    if(isFinal && num == state().boundariesCrossed) {
+      locallookupVarOrFieldName_String_boolean_values.put(_parameters, locallookupVarOrFieldName_String_boolean_value);
+    } else {
+    }
+
+    locallookupVarOrFieldName_String_boolean_visited.remove(_parameters);
+    return locallookupVarOrFieldName_String_boolean_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private VarOrFieldDecl locallookupVarOrFieldName_compute(String name, boolean fieldOnly) {
+          if (!fieldOnly) {
+              VarOrFieldDecl d = getMethodSig().locallookupVarOrFieldName(name,fieldOnly);
+              if (d != null) 
+                  return d;
+          }
+          return lookupVarOrFieldName(name,fieldOnly);
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getNodeAnnotations_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlHelpers
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlHelpers.jadd:4
+   */
+  public List<Annotation> getNodeAnnotations() {
+    ASTNode$State state = state();
+    if (getNodeAnnotations_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNodeAnnotations in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getNodeAnnotations_visited = state().boundariesCrossed;
+    try {  return getMethodSig().getNodeAnnotations();  }
+    finally {
+      getNodeAnnotations_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int sqlProcMethodImplRewriteRequired_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlProc
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:26
+   */
+  public boolean sqlProcMethodImplRewriteRequired() {
+    ASTNode$State state = state();
+    if (sqlProcMethodImplRewriteRequired_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: sqlProcMethodImplRewriteRequired in class: org.jastadd.ast.AST.SynDecl");
+    }
+    sqlProcMethodImplRewriteRequired_visited = state().boundariesCrossed;
+    try {  return !sqlProcRewriteDone;  }
+    finally {
+      sqlProcMethodImplRewriteRequired_visited = -1;
+    }
+  }
+  /**
+   * @attribute inh
+   * @aspect VarResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:193
+   */
+  public VarOrFieldDecl lookupVarOrFieldName(String name, boolean fieldOnly) {
+    java.util.List _parameters = new java.util.ArrayList(2);
+    _parameters.add(name);
+    _parameters.add(Boolean.valueOf(fieldOnly));
+    if(lookupVarOrFieldName_String_boolean_visited == null) lookupVarOrFieldName_String_boolean_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupVarOrFieldName_String_boolean_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupVarOrFieldName in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookupVarOrFieldName_String_boolean_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    VarOrFieldDecl lookupVarOrFieldName_String_boolean_value = getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, null, name, fieldOnly);
+
+    lookupVarOrFieldName_String_boolean_visited.remove(_parameters);
+    return lookupVarOrFieldName_String_boolean_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupVarOrFieldName_String_boolean_visited;
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:51
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:225
+   * @apilevel internal
+   */
+  public VarOrFieldDecl Define_VarOrFieldDecl_lookupVarOrFieldName(ASTNode caller, ASTNode child, String name, boolean fieldOnly) {
+    if (caller == getBlockNoTransform()){
+        return locallookupVarOrFieldName(name,fieldOnly);
+    }
+    else if (caller == getMethodSigNoTransform()){ 
+        if (!fieldOnly) {
+            VarOrFieldDecl d = getMethodSig().locallookupVarOrFieldName(name,fieldOnly);
+            if (d != null) 
+                return d;
+        }
+
+        return lookupVarOrFieldName(name,fieldOnly);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, caller, name, fieldOnly);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    // Declared at @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:29
+    if (sqlProcMethodImplRewriteRequired()) {
+      state().duringSqlProc++;
+      ASTNode result = rewriteRule0();
+      state().duringSqlProc--;
+      return result;
+    }    return super.rewriteTo();
+  }  /**
+   * @declaredat @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd:29
+   * @apilevel internal
+   */  private MethodImpl rewriteRule0() {
+    debugRewrite("Rewriting " + getClass().getName() + " using rule in /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlProc.jadd at line 29");
+{
+            sqlProcRewriteDone = true;
+            if (getNodeWithAnnotation("SqlProc") == null)
+            	return this;
+            PureExp dbConnection = getInheritedAnnotationValue("DatabaseConnection");
+            if (dbConnection == null)
+                return this;
+            List<Stmt> stmts = getBlockNoTransform().getStmtsNoTransform();
+            int i = 0;
+            
+            final ExpressionStmt propagationDelayStmt = CompilerUtils.copyPosition(this, new ExpressionStmt(
+                new List<Annotation>(),
+                CompilerUtils.copyPosition(dbConnection, new SyncCall(
+                    (PureExp) dbConnection.fullCopy(),
+                    "propagationDelay",
+                    new List<PureExp>()))));
+
+            // network delay before method
+            stmts.insertChild(propagationDelayStmt, i++);
+                
+            // transmission delay for arguments
+            for (ParamDecl param : getMethodSig().getParams())
+                stmts.insertChild(createSqlTransmissionDelay(dbConnection, param.getName()), i++);
+            
+            int countRegularStmts = stmts.getNumChild();
+            final Stmt lastStmt = stmts.getChild(countRegularStmts - 1);
+            if (lastStmt instanceof ReturnStmt)
+                countRegularStmts--;
+            
+            // network delay after method
+            stmts.insertChild(propagationDelayStmt.fullCopy(), countRegularStmts);
+            
+            if (!(lastStmt instanceof ReturnStmt))
+                return this;
+            
+            // transmission delay for return value
+            final String resultVar = getUnusedVarName(new HashSet<String>(), "result%s");
+            final ReturnStmt returnStmt = (ReturnStmt) lastStmt;
+            VarDeclStmt declareRetValueAsVarStmt = CompilerUtils.copyPosition(returnStmt, new VarDeclStmt(
+                new List<Annotation>(),
+                CompilerUtils.copyPosition(returnStmt, new VarDecl(
+                    resultVar,
+                    getMethodSig().getReturnType(),
+                    new Opt<Exp>(returnStmt.getRetExp())))));
+            stmts.insertChild(declareRetValueAsVarStmt, stmts.getNumChild() - 1);
+            stmts.insertChild(createSqlTransmissionDelay(dbConnection, resultVar), stmts.getNumChild() - 1);
+            returnStmt.setRetExp(new VarUse(resultVar));
+            return this;
+        }  }
+}

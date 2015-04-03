@@ -1,0 +1,1622 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:14
+ * @production ModuleDecl : {@link ASTNode} ::= <span class="component">&lt;Name:String&gt;</span> <span class="component">{@link Export}*</span> <span class="component">{@link Import}*</span> <span class="component">{@link Decl}*</span> <span class="component">[Block:{@link MainBlock}]</span>;
+
+ */
+public class ModuleDecl extends ASTNode<ASTNode> implements Cloneable, HasCogs {
+  /**
+   * @aspect GenerateCoreABS
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:24
+   */
+  public void generateCoreABS(PrintStream stream) {
+        stream.println("// " + getClass().getSimpleName() + " Declared in " + getFileName() + " line " + Symbol.getLine(getStart()));
+
+        stream.println("Module " + getName() + ";");
+        
+        for (Decl decl : getDecls()) {
+            decl.generateCoreABS(stream);
+        }
+    }
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:104
+   */
+  public void generateErlangCode(ErlApp ea) throws IOException{
+   ErlangCodeStream ecs=null;
+   try{
+     if (hasBlock()) {
+       String erlModulename = ErlUtil.getModuleName(getName());
+       ecs = ea.createSourceFile(ErlUtil.getName(this));
+       ecs.pf("-module(%s).", erlModulename);
+       ecs.println("-behaviour(application).");
+       ecs.println("-include_lib(\"include/abs_types.hrl\").");
+       ecs.println("-export([main/1]).");
+       ecs.println("%% Application callbacks");
+       ecs.println("-export([start/2, stop/1]).");
+       ecs.println();
+       ErlUtil.functionHeader(ecs, "main", Mask.none, "Cog=#cog{ref=CogRef}");
+       ecs.println("O = void,");
+       // Create a default deployment component.
+       ecs.println("%% FIXME: thisDC() won't work in main block (DC should be in Cog state)");
+       ecs.println("DC = object:new(cog:start(),class_ABS_DC_DeploymentComponent, [\"Initial DC\",dataEmptyMap,[]],Cog,[O]),");
+       ecs.println("eventstream:event({newdc, DC}),");
+       ecs.println("Stack = [DC],");
+       getBlock().generateErlangCode(ecs, Vars.n());
+       ecs.println('.');
+       ecs.decIndent();
+       ecs.println();
+       ecs.println("%% ===================================================================");
+       ecs.println("%% Application callbacks");
+       ecs.println("%% ===================================================================");
+       ecs.println();
+       ecs.println("start(_StartType, _StartArgs) ->");
+       ecs.println("    runtime:start_link([" + erlModulename + "]).");
+       ecs.println();
+       ecs.println("stop(_State) ->");
+       ecs.println("    ok.");
+
+       // Let's start the last seen module by default, hope there's
+       // only one init block in the model.
+       ea.generateModuleDefinitions(getName(), erlModulename);
+     }
+   }
+   finally{
+     if(ecs!=null)
+       try{
+       ecs.close();
+       }
+       catch(Exception a){
+       //TODO handle better, or hope for java7
+       }
+   }
+   for (Decl decl : getDecls()) {
+     decl.generateErlangCode(ea);
+    }
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:29
+   */
+  private JavaCode.Package generatedJavaPackage = null;
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:30
+   */
+  public JavaCode.Package getJavaPackage() throws JavaCodeGenerationException { 
+        if (generatedJavaPackage != null)
+            return generatedJavaPackage; 
+        else 
+            throw new JavaCodeGenerationException("A Java Package is not yet associated with this ModuleDecl (this only happens upon code generation).");
+    }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:37
+   */
+  public void generateJavaCode(JavaCode code) throws IOException, JavaCodeGenerationException {
+        String packageName = getName();
+        this.generatedJavaPackage = code.createPackage(packageName);
+
+        for (Decl decl : getDecls()) {
+            decl.generateJavaCode(generatedJavaPackage);
+        }
+
+        if (hasBlock()) {
+            Block block = getBlock();
+
+            String mainName = JavaBackend.getJavaNameForMainBlock();
+            generatedJavaPackage.addMainClass(mainName);
+            File file = generatedJavaPackage.createJavaFile(mainName);
+            PrintStream stream = null;
+            try {
+                stream = new JavaCodeStream(file);
+                stream.println("package " + generatedJavaPackage.packageName + ";");
+                //stream.println(JavaBackendConstants.LIB_IMPORT_STATEMENT);
+
+                stream.println("public class " + mainName + " extends " + ABSObject.class.getName() + " {");
+                stream.println("public static void main(java.lang.String[] args) throws Exception {");
+                stream.println(StartUp.class.getName() + ".startup(args," + mainName + ".class);");
+                stream.println("}");
+
+                stream.println("public java.lang.String getClassName() { return \"Main\"; }");
+                stream.println("public java.util.List<java.lang.String> getFieldNames() { return java.util.Collections.EMPTY_LIST; }");
+                stream.println("public " + mainName + "(" + COG.class.getName() + " cog) { super(cog); }");
+
+                // main block
+                stream.println("public " + ABSUnit.class.getName() + " run() {");
+                block.generateJava(stream);
+                stream.println("return " + JavaBackendConstants.UNITVALUE + ";");
+                stream.println("}");
+                stream.println("}");
+            } finally {
+                if (stream != null)
+                    stream.close();
+            }
+
+        }
+
+
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:68
+   */
+  public void generateJavaCodeDynamic(JavaCode code) throws IOException, JavaCodeGenerationException {
+        String packageName = getName();
+        JavaCode.Package p = code.createPackage(packageName);
+        for (Decl decl : getDecls()) {
+            decl.generateJavaCodeDynamic(p);
+        }
+
+
+        if (hasBlock()) {
+            Block block = getBlock();
+
+            String mainName = JavaBackend.getJavaNameForMainBlock();
+            p.addMainClass(mainName);
+            File file = p.createJavaFile(mainName);
+            PrintStream stream = null;
+            try {
+                stream = new JavaCodeStream(new BufferedOutputStream(new FileOutputStream(file)));
+                stream.println("package " + p.packageName + ";");
+
+                stream.println("public class " + mainName + " extends " + ABSDynamicObject.class.getName() + " {");
+                
+                stream.println("public static void main(java.lang.String[] args) throws Exception {");
+                stream.println(StartUp.class.getName() + ".startup(args, " + mainName + ".class);");
+                stream.println("}");
+
+                stream.println("public " + mainName + "(" + COG.class.getName() 
+                        + " cog) { super(cog, " + ABSMainClass.class.getName() + ".singleton()); }");
+
+                // main block
+                stream.println("public " + ABSUnit.class.getName() + " run() {");
+                stream.println("final " + ABSDynamicObject.class.getName() + " thisP = this;");
+                if (getModel().getProductName().equals("core")) {
+                    stream.println("thisP.__ABS_getRuntime().initDSPL(new " + ABSDynamicProductCore.class.getName() + "());");
+                } else {
+                    stream.println("thisP.__ABS_getRuntime().initDSPL(" 
+                            + JavaBackendConstants.LIB_RDM_PACKAGE + "." 
+                            + JavaBackend.getProductName(getModel().getProductName()) + ".singleton());");
+                }
+                block.generateJavaDynamic(stream);
+                stream.println("return " + JavaBackendConstants.UNITVALUE + ";");
+                stream.println("}");
+                stream.println("}");
+            } finally {
+                if (stream != null)
+                    stream.close();
+            }
+
+        }
+
+
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:46
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.println("module " + getName() + ";");
+        stream.println();
+        formatter.afterStmt();
+
+        for (Export e : getExportList()) {
+            e.doPrettyPrint(stream, formatter);
+            stream.println();
+            formatter.afterStmt();
+        }
+
+        stream.println();
+        formatter.afterStmt();
+
+        for (Import i : getImportList()) {
+            i.doPrettyPrint(stream, formatter);
+            stream.println();
+            formatter.afterStmt();
+        }
+
+        stream.println();
+        formatter.afterStmt();
+
+        for (Decl decl : getDecls()) {
+            decl.doPrettyPrint(stream, formatter);
+            stream.println();
+            stream.println();
+            formatter.afterStmt();
+        }
+
+        stream.println();
+        formatter.afterStmt();
+
+        if (hasBlock()) {
+            getBlock().doPrettyPrint(stream, formatter);
+        }
+        
+        stream.flush();
+
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:962
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        s.println("module("+quote(getName())+").");
+        //exports
+        List<Export> exports = this.getExportList();
+        int n = exports.getNumChild();
+        for (int i = 0; i < n; i++){
+            exports.getChild(i).generateProlog(s,reachInfo);
+        }
+        //imports
+        List<Import> imports = this.getImportList();
+        n = imports.getNumChild();
+        for (int i = 0; i < n; i++){
+            imports.getChild(i).generateProlog(s,reachInfo);
+        }
+        //declarations
+        List<Decl> declarations = this.getDeclList();
+        n = declarations.getNumChild();
+        for (int i = 0; i < n; i++){
+            declarations.getChild(i).generateProlog(s,reachInfo);
+        }
+        // FIXME DeltaDecl, ProductLine and Product have been move outside modules
+//        //productLine
+//        Opt<ProductLine> productLine=this.getProductLineOpt();
+//        if(productLine.getNumChild()>0)
+//            productLine.getChild(0).generateProlog(s,reachInfo);
+//        //products
+//        List<Product> products = this.getProductList();
+//        n = products.getNumChild();
+//        for (int i = 0; i < n; i++){
+//            products.getChild(i).generateProlog(s,reachInfo);
+//        }
+        Opt<MainBlock> mainBlock=this.getBlockOpt();
+        if(mainBlock.getNumChild()>0)
+            mainBlock.getChild(0).generateProlog(s,reachInfo);
+
+    }
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:157
+   */
+  protected void printInfo(PrintStream stream)
+    {
+        stream.print(this.getName());
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:171
+   */
+  public ModuleDecl parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:44
+   */
+  public void typeCheck(SemanticErrorList e) {
+        for (Import i : getImports()) {
+            i.typeCheck(e);
+        }
+
+        for (Export ex : getExports()) {
+            ex.typeCheck(e);
+        }
+
+        TypeCheckerHelper.checkForDuplicateDecls(this,e);
+
+        for (Decl d : getDecls()) {
+            d.typeCheck(e);
+        }
+
+        if (hasBlock()) {
+            getBlock().typeCheck(e);
+        }
+    }
+  /**
+   * @throws TypeCheckerException
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:514
+   */
+  public ResolvedName resolveName(KindedName name) {
+        return getVisibleNames().get(name);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ModuleDecl() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[4];
+    setChild(new List(), 0);
+    setChild(new List(), 1);
+    setChild(new List(), 2);
+    setChild(new Opt(), 3);
+  }
+  /**
+   * @declaredat ASTNode:17
+   */
+  public ModuleDecl(String p0, List<Export> p1, List<Import> p2, List<Decl> p3, Opt<MainBlock> p4) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+    setChild(p4, 3);
+  }
+  /**
+   * @declaredat ASTNode:24
+   */
+  public ModuleDecl(beaver.Symbol p0, List<Export> p1, List<Import> p2, List<Decl> p3, Opt<MainBlock> p4) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+    setChild(p4, 3);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:34
+   */
+  protected int numChildren() {
+    return 4;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:40
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:46
+   */
+  public void flushCache() {
+    super.flushCache();
+    getNumberOfNewCogExpr_visited = -1;
+    getNumberOfNewCogExpr_computed = false;
+    getVisibleNames_visited = -1;
+    getVisibleNames_computed = false;
+    getVisibleNames_initialized = false;
+    getVisibleNames_value = null;
+    getExportedNames_visited = -1;
+    getExportedNames_computed = false;
+    getExportedNames_initialized = false;
+    getExportedNames_value = null;
+    getImportedNames_visited = -1;
+    getImportedNames_computed = false;
+    getImportedNames_initialized = false;
+    getImportedNames_value = null;
+    getDefinedNames_visited = -1;
+    getDefinedNames_computed = false;
+    getDefinedNames_initialized = false;
+    getDefinedNames_value = null;
+    exportsName_String_visited = null;
+    exportsName_String_values = null;
+    isVisible_String_visited = null;
+    isVisible_String_values = null;
+    lookup_KindedName_visited = null;
+    lookup_KindedName_values = null;
+    lookupModule_String_visited = null;
+    getModel_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:78
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:84
+   */
+  public ModuleDecl clone() throws CloneNotSupportedException {
+    ModuleDecl node = (ModuleDecl) super.clone();
+    node.getNumberOfNewCogExpr_visited = -1;
+    node.getNumberOfNewCogExpr_computed = false;
+    node.getVisibleNames_visited = -1;
+    node.getVisibleNames_computed = false;
+    node.getVisibleNames_initialized = false;
+    node.getVisibleNames_value = null;
+    node.getExportedNames_visited = -1;
+    node.getExportedNames_computed = false;
+    node.getExportedNames_initialized = false;
+    node.getExportedNames_value = null;
+    node.getImportedNames_visited = -1;
+    node.getImportedNames_computed = false;
+    node.getImportedNames_initialized = false;
+    node.getImportedNames_value = null;
+    node.getDefinedNames_visited = -1;
+    node.getDefinedNames_computed = false;
+    node.getDefinedNames_initialized = false;
+    node.getDefinedNames_value = null;
+    node.exportsName_String_visited = null;
+    node.exportsName_String_values = null;
+    node.isVisible_String_visited = null;
+    node.isVisible_String_values = null;
+    node.lookup_KindedName_visited = null;
+    node.lookup_KindedName_values = null;
+    node.lookupModule_String_visited = null;
+    node.getModel_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:119
+   */
+  public ModuleDecl copy() {
+    try {
+      ModuleDecl node = (ModuleDecl) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:137
+   */
+  public ModuleDecl fullCopy() {
+    ModuleDecl tree = (ModuleDecl) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_Name;
+  /**
+   */
+  public int Namestart;
+  /**
+   */
+  public int Nameend;
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the Export list.
+   * @param list The new list node to be used as the Export list.
+   * @apilevel high-level
+   */
+  public void setExportList(List<Export> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the Export list.
+   * @return Number of children in the Export list.
+   * @apilevel high-level
+   */
+  public int getNumExport() {
+    return getExportList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Export list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Export list.
+   * @apilevel low-level
+   */
+  public int getNumExportNoTransform() {
+    return getExportListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Export list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Export list.
+   * @apilevel high-level
+   */
+  public Export getExport(int i) {
+    return (Export) getExportList().getChild(i);
+  }
+  /**
+   * Check whether the Export list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasExport() {
+    return getExportList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Export list.
+   * @param node The element to append to the Export list.
+   * @apilevel high-level
+   */
+  public void addExport(Export node) {
+    List<Export> list = (parent == null || state == null) ? getExportListNoTransform() : getExportList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addExportNoTransform(Export node) {
+    List<Export> list = getExportListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Export list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setExport(Export node, int i) {
+    List<Export> list = getExportList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Export list.
+   * @return The node representing the Export list.
+   * @apilevel high-level
+   */
+  public List<Export> getExportList() {
+    List<Export> list = (List<Export>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Export list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Export list.
+   * @apilevel low-level
+   */
+  public List<Export> getExportListNoTransform() {
+    return (List<Export>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the Export list.
+   * @return The node representing the Export list.
+   * @apilevel high-level
+   */
+  public List<Export> getExports() {
+    return getExportList();
+  }
+  /**
+   * Retrieves the Export list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Export list.
+   * @apilevel low-level
+   */
+  public List<Export> getExportsNoTransform() {
+    return getExportListNoTransform();
+  }
+  /**
+   * Replaces the Import list.
+   * @param list The new list node to be used as the Import list.
+   * @apilevel high-level
+   */
+  public void setImportList(List<Import> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the Import list.
+   * @return Number of children in the Import list.
+   * @apilevel high-level
+   */
+  public int getNumImport() {
+    return getImportList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Import list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Import list.
+   * @apilevel low-level
+   */
+  public int getNumImportNoTransform() {
+    return getImportListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Import list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Import list.
+   * @apilevel high-level
+   */
+  public Import getImport(int i) {
+    return (Import) getImportList().getChild(i);
+  }
+  /**
+   * Check whether the Import list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasImport() {
+    return getImportList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Import list.
+   * @param node The element to append to the Import list.
+   * @apilevel high-level
+   */
+  public void addImport(Import node) {
+    List<Import> list = (parent == null || state == null) ? getImportListNoTransform() : getImportList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addImportNoTransform(Import node) {
+    List<Import> list = getImportListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Import list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setImport(Import node, int i) {
+    List<Import> list = getImportList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Import list.
+   * @return The node representing the Import list.
+   * @apilevel high-level
+   */
+  public List<Import> getImportList() {
+    List<Import> list = (List<Import>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Import list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Import list.
+   * @apilevel low-level
+   */
+  public List<Import> getImportListNoTransform() {
+    return (List<Import>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the Import list.
+   * @return The node representing the Import list.
+   * @apilevel high-level
+   */
+  public List<Import> getImports() {
+    return getImportList();
+  }
+  /**
+   * Retrieves the Import list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Import list.
+   * @apilevel low-level
+   */
+  public List<Import> getImportsNoTransform() {
+    return getImportListNoTransform();
+  }
+  /**
+   * Replaces the Decl list.
+   * @param list The new list node to be used as the Decl list.
+   * @apilevel high-level
+   */
+  public void setDeclList(List<Decl> list) {
+    setChild(list, 2);
+  }
+  /**
+   * Retrieves the number of children in the Decl list.
+   * @return Number of children in the Decl list.
+   * @apilevel high-level
+   */
+  public int getNumDecl() {
+    return getDeclList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Decl list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Decl list.
+   * @apilevel low-level
+   */
+  public int getNumDeclNoTransform() {
+    return getDeclListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Decl list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Decl list.
+   * @apilevel high-level
+   */
+  public Decl getDecl(int i) {
+    return (Decl) getDeclList().getChild(i);
+  }
+  /**
+   * Check whether the Decl list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasDecl() {
+    return getDeclList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Decl list.
+   * @param node The element to append to the Decl list.
+   * @apilevel high-level
+   */
+  public void addDecl(Decl node) {
+    List<Decl> list = (parent == null || state == null) ? getDeclListNoTransform() : getDeclList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addDeclNoTransform(Decl node) {
+    List<Decl> list = getDeclListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Decl list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setDecl(Decl node, int i) {
+    List<Decl> list = getDeclList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Decl list.
+   * @return The node representing the Decl list.
+   * @apilevel high-level
+   */
+  public List<Decl> getDeclList() {
+    List<Decl> list = (List<Decl>) getChild(2);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Decl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Decl list.
+   * @apilevel low-level
+   */
+  public List<Decl> getDeclListNoTransform() {
+    return (List<Decl>) getChildNoTransform(2);
+  }
+  /**
+   * Retrieves the Decl list.
+   * @return The node representing the Decl list.
+   * @apilevel high-level
+   */
+  public List<Decl> getDecls() {
+    return getDeclList();
+  }
+  /**
+   * Retrieves the Decl list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Decl list.
+   * @apilevel low-level
+   */
+  public List<Decl> getDeclsNoTransform() {
+    return getDeclListNoTransform();
+  }
+  /**
+   * Replaces the optional node for the Block child. This is the <code>Opt</code>
+   * node containing the child Block, not the actual child!
+   * @param opt The new node to be used as the optional node for the Block child.
+   * @apilevel low-level
+   */
+  public void setBlockOpt(Opt<MainBlock> opt) {
+    setChild(opt, 3);
+  }
+  /**
+   * Replaces the (optional) Block child.
+   * @param node The new node to be used as the Block child.
+   * @apilevel high-level
+   */
+  public void setBlock(MainBlock node) {
+    getBlockOpt().setChild(node, 0);
+  }
+  /**
+   * Check whether the optional Block child exists.
+   * @return {@code true} if the optional Block child exists, {@code false} if it does not.
+   * @apilevel high-level
+   */
+  public boolean hasBlock() {
+    return getBlockOpt().getNumChild() != 0;
+  }
+  /**
+   * Retrieves the (optional) Block child.
+   * @return The Block child, if it exists. Returns {@code null} otherwise.
+   * @apilevel low-level
+   */
+  public MainBlock getBlock() {
+    return (MainBlock) getBlockOpt().getChild(0);
+  }
+  /**
+   * Retrieves the optional node for the Block child. This is the <code>Opt</code> node containing the child Block, not the actual child!
+   * @return The optional node for child the Block child.
+   * @apilevel low-level
+   */
+  public Opt<MainBlock> getBlockOpt() {
+    return (Opt<MainBlock>) getChild(3);
+  }
+  /**
+   * Retrieves the optional node for child Block. This is the <code>Opt</code> node containing the child Block, not the actual child!
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The optional node for child Block.
+   * @apilevel low-level
+   */
+  public Opt<MainBlock> getBlockOptNoTransform() {
+    return (Opt<MainBlock>) getChildNoTransform(3);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getNumberOfNewCogExpr_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_value;
+  /**
+   * @attribute syn
+   * @aspect NewExpCounter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/NewExprCounter.jrag:25
+   */
+  public int getNumberOfNewCogExpr() {
+    if(getNumberOfNewCogExpr_computed) {
+      return getNumberOfNewCogExpr_value;
+    }
+    ASTNode$State state = state();
+    if (getNumberOfNewCogExpr_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNumberOfNewCogExpr in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getNumberOfNewCogExpr_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getNumberOfNewCogExpr_value = getNumberOfNewCogExpr_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getNumberOfNewCogExpr_computed = true;
+    } else {
+    }
+
+    getNumberOfNewCogExpr_visited = -1;
+    return getNumberOfNewCogExpr_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private int getNumberOfNewCogExpr_compute() {  return super.getNumberOfNewCogExpr();  }
+  /**
+   * @apilevel internal
+   */
+  protected int getVisibleNames_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getVisibleNames_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getVisibleNames_initialized = false;
+  /**
+   * @apilevel internal
+   */
+  protected ResolvedMap getVisibleNames_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:49
+   */
+  public ResolvedMap getVisibleNames() {
+    if(getVisibleNames_computed) {
+      return getVisibleNames_value;
+    }
+    ASTNode$State state = state();
+    if (!getVisibleNames_initialized) {
+      getVisibleNames_initialized = true;
+      getVisibleNames_value = new ResolvedMap();
+    }
+    if (!state.IN_CIRCLE) {
+      state.IN_CIRCLE = true;
+      int num = state.boundariesCrossed;
+      boolean isFinal = this.is$Final();
+      // TODO: fixme
+      // state().CIRCLE_INDEX = 1;
+      do {
+        getVisibleNames_visited = state.CIRCLE_INDEX;
+        state.CHANGE = false;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getVisibleNames_value = getVisibleNames_compute();
+        if ((new_getVisibleNames_value==null && getVisibleNames_value!=null) || (new_getVisibleNames_value!=null && !new_getVisibleNames_value.equals(getVisibleNames_value))) {
+          state.CHANGE = true;
+        }
+        getVisibleNames_value = new_getVisibleNames_value;
+        state.CIRCLE_INDEX++;
+      } while (state.CHANGE);
+      if(isFinal && num == state().boundariesCrossed) {
+        getVisibleNames_computed = true;
+        state.LAST_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getVisibleNames_compute();
+        state.LAST_CYCLE = false;
+      } else {
+        state.RESET_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getVisibleNames_compute();
+        state.RESET_CYCLE = false;
+        getVisibleNames_computed = false;
+        getVisibleNames_initialized = false;
+      }
+      state.IN_CIRCLE = false;
+      return getVisibleNames_value;
+    }
+    if(getVisibleNames_visited != state.CIRCLE_INDEX) {
+      getVisibleNames_visited = state.CIRCLE_INDEX;
+      if (state.LAST_CYCLE) {
+      getVisibleNames_computed = true;
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getVisibleNames_value = getVisibleNames_compute();
+        return new_getVisibleNames_value;
+      }
+      if (state.RESET_CYCLE) {
+        getVisibleNames_computed = false;
+        getVisibleNames_initialized = false;
+        getVisibleNames_visited = -1;
+        return getVisibleNames_value;
+      }
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      ResolvedMap new_getVisibleNames_value = getVisibleNames_compute();
+      if ((new_getVisibleNames_value==null && getVisibleNames_value!=null) || (new_getVisibleNames_value!=null && !new_getVisibleNames_value.equals(getVisibleNames_value))) {
+        state.CHANGE = true;
+      }
+      getVisibleNames_value = new_getVisibleNames_value;
+      return getVisibleNames_value;
+    }
+    return getVisibleNames_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ResolvedMap getVisibleNames_compute() {
+          return TypeCheckerHelper.getVisibleNames(this);
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getExportedNames_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getExportedNames_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getExportedNames_initialized = false;
+  /**
+   * @apilevel internal
+   */
+  protected ResolvedMap getExportedNames_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:54
+   */
+  public ResolvedMap getExportedNames() {
+    if(getExportedNames_computed) {
+      return getExportedNames_value;
+    }
+    ASTNode$State state = state();
+    if (!getExportedNames_initialized) {
+      getExportedNames_initialized = true;
+      getExportedNames_value = new ResolvedMap();
+    }
+    if (!state.IN_CIRCLE) {
+      state.IN_CIRCLE = true;
+      int num = state.boundariesCrossed;
+      boolean isFinal = this.is$Final();
+      // TODO: fixme
+      // state().CIRCLE_INDEX = 1;
+      do {
+        getExportedNames_visited = state.CIRCLE_INDEX;
+        state.CHANGE = false;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getExportedNames_value = getExportedNames_compute();
+        if ((new_getExportedNames_value==null && getExportedNames_value!=null) || (new_getExportedNames_value!=null && !new_getExportedNames_value.equals(getExportedNames_value))) {
+          state.CHANGE = true;
+        }
+        getExportedNames_value = new_getExportedNames_value;
+        state.CIRCLE_INDEX++;
+      } while (state.CHANGE);
+      if(isFinal && num == state().boundariesCrossed) {
+        getExportedNames_computed = true;
+        state.LAST_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getExportedNames_compute();
+        state.LAST_CYCLE = false;
+      } else {
+        state.RESET_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getExportedNames_compute();
+        state.RESET_CYCLE = false;
+        getExportedNames_computed = false;
+        getExportedNames_initialized = false;
+      }
+      state.IN_CIRCLE = false;
+      return getExportedNames_value;
+    }
+    if(getExportedNames_visited != state.CIRCLE_INDEX) {
+      getExportedNames_visited = state.CIRCLE_INDEX;
+      if (state.LAST_CYCLE) {
+      getExportedNames_computed = true;
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getExportedNames_value = getExportedNames_compute();
+        return new_getExportedNames_value;
+      }
+      if (state.RESET_CYCLE) {
+        getExportedNames_computed = false;
+        getExportedNames_initialized = false;
+        getExportedNames_visited = -1;
+        return getExportedNames_value;
+      }
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      ResolvedMap new_getExportedNames_value = getExportedNames_compute();
+      if ((new_getExportedNames_value==null && getExportedNames_value!=null) || (new_getExportedNames_value!=null && !new_getExportedNames_value.equals(getExportedNames_value))) {
+        state.CHANGE = true;
+      }
+      getExportedNames_value = new_getExportedNames_value;
+      return getExportedNames_value;
+    }
+    return getExportedNames_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ResolvedMap getExportedNames_compute() {
+          return TypeCheckerHelper.getExportedNames(this);
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getImportedNames_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getImportedNames_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getImportedNames_initialized = false;
+  /**
+   * @apilevel internal
+   */
+  protected ResolvedMap getImportedNames_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:59
+   */
+  public ResolvedMap getImportedNames() {
+    if(getImportedNames_computed) {
+      return getImportedNames_value;
+    }
+    ASTNode$State state = state();
+    if (!getImportedNames_initialized) {
+      getImportedNames_initialized = true;
+      getImportedNames_value = new ResolvedMap();
+    }
+    if (!state.IN_CIRCLE) {
+      state.IN_CIRCLE = true;
+      int num = state.boundariesCrossed;
+      boolean isFinal = this.is$Final();
+      // TODO: fixme
+      // state().CIRCLE_INDEX = 1;
+      do {
+        getImportedNames_visited = state.CIRCLE_INDEX;
+        state.CHANGE = false;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getImportedNames_value = getImportedNames_compute();
+        if ((new_getImportedNames_value==null && getImportedNames_value!=null) || (new_getImportedNames_value!=null && !new_getImportedNames_value.equals(getImportedNames_value))) {
+          state.CHANGE = true;
+        }
+        getImportedNames_value = new_getImportedNames_value;
+        state.CIRCLE_INDEX++;
+      } while (state.CHANGE);
+      if(isFinal && num == state().boundariesCrossed) {
+        getImportedNames_computed = true;
+        state.LAST_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getImportedNames_compute();
+        state.LAST_CYCLE = false;
+      } else {
+        state.RESET_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getImportedNames_compute();
+        state.RESET_CYCLE = false;
+        getImportedNames_computed = false;
+        getImportedNames_initialized = false;
+      }
+      state.IN_CIRCLE = false;
+      return getImportedNames_value;
+    }
+    if(getImportedNames_visited != state.CIRCLE_INDEX) {
+      getImportedNames_visited = state.CIRCLE_INDEX;
+      if (state.LAST_CYCLE) {
+      getImportedNames_computed = true;
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getImportedNames_value = getImportedNames_compute();
+        return new_getImportedNames_value;
+      }
+      if (state.RESET_CYCLE) {
+        getImportedNames_computed = false;
+        getImportedNames_initialized = false;
+        getImportedNames_visited = -1;
+        return getImportedNames_value;
+      }
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      ResolvedMap new_getImportedNames_value = getImportedNames_compute();
+      if ((new_getImportedNames_value==null && getImportedNames_value!=null) || (new_getImportedNames_value!=null && !new_getImportedNames_value.equals(getImportedNames_value))) {
+        state.CHANGE = true;
+      }
+      getImportedNames_value = new_getImportedNames_value;
+      return getImportedNames_value;
+    }
+    return getImportedNames_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ResolvedMap getImportedNames_compute() {
+          return TypeCheckerHelper.getImportedNames(this);
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getDefinedNames_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDefinedNames_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDefinedNames_initialized = false;
+  /**
+   * @apilevel internal
+   */
+  protected ResolvedMap getDefinedNames_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:64
+   */
+  public ResolvedMap getDefinedNames() {
+    if(getDefinedNames_computed) {
+      return getDefinedNames_value;
+    }
+    ASTNode$State state = state();
+    if (!getDefinedNames_initialized) {
+      getDefinedNames_initialized = true;
+      getDefinedNames_value = new ResolvedMap();
+    }
+    if (!state.IN_CIRCLE) {
+      state.IN_CIRCLE = true;
+      int num = state.boundariesCrossed;
+      boolean isFinal = this.is$Final();
+      // TODO: fixme
+      // state().CIRCLE_INDEX = 1;
+      do {
+        getDefinedNames_visited = state.CIRCLE_INDEX;
+        state.CHANGE = false;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getDefinedNames_value = getDefinedNames_compute();
+        if ((new_getDefinedNames_value==null && getDefinedNames_value!=null) || (new_getDefinedNames_value!=null && !new_getDefinedNames_value.equals(getDefinedNames_value))) {
+          state.CHANGE = true;
+        }
+        getDefinedNames_value = new_getDefinedNames_value;
+        state.CIRCLE_INDEX++;
+      } while (state.CHANGE);
+      if(isFinal && num == state().boundariesCrossed) {
+        getDefinedNames_computed = true;
+        state.LAST_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getDefinedNames_compute();
+        state.LAST_CYCLE = false;
+      } else {
+        state.RESET_CYCLE = true;
+            if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        
+        getDefinedNames_compute();
+        state.RESET_CYCLE = false;
+        getDefinedNames_computed = false;
+        getDefinedNames_initialized = false;
+      }
+      state.IN_CIRCLE = false;
+      return getDefinedNames_value;
+    }
+    if(getDefinedNames_visited != state.CIRCLE_INDEX) {
+      getDefinedNames_visited = state.CIRCLE_INDEX;
+      if (state.LAST_CYCLE) {
+      getDefinedNames_computed = true;
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+        ResolvedMap new_getDefinedNames_value = getDefinedNames_compute();
+        return new_getDefinedNames_value;
+      }
+      if (state.RESET_CYCLE) {
+        getDefinedNames_computed = false;
+        getDefinedNames_initialized = false;
+        getDefinedNames_visited = -1;
+        return getDefinedNames_value;
+      }
+          if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      ResolvedMap new_getDefinedNames_value = getDefinedNames_compute();
+      if ((new_getDefinedNames_value==null && getDefinedNames_value!=null) || (new_getDefinedNames_value!=null && !new_getDefinedNames_value.equals(getDefinedNames_value))) {
+        state.CHANGE = true;
+      }
+      getDefinedNames_value = new_getDefinedNames_value;
+      return getDefinedNames_value;
+    }
+    return getDefinedNames_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ResolvedMap getDefinedNames_compute() {
+          return TypeCheckerHelper.getDefinedNames(this, new ArrayList<KindedName>());
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map exportsName_String_visited;
+  protected java.util.Map exportsName_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:68
+   */
+  public boolean exportsName(String name) {
+    Object _parameters = name;
+    if(exportsName_String_visited == null) exportsName_String_visited = new java.util.HashMap(4);
+    if(exportsName_String_values == null) exportsName_String_values = new java.util.HashMap(4);
+    if(exportsName_String_values.containsKey(_parameters)) {
+      return ((Boolean)exportsName_String_values.get(_parameters)).booleanValue();
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(exportsName_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: exportsName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    exportsName_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    boolean exportsName_String_value = exportsName_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      exportsName_String_values.put(_parameters, Boolean.valueOf(exportsName_String_value));
+    } else {
+    }
+
+    exportsName_String_visited.remove(_parameters);
+    return exportsName_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean exportsName_compute(String name) {
+          return ! getExportedNames().getAllNames(name).isEmpty();
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map isVisible_String_visited;
+  protected java.util.Map isVisible_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:72
+   */
+  public boolean isVisible(String name) {
+    Object _parameters = name;
+    if(isVisible_String_visited == null) isVisible_String_visited = new java.util.HashMap(4);
+    if(isVisible_String_values == null) isVisible_String_values = new java.util.HashMap(4);
+    if(isVisible_String_values.containsKey(_parameters)) {
+      return ((Boolean)isVisible_String_values.get(_parameters)).booleanValue();
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(isVisible_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: isVisible in class: org.jastadd.ast.AST.SynDecl");
+    }
+    isVisible_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    boolean isVisible_String_value = isVisible_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      isVisible_String_values.put(_parameters, Boolean.valueOf(isVisible_String_value));
+    } else {
+    }
+
+    isVisible_String_visited.remove(_parameters);
+    return isVisible_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean isVisible_compute(String name) {
+          return ! getVisibleNames().getAllNames(name).isEmpty();
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookup_KindedName_visited;
+  protected java.util.Map lookup_KindedName_values;
+  /**
+   * @throws TypeCheckerException
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:298
+   */
+  public Decl lookup(KindedName name) {
+    Object _parameters = name;
+    if(lookup_KindedName_visited == null) lookup_KindedName_visited = new java.util.HashMap(4);
+    if(lookup_KindedName_values == null) lookup_KindedName_values = new java.util.HashMap(4);
+    if(lookup_KindedName_values.containsKey(_parameters)) {
+      return (Decl)lookup_KindedName_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookup_KindedName_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookup in class: org.jastadd.ast.AST.SynDecl");
+    }
+    lookup_KindedName_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Decl lookup_KindedName_value = lookup_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      lookup_KindedName_values.put(_parameters, lookup_KindedName_value);
+    } else {
+    }
+
+    lookup_KindedName_visited.remove(_parameters);
+    return lookup_KindedName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Decl lookup_compute(KindedName name) {
+          ResolvedName r = resolveName(name);
+          if (r != null) {			
+              return r.getDecl();
+          } else {	
+              return Model.unknownDecl;
+          } 			
+      }
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:239
+   */
+  public ModuleDecl lookupModule(String name) {
+    Object _parameters = name;
+    if(lookupModule_String_visited == null) lookupModule_String_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupModule_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupModule in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookupModule_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    ModuleDecl lookupModule_String_value = getParent().Define_ModuleDecl_lookupModule(this, null, name);
+
+    lookupModule_String_visited.remove(_parameters);
+    return lookupModule_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupModule_String_visited;
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:40
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:230
+   * @apilevel internal
+   */
+  public VarOrFieldDecl Define_VarOrFieldDecl_lookupVarOrFieldName(ASTNode caller, ASTNode child, String name, boolean fieldOnly) {
+    if (caller == getDeclListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return getDecl(i).locallookupVarOrFieldName(name,fieldOnly);
+    }
+    else if (caller == getBlockOptNoTransform()) {
+      return null;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, caller, name, fieldOnly);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:233
+   * @apilevel internal
+   */
+  public ModuleDecl Define_ModuleDecl_getModuleDecl(ASTNode caller, ASTNode child) {
+    if (caller == getExportListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return this;
+    }
+    else if (caller == getDeclListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return this;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_ModuleDecl_getModuleDecl(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:277
+   * @apilevel internal
+   */
+  public Decl Define_Decl_lookup(ASTNode caller, ASTNode child, KindedName name) {
+    if (caller == getBlockOptNoTransform()) {
+      return lookup(name);
+    }
+    else if (caller == getDeclListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return lookup(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Decl_lookup(this, caller, name);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:380
+   * @apilevel internal
+   */
+  public DataTypeDecl Define_DataTypeDecl_getDataTypeDecl(ASTNode caller, ASTNode child) {
+    if (caller == getDeclListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return null;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_DataTypeDecl_getDataTypeDecl(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

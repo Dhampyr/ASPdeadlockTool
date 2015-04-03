@@ -1,0 +1,2418 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:11
+ * @production Model : {@link ASTNode} ::= <span class="component">{@link CompilationUnit}*</span>;
+
+ */
+public class Model extends ASTNode<ASTNode> implements Cloneable, HasCogs {
+  /**
+   * @aspect GenerateCoreABS
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:16
+   */
+  public void generateCoreABS(PrintStream stream) {
+        super.generateCoreABS(stream);
+
+        for (ModuleDecl decl : getModuleDecls()) {
+            decl.generateCoreABS(stream);
+        }
+    }
+  /** Global switch whether this rewriting is enabled.
+   * If you ever have to turn this off, make sure all the missing operations in the
+   * AwaitAsyncCall-class have been filled in.
+   * @aspect GenerateCoreABS
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:49
+   */
+  public static boolean doAACrewrite = true;
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:19
+   */
+  public void generateErlangCode(ErlApp ea) throws IOException{
+    for (ModuleDecl decl : getModuleDecls()) {
+      decl.generateErlangCode(ea);
+    }
+   }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:14
+   */
+  public void generateJavaCode(JavaCode code) throws IOException, JavaCodeGenerationException {
+        JavaGeneratorHelper.cleanGenFolder(code);
+        for (ModuleDecl decl : getModuleDecls()) {
+            try {
+                decl.generateJavaCode(code);
+            } catch (NotImplementedYetException e) { 
+                throw new JavaCodeGenerationException("Module " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            } catch (RuntimeException e) { 
+                throw new JavaCodeGenerationException("Module " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            }
+        }
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:16
+   */
+  public void generateJavaCodeDynamic(JavaCode code) throws IOException, JavaCodeGenerationException {
+        DynamicJavaGeneratorHelper.cleanGenFolder(code);
+        for (ModuleDecl decl : getModuleDecls()) {
+            try {
+                decl.generateJavaCodeDynamic(code);
+            } catch (NotImplementedYetException e) { 
+                throw new JavaCodeGenerationException("Module " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            } catch (RuntimeException e) { 
+                throw new JavaCodeGenerationException("Module " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            }
+        }
+        for (DeltaDecl decl : getDeltaDecls()) {
+            try {
+                decl.generateJavaCodeDynamic(code);
+            } catch (NotImplementedYetException e) { 
+                throw new JavaCodeGenerationException("Delta " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            } catch (RuntimeException e) { 
+                throw new JavaCodeGenerationException("Delta " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+            }
+        }
+        {
+            JavaCode.Package pkg = code.createPackage(JavaBackendConstants.LIB_UPDATES_PACKAGE);
+            for (UpdateDecl decl : getUpdateDecls()) {
+                try {
+                    decl.generateJavaCodeDynamic(pkg);
+                } catch (NotImplementedYetException e) { 
+                    throw new JavaCodeGenerationException("Update " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+                } catch (RuntimeException e) { 
+                    throw new JavaCodeGenerationException("Update " + decl.getName() + ":" + e.getLocalizedMessage(),e); 
+                }
+            }
+        }
+        {   /* The Reconfiguration Decision Model (RDM) */
+            // first remember all products by name
+            HashMap<String, Product> allProducts = new HashMap<String, Product>();
+            for (Product prod : getProducts()) {
+                allProducts.put(prod.getName(), prod);
+            }
+            JavaCode.Package pkg = code.createPackage(JavaBackendConstants.LIB_RDM_PACKAGE);
+            for (Product prod : getProducts()) {
+                try {
+                    prod.generateJavaCodeDynamic(pkg, allProducts);
+                } catch (NotImplementedYetException e) { 
+                    throw new JavaCodeGenerationException("Product " + prod.getName() + ":" + e.getLocalizedMessage(),e); 
+                } catch (RuntimeException e) { 
+                    throw new JavaCodeGenerationException("Product " + prod.getName() + ":" + e.getLocalizedMessage(),e); 
+                }
+            }
+        }
+
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:13
+   */
+  int defaultResources = 0;
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:15
+   */
+  public void generateMaude(PrintStream stream, MaudeCompiler.SIMULATOR module, int clocklimit, int defaultResources) {
+    	generateMaude(stream,module,null, clocklimit, defaultResources);
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:19
+   */
+  public void generateMaude(PrintStream stream, MaudeCompiler.SIMULATOR module, String mainBlock, int clocklimit, int defaultResources) {
+        assert module != null;
+        this.defaultResources = defaultResources;
+        boolean hasClasses = false;
+        stream.println("in abs-interpreter\n\nmod MODEL is\nprotecting "
+                       + module.getModule() + " .\n");
+        for (Decl decl : getDecls()) {
+            if (decl instanceof FunctionDecl)
+                decl.generateMaude(stream);
+        }
+        stream.println("op classes : -> Configuration .");
+        stream.print("eq classes =");
+        for (Decl decl : getDecls()) {
+            if (decl instanceof ClassDecl) {
+                hasClasses = true;
+                decl.generateMaude(stream);
+            }
+        }
+        if (mainBlock == null) {
+            if (hasMainBlock()) {
+                hasClasses = true;
+                getMainBlock().generateMaude(stream);
+            }
+        } else {
+            if (hasMainBlock(mainBlock)) {
+                hasClasses = true;
+                getMainBlock(mainBlock).generateMaude(stream);
+            }
+        }
+        if (!hasClasses) {
+            stream.print("none ");
+        }
+        stream.println(".\n");
+        stream.println();
+        stream.println("--- Start the main block with 'rew start .'");
+        stream.println("op start : -> State .");
+        stream.println("eq start = main(classes, \".Start\", emp, " + Integer.toString(clocklimit) + ") .");
+        stream.println("\nendm");
+        stream.println("\n\nset print color on .");
+        stream.println("set print attribute on .");
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:31
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        for (ModuleDecl d : getModuleDecls()) {
+            if (! Constants.BUILT_IN_LIBS.contains(d.getName())) {
+                d.doPrettyPrint(stream, formatter);
+            }
+        }
+
+        for (DeltaDecl d : getDeltaDecls()) {
+            d.doPrettyPrint(stream, formatter);
+        }
+        if (hasProductLine()) {
+            getProductLine().doPrettyPrint(stream, formatter);
+        }
+    }
+  /**
+   * TODO: doesn't cache intermediate results, use with care.
+   * @aspect ErrorCheck
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/ErrorCheck.jadd:11
+   */
+  public boolean hasErrors() {
+        return !getErrors().isEmpty();
+    }
+  /**
+   * @aspect ErrorCheck
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/ErrorCheck.jadd:15
+   */
+  public SemanticErrorList getErrors() {
+    SemanticErrorList s = new SemanticErrorList();
+    collectErrors(s);
+    return s;
+  }
+  /**
+   * @aspect NullObjects
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/NullObjects.jrag:7
+   */
+  public final static UnknownDecl unknownDecl = new UnknownDecl();
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:2
+   */
+  public boolean verbose = false;
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:3
+   */
+  public boolean debug   = false;
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:4
+   */
+  private PrintStream output = System.out;
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:6
+   */
+  public void setPrintStream(PrintStream o) {
+		output = o;
+	}
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:9
+   */
+  public void setNullPrintStream() {
+    	setPrintStream(
+            new java.io.PrintStream(
+            new java.io.OutputStream () {
+                public void write (int b) {}
+            }) );
+    }
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:17
+   */
+  public void print(String s)   { output.print(s);   }
+  /**
+   * @aspect Verbosity
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Verbosity.jadd:18
+   */
+  public void println(String s) { output.println(s); }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:13
+   */
+  public static void resolveOriginalCalls(Collection<DeltaDecl> deltas) throws DeltaModellingException {
+        ArrayList<DeltaDecl> prevdeltas = new ArrayList<DeltaDecl>();
+        
+        for (DeltaDecl delta : deltas) {
+            delta.resolveOriginalCalls(prevdeltas);
+            prevdeltas.add(0, delta);
+        }
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:43
+   */
+  private Set<String> originalMethodsCache = new HashSet<String>();
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:44
+   */
+  public void cacheOriginalMethod(String id) {
+        originalMethodsCache.add(id);
+    }
+  /**
+   * @aspect OriginalCallResolver
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/OriginalCallResolver.jadd:47
+   */
+  public boolean containsCachedOriginalMethod(String id) {
+        return originalMethodsCache.contains(id);
+    }
+  /**************************************************************************
+   * Configure a product
+   * This is the top level method, which does the following:
+   * - find the features of a given product, 
+   * - find a valid sequence of associated deltas,
+   * - resolve original() calls,
+   * - apply deltas in sequence.
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:15
+   */
+  public void flattenForProduct(String id) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod);
+    }
+  /**************************************************************************
+   * Apply delta to model without checking if the product is valid wrt the feature model
+   * i.e. apply each ModuleModifier to its corresponding class or interface
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:23
+   */
+  public void flattenForProductUnsafe(String id) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod, false);
+    }
+  /**
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:27
+   */
+  public void flattenForProduct(Product prod) throws WrongProgramArgumentException,DeltaModellingException {
+        flattenForProduct(prod, true);
+    }
+  /**
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:30
+   */
+  public void flattenForProduct(String id, boolean check) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod, check);
+    }
+  /**
+   * Refined with MTVL-check in CSP.jadd.
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:38
+   */
+  public void refined_ProductFlattener_Model_flattenForProduct(Product prod, boolean check) throws WrongProgramArgumentException,DeltaModellingException {
+        if (verbose)
+            System.out.println("--- configuring product: " + prod.getName());
+
+        // find product line
+        ProductLine pl = getProductLine();
+        if (pl == null)
+            throw new DeltaModellingException("Model is missing a 'productline' definition");
+
+        // find/sort applicable delta IDs
+        Set<String> deltaids = pl.findApplicableDeltas(prod);
+        ArrayList<String> sorted_deltaids = pl.sortDeltas(deltaids);
+
+        // find corresponding DeltaDecls
+        ArrayList<DeltaDecl> deltas = findDeltas(sorted_deltaids);
+        
+        // substitute delta parameters
+        pl.substituteDeltaParams(deltas, prod);
+
+        // resolve original() calls
+        resolveOriginalCalls(deltas);
+
+        if (verbose) {
+            System.out.print("--- applying deltas to core");
+            for (DeltaDecl delta : deltas) {
+                print(" << " + delta.getName());
+            }
+            println(" .");
+        }
+
+        // apply the applicable deltas in the given order
+        applyDeltas(deltas);
+        
+        // remember which product was generated
+        productName = prod.getName();
+    }
+  /**************************************************************************
+   * Apply deltas to model
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:78
+   */
+  public void applyDeltas(ArrayList<DeltaDecl> deltas) throws DeltaModellingException {
+        // TODO/FIXME: The following code is sort of hack-ish and slow. Find a better way
+        //             to flush the correct cache at the same time (or avoid flushing at all?)
+        for (DeltaDecl delta : deltas) {
+            this.applyDelta(delta);
+            for (CompilationUnit unit: this.getCompilationUnits())
+                for (ModuleDecl module: unit.getModuleDecls())
+                        module.flushCache();
+        }
+    }
+  /**************************************************************************
+   * apply each FunctionalModifier and ModuleModifier 
+   * to its corresponding class or interface
+   * 
+   * These "apply" methods are defined in "DeltaModifierApplicator.jadd"
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:95
+   */
+  public void applyDelta(DeltaDecl delta) throws DeltaModellingException {
+        for (ModuleModifier mod : delta.getModuleModifiers()) {
+            //System.out.println("*** applying ModuleModifier " + mod);
+            mod.apply();
+        }
+    }
+  /**************************************************************************
+   * find a particular product given by its name
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:105
+   */
+  public Product findProduct(String id) throws WrongProgramArgumentException {
+        for (CompilationUnit u : this.getCompilationUnits()) {
+            for (Product p : u.getProducts()) {
+                if (id.equals(p.getName()))
+                    return p;
+            }
+        }
+        throw new WrongProgramArgumentException("Product [" + id + "] is not declared");
+    }
+  /**************************************************************************
+   * Find DeltaDecls, given a list of delta names; keep order
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:208
+   */
+  public ArrayList<DeltaDecl> findDeltas(java.util.List<String> deltaids) {
+        ArrayList<DeltaDecl> deltas = new ArrayList<DeltaDecl>();
+        for (String deltaid : deltaids) {
+            for (CompilationUnit u : this.getCompilationUnits()) {
+                for (DeltaDecl delta : u.getDeltaDecls()) {
+                    if (deltaid.equals(delta.getName())) {
+                        //System.out.println("$$$ found applicable DeltaDecl : " + deltaid);
+                        deltas.add(delta);
+                    }
+                }
+            }
+        }
+        return deltas;
+    }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:34
+   */
+  public ChocoSolver getCSModel() {
+    ChocoSolver s = new ChocoSolver(this);
+
+    // new int variable for all int variables
+    for (java.util.Map.Entry<String, BoundaryInt[]> e : ints().entrySet()) {
+      String st = e.getKey();
+      if (e.getValue().length == 2) {
+    	  BoundaryInt b1 = e.getValue()[0];
+    	  BoundaryInt b2 = e.getValue()[1];
+    	  addBoundedVar(s,st,b1,b2);
+      }
+      else {
+    	  addSetVar(s,st,e.getValue());
+      }
+    
+      //s.addIntVar(st,getBoundary(b1,false),getBoundary(b2,true));
+    }
+    for (String st : bools())
+      s.addBoolVar(st);
+    for (String st : features())
+      s.addBoolVar(st);
+
+//     Constraint c = collectConstraints(s);
+//     s.addConstraint(c);
+    collectConstraints(s); // is adding intvars to the model!
+    return s;
+  }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:67
+   */
+  public void dropAttributes() {
+    // ints and bools store integer and boolean (feature) attributes. Need to be ran twice to be the same collection. 
+    ints() ; ints().clear();
+    bools(); bools().clear();
+    for (CompilationUnit c: getCompilationUnits())
+      c.dropAttributes();
+  }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:118
+   */
+  private void addBoundedVar(ChocoSolver s, String name, BoundaryInt b1, BoundaryInt b2) {
+    if (b1 instanceof Limit && b2 instanceof Limit)
+        s.addIntVar(name);
+    else if (b1 instanceof Limit)
+        s.addIntVar(name,((BoundaryVal) b2).getValue(),false);
+    else if (b2 instanceof Limit)
+        s.addIntVar(name,((BoundaryVal) b1).getValue(),true);
+    else
+        s.addIntVar(name,((BoundaryVal) b1).getValue(),((BoundaryVal) b2).getValue());
+  }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:129
+   */
+  private void addSetVar(ChocoSolver s, String name, BoundaryInt[] bs) {
+	  int bsize = bs.length - 1;
+	  int[] vals = new int[bsize];
+	  // addSetVar only called if bs has only BoundaryVals
+	  for (int i=0; i < bsize; i++) {
+		vals[i] = ((BoundaryVal) bs[i+1]).getValue(); // drop first value - repeated
+	  }
+	  s.addIntVar(name,vals);
+  }
+  /**
+   * @aspect MyDumpMTVL
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Dump.jadd:3
+   */
+  public void dumpMVars() {
+    if (hasMTVL()) {
+        println("free vars - int:  "+ints().keySet());
+        println("free vars - bool: "+bools());
+        println("free vars - feat: "+features());
+    }
+  }
+  /**
+   * @aspect MyDumpMTVL
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Dump.jadd:11
+   */
+  public boolean hasMTVL() {
+    for (CompilationUnit u: getCompilationUnits())
+        if (u.getNumFeatureDecl() != 0)
+            return true;
+    return false;
+  }
+  /**
+   * @aspect ProductConstraints
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/ProductConstraints.jadd:17
+   */
+  public void getDiffConstraints(Product p, Map<String,IntegerVariable> vars, Set<Constraint> newcs, String diffVar) {
+        //calculating deselected featrues, initially initialized by all features
+        ArrayList<String> deselectedFeatures = new ArrayList();
+        for (String fname: features()){
+            deselectedFeatures.add(fname);
+        }
+        
+        //removing the selected features to get deselected features
+        //
+        IntegerExpressionVariable v = Choco.ZERO;
+        for (Feature f: p.getFeatures()) {
+            v = Choco.plus(v, Choco.abs(Choco.minus(vars.get(f.getName()), 1)));
+            for (String fname: deselectedFeatures) {
+                if(f.getName().equalsIgnoreCase(fname)) {
+                    deselectedFeatures.remove(fname);
+                    break;
+                }
+            }
+        }
+       
+        for(String fname: deselectedFeatures){
+            v = Choco.plus(v, vars.get(fname));
+        }
+        newcs.add(ChocoSolver.eqeq(vars.get(diffVar),v));
+    }
+  /**
+   * @aspect ProductConstraints
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/ProductConstraints.jadd:43
+   */
+  public boolean getMaxConstraints(Map<String,IntegerVariable> vars, Set<Constraint> newcs, String maxVar) {
+        IntegerExpressionVariable v = Choco.ZERO;
+        for(String fname: features()){
+            if (vars.containsKey(fname))
+                v = Choco.plus(v, vars.get(fname));
+        }
+        
+        newcs.add(ChocoSolver.eqeq(vars.get(maxVar),v));
+        return true;
+    }
+  /**
+   * @aspect VerifyLeafs
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/verifyLeafs.jadd:12
+   */
+  private Set<String> nonLeafs = new HashSet<String>();
+  /**
+   * @aspect VerifyLeafs
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/verifyLeafs.jadd:14
+   */
+  public Set<String> getNonLeafs() {
+    return nonLeafs;
+  }
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:7
+   */
+  private java.util.List<ParserError> parserErrors;
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:21
+   */
+  public boolean hasParserErrors() {
+		return !getParserErrors().isEmpty();
+	}
+  /**
+   * @aspect ParserErrors
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/parser/ParserErrors.jrag:25
+   */
+  public java.util.List<ParserError> getParserErrors() {
+		if (parserErrors != null)
+			return parserErrors;
+			
+		parserErrors = new ArrayList<ParserError>();
+	
+		for (CompilationUnit u : getCompilationUnits()) {
+			if (u.getParserErrors() != null) {
+				parserErrors.addAll(u.getParserErrors());
+			}
+		}
+		
+		return parserErrors;
+	}
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:165
+   */
+  public Model parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect SPLProduct
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:94
+   */
+  private String productName = "core";
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:15
+   */
+  public boolean hasTypeErrors() { return !typeCheck().isEmpty(); }
+  /**
+   * @see #typeCheck()
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:26
+   */
+  public SemanticErrorList getTypeErrors() {
+        return typeCheck();
+    }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:30
+   */
+  public void refined_TypeChecker_Model_typeCheck(SemanticErrorList errors) {
+        try {
+            TypeCheckerHelper.checkForDuplicateModules(errors, getCompilationUnits());
+            TypeCheckerHelper.checkForDuplicateDeltas(errors, getCompilationUnits());
+            TypeCheckerHelper.checkForDuplicateProducts(errors, getCompilationUnits());
+            TypeCheckerHelper.checkForDuplicateUpdates(errors, getCompilationUnits());
+            for (CompilationUnit u : getCompilationUnits()) {
+                u.typeCheck(errors);
+            }
+        } catch (TypeCheckerException e) {
+            errors.add(e);
+        }
+    }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:8
+   */
+  private TypeExtensionHelper typeCheckerExtension = new TypeExtensionHelper();
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:11
+   */
+  public void registerTypeSystemExtension(TypeSystemExtension tse) {
+        typeCheckerExtension.register(tse);
+    }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:15
+   */
+  public TypeExtensionHelper getTypeExt() {
+        return typeCheckerExtension;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public Model() {
+    super();
+    is$Final(true);
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:11
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:15
+   */
+  public Model(List<CompilationUnit> p0) {
+    setChild(p0, 0);
+    is$Final(true);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:22
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:28
+   */
+  protected boolean debugNodeAttachmentIsRoot() {
+    return true;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:34
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:40
+   */
+  public void flushCache() {
+    super.flushCache();
+    getNumberOfNewCogExpr_visited = -1;
+    getNumberOfNewCogExpr_computed = false;
+    getFileName_visited = -1;
+    getProductName_visited = -1;
+    typeCheck_visited = -1;
+    typeCheck_computed = false;
+    typeCheck_value = null;
+    getModuleDecls_visited = -1;
+    getModuleDecls_computed = false;
+    getModuleDecls_value = null;
+    getDecls_visited = -1;
+    getDecls_computed = false;
+    getDecls_value = null;
+    getDeltaDecls_visited = -1;
+    getDeltaDecls_computed = false;
+    getDeltaDecls_value = null;
+    getDeltaDeclsMap_visited = -1;
+    getDeltaDeclsMap_computed = false;
+    getDeltaDeclsMap_value = null;
+    findDelta_String_visited = null;
+    getUpdateDecls_visited = -1;
+    getUpdateDecls_computed = false;
+    getUpdateDecls_value = null;
+    getProducts_visited = -1;
+    getProducts_computed = false;
+    getProducts_value = null;
+    getProductLine_visited = -1;
+    getProductLine_computed = false;
+    getProductLine_value = null;
+    getMainBlock_visited = -1;
+    getMainBlock_computed = false;
+    getMainBlock_value = null;
+    getMainBlock_String_visited = null;
+    getMainBlock_String_values = null;
+    hasProductLine_visited = -1;
+    hasMainBlock_visited = -1;
+    hasMainBlock_String_visited = null;
+    hasMainBlock_String_values = null;
+    lookupModule_String_visited = null;
+    lookupModule_String_values = null;
+    lookup_KindedName_visited = null;
+    lookup_KindedName_values = null;
+    getStdDataType_String_visited = null;
+    getModel_visited = -1;
+    getUnitType_visited = -1;
+    getIntType_visited = -1;
+    getRatType_visited = -1;
+    getBoolType_visited = -1;
+    getStringType_visited = -1;
+    getExceptionType_visited = -1;
+    getFutType_Type_visited = null;
+    getResultType_Type_visited = null;
+    Model_ints_visited = -1;
+    Model_ints_computed = false;
+    Model_ints_value = null;
+        Model_ints_contributors = null;
+    Model_bools_visited = -1;
+    Model_bools_computed = false;
+    Model_bools_value = null;
+        Model_bools_contributors = null;
+    Model_features_visited = -1;
+    Model_features_computed = false;
+    Model_features_value = null;
+        Model_features_contributors = null;
+        collect_contributors_Model_ints = false;
+        collect_contributors_Model_bools = false;
+        collect_contributors_Model_features = false;
+        collect_contributors_DeltaDecl_getErrsWithinDelta = false;
+        collect_contributors_InterfaceDecl_getDirectSubTypes = false;
+        collect_contributors_InterfaceDecl_getSubTypes = false;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:116
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+    Model_ints_visited = -1;
+    Model_ints_computed = false;
+    Model_ints_value = null;
+        Model_ints_contributors = null;
+    Model_bools_visited = -1;
+    Model_bools_computed = false;
+    Model_bools_value = null;
+        Model_bools_contributors = null;
+    Model_features_visited = -1;
+    Model_features_computed = false;
+    Model_features_value = null;
+        Model_features_contributors = null;
+        collect_contributors_Model_ints = false;
+        collect_contributors_Model_bools = false;
+        collect_contributors_Model_features = false;
+        collect_contributors_DeltaDecl_getErrsWithinDelta = false;
+        collect_contributors_InterfaceDecl_getDirectSubTypes = false;
+        collect_contributors_InterfaceDecl_getSubTypes = false;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:140
+   */
+  public Model clone() throws CloneNotSupportedException {
+    Model node = (Model) super.clone();
+    node.getNumberOfNewCogExpr_visited = -1;
+    node.getNumberOfNewCogExpr_computed = false;
+    node.getFileName_visited = -1;
+    node.getProductName_visited = -1;
+    node.typeCheck_visited = -1;
+    node.typeCheck_computed = false;
+    node.typeCheck_value = null;
+    node.getModuleDecls_visited = -1;
+    node.getModuleDecls_computed = false;
+    node.getModuleDecls_value = null;
+    node.getDecls_visited = -1;
+    node.getDecls_computed = false;
+    node.getDecls_value = null;
+    node.getDeltaDecls_visited = -1;
+    node.getDeltaDecls_computed = false;
+    node.getDeltaDecls_value = null;
+    node.getDeltaDeclsMap_visited = -1;
+    node.getDeltaDeclsMap_computed = false;
+    node.getDeltaDeclsMap_value = null;
+    node.findDelta_String_visited = null;
+    node.getUpdateDecls_visited = -1;
+    node.getUpdateDecls_computed = false;
+    node.getUpdateDecls_value = null;
+    node.getProducts_visited = -1;
+    node.getProducts_computed = false;
+    node.getProducts_value = null;
+    node.getProductLine_visited = -1;
+    node.getProductLine_computed = false;
+    node.getProductLine_value = null;
+    node.getMainBlock_visited = -1;
+    node.getMainBlock_computed = false;
+    node.getMainBlock_value = null;
+    node.getMainBlock_String_visited = null;
+    node.getMainBlock_String_values = null;
+    node.hasProductLine_visited = -1;
+    node.hasMainBlock_visited = -1;
+    node.hasMainBlock_String_visited = null;
+    node.hasMainBlock_String_values = null;
+    node.lookupModule_String_visited = null;
+    node.lookupModule_String_values = null;
+    node.lookup_KindedName_visited = null;
+    node.lookup_KindedName_values = null;
+    node.getStdDataType_String_visited = null;
+    node.getModel_visited = -1;
+    node.getUnitType_visited = -1;
+    node.getIntType_visited = -1;
+    node.getRatType_visited = -1;
+    node.getBoolType_visited = -1;
+    node.getStringType_visited = -1;
+    node.getExceptionType_visited = -1;
+    node.getFutType_Type_visited = null;
+    node.getResultType_Type_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:201
+   */
+  public Model copy() {
+    try {
+      Model node = (Model) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:219
+   */
+  public Model fullCopy() {
+    Model tree = (Model) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the CompilationUnit list.
+   * @param list The new list node to be used as the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public void setCompilationUnitList(List<CompilationUnit> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the CompilationUnit list.
+   * @return Number of children in the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public int getNumCompilationUnit() {
+    return getCompilationUnitList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the CompilationUnit list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the CompilationUnit list.
+   * @apilevel low-level
+   */
+  public int getNumCompilationUnitNoTransform() {
+    return getCompilationUnitListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the CompilationUnit list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public CompilationUnit getCompilationUnit(int i) {
+    return (CompilationUnit) getCompilationUnitList().getChild(i);
+  }
+  /**
+   * Check whether the CompilationUnit list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasCompilationUnit() {
+    return getCompilationUnitList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the CompilationUnit list.
+   * @param node The element to append to the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public void addCompilationUnit(CompilationUnit node) {
+    List<CompilationUnit> list = (parent == null || state == null) ? getCompilationUnitListNoTransform() : getCompilationUnitList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addCompilationUnitNoTransform(CompilationUnit node) {
+    List<CompilationUnit> list = getCompilationUnitListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the CompilationUnit list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setCompilationUnit(CompilationUnit node, int i) {
+    List<CompilationUnit> list = getCompilationUnitList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the CompilationUnit list.
+   * @return The node representing the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public List<CompilationUnit> getCompilationUnitList() {
+    List<CompilationUnit> list = (List<CompilationUnit>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the CompilationUnit list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the CompilationUnit list.
+   * @apilevel low-level
+   */
+  public List<CompilationUnit> getCompilationUnitListNoTransform() {
+    return (List<CompilationUnit>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the CompilationUnit list.
+   * @return The node representing the CompilationUnit list.
+   * @apilevel high-level
+   */
+  public List<CompilationUnit> getCompilationUnits() {
+    return getCompilationUnitList();
+  }
+  /**
+   * Retrieves the CompilationUnit list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the CompilationUnit list.
+   * @apilevel low-level
+   */
+  public List<CompilationUnit> getCompilationUnitsNoTransform() {
+    return getCompilationUnitListNoTransform();
+  }
+  /**
+   * @aspect CSP
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/CSP.jadd:20
+   */
+    public void flattenForProduct(Product prod, boolean check) throws WrongProgramArgumentException,DeltaModellingException {
+        if (check && hasMTVL()) {
+            java.util.List<String> errors = getCSModel().checkSolutionWithErrors(prod.getSolution(), this);
+            if (!errors.isEmpty()) {
+                String msg = "Product [" + prod.getName() + "] does not satisfy the feature model. Constraints failed:";
+                for (String s: errors)
+                    msg = msg + "\n- " + s;
+                throw new WrongProgramArgumentException(msg);
+            }
+        }
+        /* call original: */
+        refined_ProductFlattener_Model_flattenForProduct(prod,check);  
+  }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:318
+   */
+    public void typeCheck(SemanticErrorList s) {
+         getTypeExt().typeCheckStarted(this,s);
+         refined_TypeChecker_Model_typeCheck(s);
+         getTypeExt().finished();
+     }
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:14
+   */
+    private boolean collect_contributors_Model_ints = false;
+  protected void collect_contributors_Model_ints() {
+    if(collect_contributors_Model_ints) return;
+    super.collect_contributors_Model_ints();
+    collect_contributors_Model_ints = true;
+  }
+
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:24
+   */
+    private boolean collect_contributors_Model_bools = false;
+  protected void collect_contributors_Model_bools() {
+    if(collect_contributors_Model_bools) return;
+    super.collect_contributors_Model_bools();
+    collect_contributors_Model_bools = true;
+  }
+
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:25
+   */
+    private boolean collect_contributors_Model_features = false;
+  protected void collect_contributors_Model_features() {
+    if(collect_contributors_Model_features) return;
+    super.collect_contributors_Model_features();
+    collect_contributors_Model_features = true;
+  }
+
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/ErrorCheck.jadd:74
+   */
+    private boolean collect_contributors_DeltaDecl_getErrsWithinDelta = false;
+  protected void collect_contributors_DeltaDecl_getErrsWithinDelta() {
+    if(collect_contributors_DeltaDecl_getErrsWithinDelta) return;
+    super.collect_contributors_DeltaDecl_getErrsWithinDelta();
+    collect_contributors_DeltaDecl_getErrsWithinDelta = true;
+  }
+
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/TypeHierarchy.jadd:22
+   */
+    private boolean collect_contributors_InterfaceDecl_getDirectSubTypes = false;
+  protected void collect_contributors_InterfaceDecl_getDirectSubTypes() {
+    if(collect_contributors_InterfaceDecl_getDirectSubTypes) return;
+    super.collect_contributors_InterfaceDecl_getDirectSubTypes();
+    collect_contributors_InterfaceDecl_getDirectSubTypes = true;
+  }
+
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/TypeHierarchy.jadd:31
+   */
+    private boolean collect_contributors_InterfaceDecl_getSubTypes = false;
+  protected void collect_contributors_InterfaceDecl_getSubTypes() {
+    if(collect_contributors_InterfaceDecl_getSubTypes) return;
+    super.collect_contributors_InterfaceDecl_getSubTypes();
+    collect_contributors_InterfaceDecl_getSubTypes = true;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getNumberOfNewCogExpr_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected int getNumberOfNewCogExpr_value;
+  /**
+   * @attribute syn
+   * @aspect NewExpCounter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/NewExprCounter.jrag:23
+   */
+  public int getNumberOfNewCogExpr() {
+    if(getNumberOfNewCogExpr_computed) {
+      return getNumberOfNewCogExpr_value;
+    }
+    ASTNode$State state = state();
+    if (getNumberOfNewCogExpr_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNumberOfNewCogExpr in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getNumberOfNewCogExpr_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getNumberOfNewCogExpr_value = getNumberOfNewCogExpr_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getNumberOfNewCogExpr_computed = true;
+    } else {
+    }
+
+    getNumberOfNewCogExpr_visited = -1;
+    return getNumberOfNewCogExpr_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private int getNumberOfNewCogExpr_compute() {  return super.getNumberOfNewCogExpr();  }
+  /**
+   * @apilevel internal
+   */
+  protected int getFileName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect FileName
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:89
+   */
+  public String getFileName() {
+    ASTNode$State state = state();
+    if (getFileName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getFileName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFileName_visited = state().boundariesCrossed;
+    try {  return "<invalid>";  }
+    finally {
+      getFileName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getProductName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SPLProduct
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:95
+   */
+  public String getProductName() {
+    ASTNode$State state = state();
+    if (getProductName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getProductName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getProductName_visited = state().boundariesCrossed;
+    try {  return this.productName;  }
+    finally {
+      getProductName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int typeCheck_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean typeCheck_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected SemanticErrorList typeCheck_value;
+  /**
+   * @attribute syn
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:17
+   */
+  public SemanticErrorList typeCheck() {
+    if(typeCheck_computed) {
+      return typeCheck_value;
+    }
+    ASTNode$State state = state();
+    if (typeCheck_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: typeCheck in class: org.jastadd.ast.AST.SynDecl");
+    }
+    typeCheck_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    typeCheck_value = typeCheck_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      typeCheck_computed = true;
+    } else {
+    }
+
+    typeCheck_visited = -1;
+    return typeCheck_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private SemanticErrorList typeCheck_compute() {
+          SemanticErrorList res = new SemanticErrorList();
+          typeCheck(res);
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getModuleDecls_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getModuleDecls_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<ModuleDecl> getModuleDecls_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:76
+   */
+  public Collection<ModuleDecl> getModuleDecls() {
+    if(getModuleDecls_computed) {
+      return getModuleDecls_value;
+    }
+    ASTNode$State state = state();
+    if (getModuleDecls_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModuleDecls in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getModuleDecls_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getModuleDecls_value = getModuleDecls_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getModuleDecls_computed = true;
+    } else {
+    }
+
+    getModuleDecls_visited = -1;
+    return getModuleDecls_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<ModuleDecl> getModuleDecls_compute() {
+          ArrayList<ModuleDecl> res = new ArrayList<ModuleDecl>();
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (ModuleDecl mdecl : u.getModuleDecls()) {
+                  res.add(mdecl);
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getDecls_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDecls_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<Decl> getDecls_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:86
+   */
+  public Collection<Decl> getDecls() {
+    if(getDecls_computed) {
+      return getDecls_value;
+    }
+    ASTNode$State state = state();
+    if (getDecls_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDecls in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getDecls_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getDecls_value = getDecls_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getDecls_computed = true;
+    } else {
+    }
+
+    getDecls_visited = -1;
+    return getDecls_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<Decl> getDecls_compute() {
+          ArrayList<Decl> res = new ArrayList<Decl>();
+          for (ModuleDecl mdecl : getModuleDecls()) {
+              for (Decl d : mdecl.getDecls()) {
+                  res.add(d);
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getDeltaDecls_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDeltaDecls_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<DeltaDecl> getDeltaDecls_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:96
+   */
+  public Collection<DeltaDecl> getDeltaDecls() {
+    if(getDeltaDecls_computed) {
+      return getDeltaDecls_value;
+    }
+    ASTNode$State state = state();
+    if (getDeltaDecls_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDeltaDecls in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getDeltaDecls_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getDeltaDecls_value = getDeltaDecls_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getDeltaDecls_computed = true;
+    } else {
+    }
+
+    getDeltaDecls_visited = -1;
+    return getDeltaDecls_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<DeltaDecl> getDeltaDecls_compute() {
+          ArrayList<DeltaDecl> res = new ArrayList<DeltaDecl>();
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (DeltaDecl d : u.getDeltaDecls()) {
+                  res.add(d);
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getDeltaDeclsMap_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDeltaDeclsMap_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Map<String,DeltaDecl> getDeltaDeclsMap_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:106
+   */
+  public Map<String,DeltaDecl> getDeltaDeclsMap() {
+    if(getDeltaDeclsMap_computed) {
+      return getDeltaDeclsMap_value;
+    }
+    ASTNode$State state = state();
+    if (getDeltaDeclsMap_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDeltaDeclsMap in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getDeltaDeclsMap_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getDeltaDeclsMap_value = getDeltaDeclsMap_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getDeltaDeclsMap_computed = true;
+    } else {
+    }
+
+    getDeltaDeclsMap_visited = -1;
+    return getDeltaDeclsMap_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Map<String,DeltaDecl> getDeltaDeclsMap_compute() {
+          Map<String,DeltaDecl> res = new HashMap<String,DeltaDecl>();
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (DeltaDecl d : u.getDeltaDecls()) {
+                  Object dupe = res.put(d.getName(),d);
+                  assert dupe == null : "dupe " + d.getName();
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map findDelta_String_visited;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:117
+   */
+  public DeltaDecl findDelta(String name) {
+    Object _parameters = name;
+    if(findDelta_String_visited == null) findDelta_String_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(findDelta_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: findDelta in class: org.jastadd.ast.AST.SynDecl");
+    }
+    findDelta_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {
+    	   return getDeltaDeclsMap().get(name);
+        }
+    finally {
+      findDelta_String_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getUpdateDecls_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getUpdateDecls_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<UpdateDecl> getUpdateDecls_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:121
+   */
+  public Collection<UpdateDecl> getUpdateDecls() {
+    if(getUpdateDecls_computed) {
+      return getUpdateDecls_value;
+    }
+    ASTNode$State state = state();
+    if (getUpdateDecls_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getUpdateDecls in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getUpdateDecls_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getUpdateDecls_value = getUpdateDecls_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getUpdateDecls_computed = true;
+    } else {
+    }
+
+    getUpdateDecls_visited = -1;
+    return getUpdateDecls_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<UpdateDecl> getUpdateDecls_compute() {
+          ArrayList<UpdateDecl> res = new ArrayList<UpdateDecl>();
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (UpdateDecl d : u.getUpdateDecls()) {
+                  res.add(d);
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getProducts_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getProducts_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Collection<Product> getProducts_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:131
+   */
+  public Collection<Product> getProducts() {
+    if(getProducts_computed) {
+      return getProducts_value;
+    }
+    ASTNode$State state = state();
+    if (getProducts_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getProducts in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getProducts_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getProducts_value = getProducts_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getProducts_computed = true;
+    } else {
+    }
+
+    getProducts_visited = -1;
+    return getProducts_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Collection<Product> getProducts_compute() {
+          ArrayList<Product> res = new ArrayList<Product>();
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (Product p : u.getProducts()) {
+                  res.add(p);
+              }
+          }
+          return res;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getProductLine_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getProductLine_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected ProductLine getProductLine_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:141
+   */
+  public ProductLine getProductLine() {
+    if(getProductLine_computed) {
+      return getProductLine_value;
+    }
+    ASTNode$State state = state();
+    if (getProductLine_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getProductLine in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getProductLine_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getProductLine_value = getProductLine_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getProductLine_computed = true;
+    } else {
+    }
+
+    getProductLine_visited = -1;
+    return getProductLine_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ProductLine getProductLine_compute() {
+          for (CompilationUnit u : getCompilationUnits()) {
+              if (u.hasProductLine())
+                  return u.getProductLine();
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getMainBlock_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getMainBlock_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Block getMainBlock_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:149
+   */
+  public Block getMainBlock() {
+    if(getMainBlock_computed) {
+      return getMainBlock_value;
+    }
+    ASTNode$State state = state();
+    if (getMainBlock_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getMainBlock_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getMainBlock_value = getMainBlock_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getMainBlock_computed = true;
+    } else {
+    }
+
+    getMainBlock_visited = -1;
+    return getMainBlock_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Block getMainBlock_compute() {
+          for (CompilationUnit u : getCompilationUnits()) {
+              if (u.hasMainBlock())
+                  return u.getMainBlock();
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getMainBlock_String_visited;
+  protected java.util.Map getMainBlock_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:157
+   */
+  public Block getMainBlock(String moduleName) {
+    Object _parameters = moduleName;
+    if(getMainBlock_String_visited == null) getMainBlock_String_visited = new java.util.HashMap(4);
+    if(getMainBlock_String_values == null) getMainBlock_String_values = new java.util.HashMap(4);
+    if(getMainBlock_String_values.containsKey(_parameters)) {
+      return (Block)getMainBlock_String_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getMainBlock_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getMainBlock_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Block getMainBlock_String_value = getMainBlock_compute(moduleName);
+    if(isFinal && num == state().boundariesCrossed) {
+      getMainBlock_String_values.put(_parameters, getMainBlock_String_value);
+    } else {
+    }
+
+    getMainBlock_String_visited.remove(_parameters);
+    return getMainBlock_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Block getMainBlock_compute(String moduleName) {
+          for (CompilationUnit u : getCompilationUnits()) {
+              if (u.hasMainBlock(moduleName)) {
+                  return u.getMainBlock(moduleName);
+              }
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int hasProductLine_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:182
+   */
+  public boolean hasProductLine() {
+    ASTNode$State state = state();
+    if (hasProductLine_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: hasProductLine in class: org.jastadd.ast.AST.SynDecl");
+    }
+    hasProductLine_visited = state().boundariesCrossed;
+    try {  return getProductLine() != null;  }
+    finally {
+      hasProductLine_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int hasMainBlock_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:183
+   */
+  public boolean hasMainBlock() {
+    ASTNode$State state = state();
+    if (hasMainBlock_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: hasMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    hasMainBlock_visited = state().boundariesCrossed;
+    try {  return getMainBlock() != null;  }
+    finally {
+      hasMainBlock_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map hasMainBlock_String_visited;
+  protected java.util.Map hasMainBlock_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:184
+   */
+  public boolean hasMainBlock(String mainBlock) {
+    Object _parameters = mainBlock;
+    if(hasMainBlock_String_visited == null) hasMainBlock_String_visited = new java.util.HashMap(4);
+    if(hasMainBlock_String_values == null) hasMainBlock_String_values = new java.util.HashMap(4);
+    if(hasMainBlock_String_values.containsKey(_parameters)) {
+      return ((Boolean)hasMainBlock_String_values.get(_parameters)).booleanValue();
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(hasMainBlock_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: hasMainBlock in class: org.jastadd.ast.AST.SynDecl");
+    }
+    hasMainBlock_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    boolean hasMainBlock_String_value = hasMainBlock_compute(mainBlock);
+    if(isFinal && num == state().boundariesCrossed) {
+      hasMainBlock_String_values.put(_parameters, Boolean.valueOf(hasMainBlock_String_value));
+    } else {
+    }
+
+    hasMainBlock_String_visited.remove(_parameters);
+    return hasMainBlock_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean hasMainBlock_compute(String mainBlock) {  return getMainBlock(mainBlock) != null;  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupModule_String_visited;
+  protected java.util.Map lookupModule_String_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:193
+   */
+  public ModuleDecl lookupModule(String name) {
+    Object _parameters = name;
+    if(lookupModule_String_visited == null) lookupModule_String_visited = new java.util.HashMap(4);
+    if(lookupModule_String_values == null) lookupModule_String_values = new java.util.HashMap(4);
+    if(lookupModule_String_values.containsKey(_parameters)) {
+      return (ModuleDecl)lookupModule_String_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupModule_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupModule in class: org.jastadd.ast.AST.SynDecl");
+    }
+    lookupModule_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    ModuleDecl lookupModule_String_value = lookupModule_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      lookupModule_String_values.put(_parameters, lookupModule_String_value);
+    } else {
+    }
+
+    lookupModule_String_visited.remove(_parameters);
+    return lookupModule_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ModuleDecl lookupModule_compute(String name) {
+      	assert name != null;
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (ModuleDecl d : u.getModuleDecls()) {
+                  if (d.getName().equals(name)) {
+                      return d;
+                  }
+              }    			
+          }
+          return null;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookup_KindedName_visited;
+  protected java.util.Map lookup_KindedName_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:245
+   */
+  public Decl lookup(KindedName name) {
+    Object _parameters = name;
+    if(lookup_KindedName_visited == null) lookup_KindedName_visited = new java.util.HashMap(4);
+    if(lookup_KindedName_values == null) lookup_KindedName_values = new java.util.HashMap(4);
+    if(lookup_KindedName_values.containsKey(_parameters)) {
+      return (Decl)lookup_KindedName_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookup_KindedName_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookup in class: org.jastadd.ast.AST.SynDecl");
+    }
+    lookup_KindedName_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Decl lookup_KindedName_value = lookup_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      lookup_KindedName_values.put(_parameters, lookup_KindedName_value);
+    } else {
+    }
+
+    lookup_KindedName_visited.remove(_parameters);
+    return lookup_KindedName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Decl lookup_compute(KindedName name) {
+          for (CompilationUnit u : getCompilationUnits()) {
+              for (ModuleDecl d : u.getModuleDecls()) {
+                  Decl decl = d.lookup(name);
+                  if (!decl.equals(unknownDecl))
+                      return decl;
+              }    			
+          }
+          return unknownDecl;
+      }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getStdDataType_String_visited;
+  /**
+   * May return UnknownType when running without stdlib.
+   * 
+   * If we use Model.lookup() here, trying to find the Exception datatype
+   * early in analyzeModel will cause lookup() of exception constructors to
+   * fail later (the first lookup() will record the fact that there's no such
+   * constructor, which is correct because it will be constructed as soon as
+   * we have found the declaration of Exception), so we manually look for
+   * declarations in the stdlib module instead.
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:21
+   */
+  public Type getStdDataType(String n) {
+    Object _parameters = n;
+    if(getStdDataType_String_visited == null) getStdDataType_String_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getStdDataType_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getStdDataType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getStdDataType_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {
+            ModuleDecl stdlibdecl = null;
+            for (ModuleDecl d : getModuleDecls()) {
+                if (d.getName().equals(Constants.STDLIB_NAME)) {
+                    stdlibdecl = d;
+                    break;
+                }
+            }
+            if (stdlibdecl == null) return UnknownType.INSTANCE;
+            for (Decl d : stdlibdecl.getDecls()) {
+                if (d instanceof DataTypeDecl && d.getName().equals(n)) {
+                    return new DataTypeType((DataTypeDecl)d);
+                }
+            }
+            return UnknownType.INSTANCE;
+        }
+    finally {
+      getStdDataType_String_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:38
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+    try {  return this;  }
+    finally {
+      getModel_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getUnitType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:56
+   */
+  public Type getUnitType() {
+    ASTNode$State state = state();
+    if (getUnitType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getUnitType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getUnitType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("Unit");  }
+    finally {
+      getUnitType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getIntType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:57
+   */
+  public Type getIntType() {
+    ASTNode$State state = state();
+    if (getIntType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getIntType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getIntType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("Int");  }
+    finally {
+      getIntType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getRatType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:58
+   */
+  public Type getRatType() {
+    ASTNode$State state = state();
+    if (getRatType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getRatType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getRatType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("Rat");  }
+    finally {
+      getRatType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getBoolType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:59
+   */
+  public Type getBoolType() {
+    ASTNode$State state = state();
+    if (getBoolType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getBoolType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getBoolType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("Bool");  }
+    finally {
+      getBoolType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getStringType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:60
+   */
+  public Type getStringType() {
+    ASTNode$State state = state();
+    if (getStringType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getStringType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getStringType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("String");  }
+    finally {
+      getStringType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getExceptionType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:61
+   */
+  public Type getExceptionType() {
+    ASTNode$State state = state();
+    if (getExceptionType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getExceptionType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getExceptionType_visited = state().boundariesCrossed;
+    try {  return getStdDataType("Exception");  }
+    finally {
+      getExceptionType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getFutType_Type_visited;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:62
+   */
+  public DataTypeType getFutType(Type typeArg) {
+    Object _parameters = typeArg;
+    if(getFutType_Type_visited == null) getFutType_Type_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getFutType_Type_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getFutType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFutType_Type_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {  return ((DataTypeType)getStdDataType("Fut")).withTypeArgs(typeArg);  }
+    finally {
+      getFutType_Type_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getResultType_Type_visited;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:63
+   */
+  public DataTypeType getResultType(Type typeArg) {
+    Object _parameters = typeArg;
+    if(getResultType_Type_visited == null) getResultType_Type_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getResultType_Type_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getResultType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getResultType_Type_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {  return ((DataTypeType)getStdDataType("Result")).withTypeArgs(typeArg);  }
+    finally {
+      getResultType_Type_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/verifyLeafs.jadd:23
+   * @apilevel internal
+   */
+  public Set<String> Define_Set_String__getNonLeafs(ASTNode caller, ASTNode child) {
+    if (caller == getCompilationUnitListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return getNonLeafs();
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Set_String__getNonLeafs(this, caller);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:242
+   * @apilevel internal
+   */
+  public ModuleDecl Define_ModuleDecl_lookupModule(ASTNode caller, ASTNode child, String name) {
+    if (caller == getCompilationUnitListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return lookupModule(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_ModuleDecl_lookupModule(this, caller, name);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:276
+   * @apilevel internal
+   */
+  public Decl Define_Decl_lookup(ASTNode caller, ASTNode child, KindedName name) {
+    if (caller == getCompilationUnitListNoTransform()) {
+      int i = caller.getIndexOfChild(child);
+      return lookup(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Decl_lookup(this, caller, name);
+    }
+  }
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:45
+   * @apilevel internal
+   */
+  public Model Define_Model_getModel(ASTNode caller, ASTNode child) {
+    if (caller == getCompilationUnitListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return this;
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Model_getModel(this, caller);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }  /**
+   * @attribute coll
+   * @aspect Variables
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:14
+   */
+  public RepeatMap<String,BoundaryInt[]> ints() {
+    if(Model_ints_computed) {
+      return Model_ints_value;
+    }
+    ASTNode$State state = state();
+    if (Model_ints_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: ints in class: org.jastadd.ast.AST.CollDecl");
+    }
+    Model_ints_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Model_ints_value = ints_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      Model_ints_computed = true;
+    } else {
+    }
+
+    Model_ints_visited = -1;
+    return Model_ints_value;
+  }
+  java.util.Set Model_ints_contributors;
+
+  /**
+   * @apilevel internal
+   * @return the contributor set for ints
+   */
+  public java.util.Set Model_ints_contributors() {
+    if(Model_ints_contributors == null)
+      Model_ints_contributors  = new ASTNode$State.IdentityHashSet(4);
+    return Model_ints_contributors;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  private RepeatMap<String,BoundaryInt[]> ints_compute() {
+    ASTNode node = this;
+    while(node.getParent() != null && !(node instanceof Model)) {
+      node = node.getParent();
+    }
+    if(node == null) throw new RuntimeException("Trying to evaluate collection attribute in subtree not attached to main tree");
+    Model root = (Model) node;
+    root.collect_contributors_Model_ints();
+    Model_ints_value = new RepeatMap<String,BoundaryInt[]>();
+    if(Model_ints_contributors != null)
+    for (java.util.Iterator iter = Model_ints_contributors.iterator(); iter.hasNext(); ) {
+      ASTNode contributor = (ASTNode) iter.next();
+      contributor.contributeTo_Model_Model_ints(Model_ints_value);
+    }
+    // TODO: disabled temporarily since collections may not be cached
+    //Model_ints_contributors = null;
+    return Model_ints_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int Model_ints_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean Model_ints_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected RepeatMap<String,BoundaryInt[]> Model_ints_value;
+  /**
+   * @attribute coll
+   * @aspect Variables
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:24
+   */
+  public RepeatList bools() {
+    if(Model_bools_computed) {
+      return Model_bools_value;
+    }
+    ASTNode$State state = state();
+    if (Model_bools_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: bools in class: org.jastadd.ast.AST.CollDecl");
+    }
+    Model_bools_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Model_bools_value = bools_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      Model_bools_computed = true;
+    } else {
+    }
+
+    Model_bools_visited = -1;
+    return Model_bools_value;
+  }
+  java.util.Set Model_bools_contributors;
+
+  /**
+   * @apilevel internal
+   * @return the contributor set for bools
+   */
+  public java.util.Set Model_bools_contributors() {
+    if(Model_bools_contributors == null)
+      Model_bools_contributors  = new ASTNode$State.IdentityHashSet(4);
+    return Model_bools_contributors;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  private RepeatList bools_compute() {
+    ASTNode node = this;
+    while(node.getParent() != null && !(node instanceof Model)) {
+      node = node.getParent();
+    }
+    if(node == null) throw new RuntimeException("Trying to evaluate collection attribute in subtree not attached to main tree");
+    Model root = (Model) node;
+    root.collect_contributors_Model_bools();
+    Model_bools_value = new RepeatList();
+    if(Model_bools_contributors != null)
+    for (java.util.Iterator iter = Model_bools_contributors.iterator(); iter.hasNext(); ) {
+      ASTNode contributor = (ASTNode) iter.next();
+      contributor.contributeTo_Model_Model_bools(Model_bools_value);
+    }
+    // TODO: disabled temporarily since collections may not be cached
+    //Model_bools_contributors = null;
+    return Model_bools_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int Model_bools_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean Model_bools_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected RepeatList Model_bools_value;
+  /**
+   * @attribute coll
+   * @aspect Variables
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/mtvl/Variables.jrag:25
+   */
+  public RepeatList features() {
+    if(Model_features_computed) {
+      return Model_features_value;
+    }
+    ASTNode$State state = state();
+    if (Model_features_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: features in class: org.jastadd.ast.AST.CollDecl");
+    }
+    Model_features_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Model_features_value = features_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      Model_features_computed = true;
+    } else {
+    }
+
+    Model_features_visited = -1;
+    return Model_features_value;
+  }
+  java.util.Set Model_features_contributors;
+
+  /**
+   * @apilevel internal
+   * @return the contributor set for features
+   */
+  public java.util.Set Model_features_contributors() {
+    if(Model_features_contributors == null)
+      Model_features_contributors  = new ASTNode$State.IdentityHashSet(4);
+    return Model_features_contributors;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  private RepeatList features_compute() {
+    ASTNode node = this;
+    while(node.getParent() != null && !(node instanceof Model)) {
+      node = node.getParent();
+    }
+    if(node == null) throw new RuntimeException("Trying to evaluate collection attribute in subtree not attached to main tree");
+    Model root = (Model) node;
+    root.collect_contributors_Model_features();
+    Model_features_value = new RepeatList();
+    if(Model_features_contributors != null)
+    for (java.util.Iterator iter = Model_features_contributors.iterator(); iter.hasNext(); ) {
+      ASTNode contributor = (ASTNode) iter.next();
+      contributor.contributeTo_Model_Model_features(Model_features_value);
+    }
+    // TODO: disabled temporarily since collections may not be cached
+    //Model_features_contributors = null;
+    return Model_features_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int Model_features_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean Model_features_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected RepeatList Model_features_value;
+}

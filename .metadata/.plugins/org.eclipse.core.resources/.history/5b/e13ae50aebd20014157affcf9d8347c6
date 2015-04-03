@@ -1,0 +1,250 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:303
+ * @production AppCondNot : {@link AppCond} ::= <span class="component">{@link AppCond}</span>;
+
+ */
+public class AppCondNot extends AppCond implements Cloneable {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:174
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print("~");
+        getAppCond().doPrettyPrint(stream, formatter);
+    }
+  /**
+   * @aspect ProductFlattener
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/ProductFlattener.jadd:197
+   */
+  public boolean evaluate(Set<String> features) {
+    	return !getAppCond().evaluate(features);
+    }
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:1079
+   */
+  public void typeCheck(Set<String> definedFeatures, SemanticErrorList e) {
+        getAppCond().typeCheck(definedFeatures, e);
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public AppCondNot() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public AppCondNot(AppCond p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:19
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:25
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  public void flushCache() {
+    super.flushCache();
+    refersTo_Feature_visited = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:38
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:44
+   */
+  public AppCondNot clone() throws CloneNotSupportedException {
+    AppCondNot node = (AppCondNot) super.clone();
+    node.refersTo_Feature_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:54
+   */
+  public AppCondNot copy() {
+    try {
+      AppCondNot node = (AppCondNot) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:72
+   */
+  public AppCondNot fullCopy() {
+    AppCondNot tree = (AppCondNot) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the AppCond child.
+   * @param node The new node to replace the AppCond child.
+   * @apilevel high-level
+   */
+  public void setAppCond(AppCond node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the AppCond child.
+   * @return The current node used as the AppCond child.
+   * @apilevel high-level
+   */
+  public AppCond getAppCond() {
+    return (AppCond) getChild(0);
+  }
+  /**
+   * Retrieves the AppCond child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the AppCond child.
+   * @apilevel low-level
+   */
+  public AppCond getAppCondNoTransform() {
+    return (AppCond) getChildNoTransform(0);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map refersTo_Feature_visited;
+  /**
+   * @attribute syn
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:1106
+   */
+  public boolean refersTo(Feature f) {
+    Object _parameters = f;
+    if(refersTo_Feature_visited == null) refersTo_Feature_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(refersTo_Feature_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: refersTo in class: org.jastadd.ast.AST.SynDecl");
+    }
+    refersTo_Feature_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    try {  return getAppCond().refersTo(f);  }
+    finally {
+      refersTo_Feature_visited.remove(_parameters);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

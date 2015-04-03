@@ -1,0 +1,490 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/SQL.ast:11
+ * @production SqlInsertExp : {@link SqlModifyExp} ::= <span class="component">{@link SqlRelationRef}</span> <span class="component">SqlAttrRef:{@link PureExp}*</span> <span class="component">{@link SqlTupleConstant}*</span>;
+
+ */
+public class SqlInsertExp extends SqlModifyExp implements Cloneable {
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:509
+   */
+  protected List<PureExp> createSqlDbMethodArguments(PureExp transactionExp) throws abs.frontend.sql.SqlRewritingException {
+        final List<PureExp> arguments = new List<PureExp>();
+        final PureExp relationalModification = new DataConstructorExp(
+                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".Insertion",
+                new List<PureExp>().add(createSqlAttrValueMap()));
+        arguments.add(modifiesDb() ?
+            new DataConstructorExp(
+                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".RelationalModification",
+                new List<PureExp>().add(
+                    new StringLiteral(((SqlDbRelationRef) getSqlRelationRef()).getRelationName())).add(
+                    relationalModification)) :
+            new DataConstructorExp(
+                Constants.DBLIB_NAME + ".UnaryExecutionNode",
+                new List<PureExp>().add(
+                    new DataConstructorExp(
+                        Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".Modification",
+                        new List<PureExp>().add(relationalModification))).add(
+                    CompilerUtils.copyPosition(getSqlRelationRef(), new DataConstructorExp(
+                        Constants.DBLIB_NAME + ".DirectRelationLeaf",
+                        new List<PureExp>().add(
+                            ((SqlVarOrFieldRelationRef) getSqlRelationRef()).getVarOrFieldUse()))))));
+        if (transactionExp != null)
+            arguments.add((PureExp) transactionExp.fullCopy());
+        return arguments;
+    }
+  /**
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:535
+   */
+  private PureExp createSqlAttrValueMap() throws abs.frontend.sql.SqlRewritingException {
+        if (getNumSqlAttrRef() != getNumSqlTupleConstant())
+            throw new abs.frontend.sql.SqlRewritingException(new SemanticError(
+                getSqlTupleConstants(),
+                ErrorMessage.SQL_INSERT_UNEQUAL_ATTR_AND_VALUE_NUMBER,
+                new String[0]));
+        PureExp attrMap = new DataConstructorExp("EmptyMap", new List<PureExp>());
+        for (int i = getNumSqlAttrRef() - 1; i >= 0; i--)
+            attrMap = new DataConstructorExp(
+                "InsertAssoc",
+                new List<PureExp>().add(
+                    new DataConstructorExp("Pair", new List<PureExp>().add(
+                        new DataConstructorExp(
+                                Constants.DB_OPERATORS_STRUCTURE_LIB_NAME + ".AttributeRefByName",
+                                new List<PureExp>().add(getSqlAttrRef(i)))).add(
+                        getSqlTupleConstant(i).createDbValueExp()))).add(
+                    attrMap));
+        return attrMap;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public SqlInsertExp() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[3];
+    setChild(new List(), 1);
+    setChild(new List(), 2);
+  }
+  /**
+   * @declaredat ASTNode:15
+   */
+  public SqlInsertExp(SqlRelationRef p0, List<PureExp> p1, List<SqlTupleConstant> p2) {
+    setChild(p0, 0);
+    setChild(p1, 1);
+    setChild(p2, 2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:23
+   */
+  protected int numChildren() {
+    return 3;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:29
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:35
+   */
+  public void flushCache() {
+    super.flushCache();
+    modifiesDb_visited = -1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:42
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:48
+   */
+  public SqlInsertExp clone() throws CloneNotSupportedException {
+    SqlInsertExp node = (SqlInsertExp) super.clone();
+    node.modifiesDb_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:58
+   */
+  public SqlInsertExp copy() {
+    try {
+      SqlInsertExp node = (SqlInsertExp) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:76
+   */
+  public SqlInsertExp fullCopy() {
+    SqlInsertExp tree = (SqlInsertExp) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the SqlRelationRef child.
+   * @param node The new node to replace the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public void setSqlRelationRef(SqlRelationRef node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel high-level
+   */
+  public SqlRelationRef getSqlRelationRef() {
+    return (SqlRelationRef) getChild(0);
+  }
+  /**
+   * Retrieves the SqlRelationRef child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the SqlRelationRef child.
+   * @apilevel low-level
+   */
+  public SqlRelationRef getSqlRelationRefNoTransform() {
+    return (SqlRelationRef) getChildNoTransform(0);
+  }
+  /**
+   * Replaces the SqlAttrRef list.
+   * @param list The new list node to be used as the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public void setSqlAttrRefList(List<PureExp> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the SqlAttrRef list.
+   * @return Number of children in the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public int getNumSqlAttrRef() {
+    return getSqlAttrRefList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the SqlAttrRef list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the SqlAttrRef list.
+   * @apilevel low-level
+   */
+  public int getNumSqlAttrRefNoTransform() {
+    return getSqlAttrRefListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the SqlAttrRef list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public PureExp getSqlAttrRef(int i) {
+    return (PureExp) getSqlAttrRefList().getChild(i);
+  }
+  /**
+   * Check whether the SqlAttrRef list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasSqlAttrRef() {
+    return getSqlAttrRefList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the SqlAttrRef list.
+   * @param node The element to append to the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public void addSqlAttrRef(PureExp node) {
+    List<PureExp> list = (parent == null || state == null) ? getSqlAttrRefListNoTransform() : getSqlAttrRefList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addSqlAttrRefNoTransform(PureExp node) {
+    List<PureExp> list = getSqlAttrRefListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the SqlAttrRef list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setSqlAttrRef(PureExp node, int i) {
+    List<PureExp> list = getSqlAttrRefList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the SqlAttrRef list.
+   * @return The node representing the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getSqlAttrRefList() {
+    List<PureExp> list = (List<PureExp>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the SqlAttrRef list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlAttrRef list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getSqlAttrRefListNoTransform() {
+    return (List<PureExp>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the SqlAttrRef list.
+   * @return The node representing the SqlAttrRef list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getSqlAttrRefs() {
+    return getSqlAttrRefList();
+  }
+  /**
+   * Retrieves the SqlAttrRef list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlAttrRef list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getSqlAttrRefsNoTransform() {
+    return getSqlAttrRefListNoTransform();
+  }
+  /**
+   * Replaces the SqlTupleConstant list.
+   * @param list The new list node to be used as the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public void setSqlTupleConstantList(List<SqlTupleConstant> list) {
+    setChild(list, 2);
+  }
+  /**
+   * Retrieves the number of children in the SqlTupleConstant list.
+   * @return Number of children in the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public int getNumSqlTupleConstant() {
+    return getSqlTupleConstantList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the SqlTupleConstant list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the SqlTupleConstant list.
+   * @apilevel low-level
+   */
+  public int getNumSqlTupleConstantNoTransform() {
+    return getSqlTupleConstantListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the SqlTupleConstant list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public SqlTupleConstant getSqlTupleConstant(int i) {
+    return (SqlTupleConstant) getSqlTupleConstantList().getChild(i);
+  }
+  /**
+   * Check whether the SqlTupleConstant list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasSqlTupleConstant() {
+    return getSqlTupleConstantList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the SqlTupleConstant list.
+   * @param node The element to append to the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public void addSqlTupleConstant(SqlTupleConstant node) {
+    List<SqlTupleConstant> list = (parent == null || state == null) ? getSqlTupleConstantListNoTransform() : getSqlTupleConstantList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addSqlTupleConstantNoTransform(SqlTupleConstant node) {
+    List<SqlTupleConstant> list = getSqlTupleConstantListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the SqlTupleConstant list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setSqlTupleConstant(SqlTupleConstant node, int i) {
+    List<SqlTupleConstant> list = getSqlTupleConstantList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the SqlTupleConstant list.
+   * @return The node representing the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public List<SqlTupleConstant> getSqlTupleConstantList() {
+    List<SqlTupleConstant> list = (List<SqlTupleConstant>) getChild(2);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the SqlTupleConstant list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlTupleConstant list.
+   * @apilevel low-level
+   */
+  public List<SqlTupleConstant> getSqlTupleConstantListNoTransform() {
+    return (List<SqlTupleConstant>) getChildNoTransform(2);
+  }
+  /**
+   * Retrieves the SqlTupleConstant list.
+   * @return The node representing the SqlTupleConstant list.
+   * @apilevel high-level
+   */
+  public List<SqlTupleConstant> getSqlTupleConstants() {
+    return getSqlTupleConstantList();
+  }
+  /**
+   * Retrieves the SqlTupleConstant list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the SqlTupleConstant list.
+   * @apilevel low-level
+   */
+  public List<SqlTupleConstant> getSqlTupleConstantsNoTransform() {
+    return getSqlTupleConstantListNoTransform();
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int modifiesDb_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:493
+   */
+  public boolean modifiesDb() {
+    ASTNode$State state = state();
+    if (modifiesDb_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: modifiesDb in class: org.jastadd.ast.AST.SynDecl");
+    }
+    modifiesDb_visited = state().boundariesCrossed;
+    try {  return getSqlRelationRef() instanceof SqlDbRelationRef;  }
+    finally {
+      modifiesDb_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

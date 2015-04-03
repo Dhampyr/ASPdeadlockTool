@@ -1,0 +1,420 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:66
+ * @production ModuleModifier : {@link ASTNode};
+
+ */
+public abstract class ModuleModifier extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1032
+   */
+  protected String generatedJavaPackageName;
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1033
+   */
+  protected String generatedJavaClassName;
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1035
+   */
+  public void generateJavaCodeDynamic(JavaCode.Package pkg) throws IOException, JavaCodeGenerationException {
+        PrintStream stream = null;
+        generatedJavaClassName = JavaBackend.getModifierName();
+        try {
+            File file = pkg.createJavaFile(generatedJavaClassName);
+            stream = new JavaCodeStream(new BufferedOutputStream(new FileOutputStream(file)));
+            stream.println("package " + pkg.packageName + ";");
+
+            // gen header
+            stream.println("public class " + generatedJavaClassName + " {");
+            generateJavaDynamic(stream);
+            stream.println("}");
+        } finally {
+            if (stream != null)
+                stream.close();
+        }
+    }
+  /**
+   * @aspect GenerateJavaDynamic_DeltaModelling
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:1053
+   */
+  abstract void generateJavaDynamic(PrintStream stream);
+  /**
+   * @aspect DeltaModifierApplicator
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaModifierApplicator.jadd:18
+   */
+  abstract public void apply() throws DeltaModellingException;
+  /**************************************************************************
+   * helper method
+   * find the ModuleDecl to which this ModuleModifier applies
+   * if qualified => easy; if unqualified => look in delta's 'uses' list.
+   * @aspect DeltaModifierApplicator
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/delta/DeltaModifierApplicator.jadd:200
+   */
+  public ModuleDecl findModule() throws DeltaModellingException {
+        String moduleid;
+        Name name = new Name(getName());
+        if (name.isSimple()) {
+            // assume the module name was specified in a 'uses' statement
+            // For now we only check the first used module - does having multiple 'uses' statements ever make sense?
+            // If not, FIXME change the syntax accordingly.
+            try {
+                moduleid = getDelta().getDeltaAccess(0).getModuleName();
+            } catch(NullPointerException e) {
+                throw new DeltaModellingException(getDelta(),"Unqualified name of modified entity requires "
+                        + "a \'uses\' statement inside the delta, to determine the module to be modified.");
+            }
+        } else {
+            moduleid = name.getModuleName();
+        }            
+
+        for (ModuleDecl module : getModel().getModuleDecls()) {
+            if (module.getName().equals(moduleid)) {
+                return module;
+            }
+        }
+        throw new DeltaModellingException(getDelta(), 
+                " wants to modify module [" + moduleid + "], which was not found.");
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:50
+   */
+  public ModuleModifier parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect Name
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:16
+   */
+  abstract public String getName();
+  /**
+   * @aspect TypeCheckProductline
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:948
+   */
+  protected void typeCheck(SemanticErrorList e) {
+        // Just check the module, the rest is done in the subclass
+        ModuleDecl d = lookupModule(targetModuleName());
+        if (d == null) {
+            e.add(new TypeError(this, ErrorMessage.MODULE_NOT_RESOLVABLE, targetModuleName()));
+        }
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ModuleModifier() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:15
+   */
+  protected int numChildren() {
+    return 0;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:21
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:27
+   */
+  public void flushCache() {
+    super.flushCache();
+    getSimpleName_visited = -1;
+    targetModuleName_visited = -1;
+    getModule_visited = -1;
+    getModule_computed = false;
+    getModule_value = null;
+    deltaName_visited = -1;
+    getModel_visited = -1;
+    getDelta_visited = -1;
+    lookupModule_String_visited = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:42
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:48
+   */
+  public ModuleModifier clone() throws CloneNotSupportedException {
+    ModuleModifier node = (ModuleModifier) super.clone();
+    node.getSimpleName_visited = -1;
+    node.targetModuleName_visited = -1;
+    node.getModule_visited = -1;
+    node.getModule_computed = false;
+    node.getModule_value = null;
+    node.deltaName_visited = -1;
+    node.getModel_visited = -1;
+    node.getDelta_visited = -1;
+    node.lookupModule_String_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getSimpleName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Name
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:27
+   */
+  public String getSimpleName() {
+    ASTNode$State state = state();
+    if (getSimpleName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getSimpleName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getSimpleName_visited = state().boundariesCrossed;
+    try {
+            Name name = new Name(this.getName());
+            return name.getSimpleName();
+        }
+    finally {
+      getSimpleName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int targetModuleName_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect TargetModuleName
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:35
+   */
+  public String targetModuleName() {
+    ASTNode$State state = state();
+    if (targetModuleName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: targetModuleName in class: org.jastadd.ast.AST.SynDecl");
+    }
+    targetModuleName_visited = state().boundariesCrossed;
+    try {  return getModule() == null ? null : getModule().getName();  }
+    finally {
+      targetModuleName_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModule_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getModule_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected ModuleDecl getModule_value;
+  /**
+   * @attribute syn
+   * @aspect Module
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:34
+   */
+  public ModuleDecl getModule() {
+    if(getModule_computed) {
+      return getModule_value;
+    }
+    ASTNode$State state = state();
+    if (getModule_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModule in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getModule_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getModule_value = getModule_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getModule_computed = true;
+    } else {
+    }
+
+    getModule_visited = -1;
+    return getModule_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private ModuleDecl getModule_compute() {
+          try { return findModule(); } catch (DeltaModellingException e) { return null; } 
+      }
+  /**
+   * @attribute inh
+   * @aspect DeltaName
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeNames.jrag:7
+   */
+  public String deltaName() {
+    ASTNode$State state = state();
+    if (deltaName_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: deltaName in class: org.jastadd.ast.AST.InhDecl");
+    }
+    deltaName_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    String deltaName_value = getParent().Define_String_deltaName(this, null);
+
+    deltaName_visited = -1;
+    return deltaName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int deltaName_visited = -1;
+  /**
+   * @attribute inh
+   * @aspect Model
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:3
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @attribute inh
+   * @aspect Delta
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/NodeReferences.jrag:16
+   */
+  public DeltaDecl getDelta() {
+    ASTNode$State state = state();
+    if (getDelta_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDelta in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getDelta_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    DeltaDecl getDelta_value = getParent().Define_DeltaDecl_getDelta(this, null);
+
+    getDelta_visited = -1;
+    return getDelta_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getDelta_visited = -1;
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:240
+   */
+  public ModuleDecl lookupModule(String name) {
+    Object _parameters = name;
+    if(lookupModule_String_visited == null) lookupModule_String_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupModule_String_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupModule in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookupModule_String_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    ModuleDecl lookupModule_String_value = getParent().Define_ModuleDecl_lookupModule(this, null, name);
+
+    lookupModule_String_visited.remove(_parameters);
+    return lookupModule_String_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupModule_String_visited;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

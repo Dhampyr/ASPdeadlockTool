@@ -1,0 +1,730 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:51
+ * @production ParametricDataTypeDecl : {@link DataTypeDecl} ::= <span class="component">{@link Annotation}*</span> <span class="component">TypeParameter:{@link TypeParameterDecl}*</span>;
+
+ */
+public class ParametricDataTypeDecl extends DataTypeDecl implements Cloneable, HasTypes, HasTypeParameters {
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:834
+   */
+  public void doPrettyPrintTypeParam(PrintWriter stream, ABSFormatter formatter) { 
+        if (getNumTypeParameter() > 0) {
+            stream.print("<");
+            getTypeParameterList().doPrettyPrint(stream, formatter, ",");
+            stream.print(">");
+        }
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:37
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        s.print("data(" + quote(getName()) + ",[");
+        List<?> cs = (List<?>) getChild(0);
+        int n = cs.getNumChild();
+        for (int i = 0; i < n; i++){
+            cs.getChild(i).generateProlog(s,reachInfo); // cons here is a DataConstructor
+            if (i != n-1) s.print(",");
+        }
+        s.print("],[");
+        // child(1) and child(2) are resp. annotations and type parameters. I ignore the annotations
+        
+        n = getNumTypeParameter();
+        for (int i = 0; i < n; i++){
+            getTypeParameter(i).generateProlog(s,reachInfo); 
+            if (i != n-1) s.print(",");
+        }
+        
+        s.println("]).");
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:192
+   */
+  public ParametricDataTypeDecl parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:373
+   */
+  public java.util.List<Type> getTypes() {
+        return TypeCheckerHelper.getTypes(getTypeParameters());
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:381
+   */
+  public java.util.List<Type> applyBindings(Map<TypeParameter, Type> binding) {
+		return TypeCheckerHelper.applyBindings(binding, getTypes());
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:416
+   */
+  public Map<TypeParameter, Type> getTypeParamBinding(ASTNode<?> node, java.util.List<Type> args) {
+        Map<TypeParameter, Type> binding = new HashMap<TypeParameter, Type>();
+        TypeCheckerHelper.addTypeParamBinding(node, binding, getTypes(), args);
+        return binding;
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public ParametricDataTypeDecl() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[3];
+    setChild(new List(), 0);
+    setChild(new List(), 1);
+    setChild(new List(), 2);
+  }
+  /**
+   * @declaredat ASTNode:16
+   */
+  public ParametricDataTypeDecl(String p0, List<DataConstructor> p1, List<Annotation> p2, List<TypeParameterDecl> p3) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+  }
+  /**
+   * @declaredat ASTNode:22
+   */
+  public ParametricDataTypeDecl(beaver.Symbol p0, List<DataConstructor> p1, List<Annotation> p2, List<TypeParameterDecl> p3) {
+    setName(p0);
+    setChild(p1, 0);
+    setChild(p2, 1);
+    setChild(p3, 2);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:31
+   */
+  protected int numChildren() {
+    return 3;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:37
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:43
+   */
+  public void flushCache() {
+    super.flushCache();
+    localLookup_KindedName_visited = null;
+    localLookup_KindedName_values = null;
+    getType_visited = -1;
+    getType_computed = false;
+    getType_value = null;
+    lookup_KindedName_visited = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:55
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:61
+   */
+  public ParametricDataTypeDecl clone() throws CloneNotSupportedException {
+    ParametricDataTypeDecl node = (ParametricDataTypeDecl) super.clone();
+    node.localLookup_KindedName_visited = null;
+    node.localLookup_KindedName_values = null;
+    node.getType_visited = -1;
+    node.getType_computed = false;
+    node.getType_value = null;
+    node.lookup_KindedName_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:76
+   */
+  public ParametricDataTypeDecl copy() {
+    try {
+      ParametricDataTypeDecl node = (ParametricDataTypeDecl) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:94
+   */
+  public ParametricDataTypeDecl fullCopy() {
+    ParametricDataTypeDecl tree = (ParametricDataTypeDecl) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the DataConstructor list.
+   * @param list The new list node to be used as the DataConstructor list.
+   * @apilevel high-level
+   */
+  public void setDataConstructorList(List<DataConstructor> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the DataConstructor list.
+   * @return Number of children in the DataConstructor list.
+   * @apilevel high-level
+   */
+  public int getNumDataConstructor() {
+    return getDataConstructorList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the DataConstructor list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the DataConstructor list.
+   * @apilevel low-level
+   */
+  public int getNumDataConstructorNoTransform() {
+    return getDataConstructorListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the DataConstructor list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the DataConstructor list.
+   * @apilevel high-level
+   */
+  public DataConstructor getDataConstructor(int i) {
+    return (DataConstructor) getDataConstructorList().getChild(i);
+  }
+  /**
+   * Check whether the DataConstructor list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasDataConstructor() {
+    return getDataConstructorList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the DataConstructor list.
+   * @param node The element to append to the DataConstructor list.
+   * @apilevel high-level
+   */
+  public void addDataConstructor(DataConstructor node) {
+    List<DataConstructor> list = (parent == null || state == null) ? getDataConstructorListNoTransform() : getDataConstructorList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addDataConstructorNoTransform(DataConstructor node) {
+    List<DataConstructor> list = getDataConstructorListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the DataConstructor list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setDataConstructor(DataConstructor node, int i) {
+    List<DataConstructor> list = getDataConstructorList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the DataConstructor list.
+   * @return The node representing the DataConstructor list.
+   * @apilevel high-level
+   */
+  public List<DataConstructor> getDataConstructorList() {
+    List<DataConstructor> list = (List<DataConstructor>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the DataConstructor list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DataConstructor list.
+   * @apilevel low-level
+   */
+  public List<DataConstructor> getDataConstructorListNoTransform() {
+    return (List<DataConstructor>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the DataConstructor list.
+   * @return The node representing the DataConstructor list.
+   * @apilevel high-level
+   */
+  public List<DataConstructor> getDataConstructors() {
+    return getDataConstructorList();
+  }
+  /**
+   * Retrieves the DataConstructor list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the DataConstructor list.
+   * @apilevel low-level
+   */
+  public List<DataConstructor> getDataConstructorsNoTransform() {
+    return getDataConstructorListNoTransform();
+  }
+  /**
+   * Replaces the Annotation list.
+   * @param list The new list node to be used as the Annotation list.
+   * @apilevel high-level
+   */
+  public void setAnnotationList(List<Annotation> list) {
+    setChild(list, 1);
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * @return Number of children in the Annotation list.
+   * @apilevel high-level
+   */
+  public int getNumAnnotation() {
+    return getAnnotationList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Annotation list.
+   * @apilevel low-level
+   */
+  public int getNumAnnotationNoTransform() {
+    return getAnnotationListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Annotation list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Annotation list.
+   * @apilevel high-level
+   */
+  public Annotation getAnnotation(int i) {
+    return (Annotation) getAnnotationList().getChild(i);
+  }
+  /**
+   * Check whether the Annotation list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasAnnotation() {
+    return getAnnotationList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Annotation list.
+   * @param node The element to append to the Annotation list.
+   * @apilevel high-level
+   */
+  public void addAnnotation(Annotation node) {
+    List<Annotation> list = (parent == null || state == null) ? getAnnotationListNoTransform() : getAnnotationList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addAnnotationNoTransform(Annotation node) {
+    List<Annotation> list = getAnnotationListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Annotation list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setAnnotation(Annotation node, int i) {
+    List<Annotation> list = getAnnotationList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotationList() {
+    List<Annotation> list = (List<Annotation>) getChild(1);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationListNoTransform() {
+    return (List<Annotation>) getChildNoTransform(1);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotations() {
+    return getAnnotationList();
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationsNoTransform() {
+    return getAnnotationListNoTransform();
+  }
+  /**
+   * Replaces the TypeParameter list.
+   * @param list The new list node to be used as the TypeParameter list.
+   * @apilevel high-level
+   */
+  public void setTypeParameterList(List<TypeParameterDecl> list) {
+    setChild(list, 2);
+  }
+  /**
+   * Retrieves the number of children in the TypeParameter list.
+   * @return Number of children in the TypeParameter list.
+   * @apilevel high-level
+   */
+  public int getNumTypeParameter() {
+    return getTypeParameterList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the TypeParameter list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the TypeParameter list.
+   * @apilevel low-level
+   */
+  public int getNumTypeParameterNoTransform() {
+    return getTypeParameterListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the TypeParameter list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the TypeParameter list.
+   * @apilevel high-level
+   */
+  public TypeParameterDecl getTypeParameter(int i) {
+    return (TypeParameterDecl) getTypeParameterList().getChild(i);
+  }
+  /**
+   * Check whether the TypeParameter list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasTypeParameter() {
+    return getTypeParameterList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the TypeParameter list.
+   * @param node The element to append to the TypeParameter list.
+   * @apilevel high-level
+   */
+  public void addTypeParameter(TypeParameterDecl node) {
+    List<TypeParameterDecl> list = (parent == null || state == null) ? getTypeParameterListNoTransform() : getTypeParameterList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addTypeParameterNoTransform(TypeParameterDecl node) {
+    List<TypeParameterDecl> list = getTypeParameterListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the TypeParameter list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setTypeParameter(TypeParameterDecl node, int i) {
+    List<TypeParameterDecl> list = getTypeParameterList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the TypeParameter list.
+   * @return The node representing the TypeParameter list.
+   * @apilevel high-level
+   */
+  public List<TypeParameterDecl> getTypeParameterList() {
+    List<TypeParameterDecl> list = (List<TypeParameterDecl>) getChild(2);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the TypeParameter list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the TypeParameter list.
+   * @apilevel low-level
+   */
+  public List<TypeParameterDecl> getTypeParameterListNoTransform() {
+    return (List<TypeParameterDecl>) getChildNoTransform(2);
+  }
+  /**
+   * Retrieves the TypeParameter list.
+   * @return The node representing the TypeParameter list.
+   * @apilevel high-level
+   */
+  public List<TypeParameterDecl> getTypeParameters() {
+    return getTypeParameterList();
+  }
+  /**
+   * Retrieves the TypeParameter list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the TypeParameter list.
+   * @apilevel low-level
+   */
+  public List<TypeParameterDecl> getTypeParametersNoTransform() {
+    return getTypeParameterListNoTransform();
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map localLookup_KindedName_visited;
+  protected java.util.Map localLookup_KindedName_values;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:310
+   */
+  public Decl localLookup(KindedName name) {
+    Object _parameters = name;
+    if(localLookup_KindedName_visited == null) localLookup_KindedName_visited = new java.util.HashMap(4);
+    if(localLookup_KindedName_values == null) localLookup_KindedName_values = new java.util.HashMap(4);
+    if(localLookup_KindedName_values.containsKey(_parameters)) {
+      return (Decl)localLookup_KindedName_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(localLookup_KindedName_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: localLookup in class: org.jastadd.ast.AST.SynDecl");
+    }
+    localLookup_KindedName_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Decl localLookup_KindedName_value = localLookup_compute(name);
+    if(isFinal && num == state().boundariesCrossed) {
+      localLookup_KindedName_values.put(_parameters, localLookup_KindedName_value);
+    } else {
+    }
+
+    localLookup_KindedName_visited.remove(_parameters);
+    return localLookup_KindedName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Decl localLookup_compute(KindedName name) {
+          for (TypeParameterDecl d : getTypeParameters())
+              if (d.getName().equals(name.getName()))
+                  return d;
+          return lookup(name);
+      }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getType_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Type getType_value;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:79
+   */
+  public Type getType() {
+    if(getType_computed) {
+      return getType_value;
+    }
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getType_value = getType_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getType_computed = true;
+    } else {
+    }
+
+    getType_visited = -1;
+    return getType_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Type getType_compute() { 
+     	 return new DataTypeType(this, getTypes()); 
+      }
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:270
+   */
+  public Decl lookup(KindedName name) {
+    Object _parameters = name;
+    if(lookup_KindedName_visited == null) lookup_KindedName_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookup_KindedName_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookup in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookup_KindedName_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Decl lookup_KindedName_value = getParent().Define_Decl_lookup(this, null, name);
+
+    lookup_KindedName_visited.remove(_parameters);
+    return lookup_KindedName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookup_KindedName_visited;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:256
+   * @apilevel internal
+   */
+  public Decl Define_Decl_lookup(ASTNode caller, ASTNode child, KindedName name) {
+    if (caller == getDataConstructorListNoTransform()) {
+      int childIndex = caller.getIndexOfChild(child);
+      return localLookup(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Decl_lookup(this, caller, name);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

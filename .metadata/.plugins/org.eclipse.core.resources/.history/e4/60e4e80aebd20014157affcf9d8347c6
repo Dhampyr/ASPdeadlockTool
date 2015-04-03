@@ -1,0 +1,864 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:215
+ * @production FnApp : {@link PureExp} ::= <span class="component">&lt;Name:String&gt;</span> <span class="component">Param:{@link PureExp}*</span>;
+
+ */
+public class FnApp extends PureExp implements Cloneable, HasActualParams {
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:81
+   */
+  private final static Set<String> ERLANG_BUILTINS=ImmutableSet.of(
+      "currentms", "getProductLine", "lowlevelDeadline", "print", "println",
+      "random", "strlen", "substr", "thisDC", "toString", "truncate");
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:84
+   */
+  public  void generateErlangCode(ErlangCodeStream ecs,Vars vars){
+    FunctionDecl decl = (FunctionDecl)getDecl();
+    boolean builtin = decl.getFunctionDef() instanceof BuiltinFunctionDef;
+    if(builtin){
+      if(!ERLANG_BUILTINS.contains(decl.getName()))
+        throw new NotImplementedYetException("builtin: "+decl.getName(), this);
+      ecs.print("builtin:");
+      ecs.print(decl.getName());
+    }
+    else {
+      ecs.print( ErlUtil.getName(decl.getModuleDecl())+ "_funs:f_" + decl.getName());
+    }
+    ErlUtil.argumentList(ecs,null, builtin, isContextImperative(), getParams(), vars);
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:739
+   */
+  public void generateJava(PrintStream stream) {
+
+        // Have to explicitly type the call due to a bug in the JastAdd Java
+        // compiler that generates wrong code otherwise.
+        FunctionDecl d = (FunctionDecl)getDecl();
+        
+        		
+        if (d.getFunctionDef() instanceof BuiltinFunctionDef) {
+            JavaGeneratorHelper.generateBuiltInFnApp(stream,this);
+            return;
+        }
+
+        stream.print(JavaBackend.getQualifiedString(d) + ".");
+        Type declaredResultType = d.getTypeUse().getType();
+        if (d instanceof ParametricFunctionDecl) {
+            ParametricFunctionDecl funDecl = (ParametricFunctionDecl) d;
+            Map<TypeParameter, Type> typeBinding = getTypeParamBindingFromParamDecl(funDecl);
+
+            /*
+         StringBuffer buf = new StringBuffer();
+         buf.append("<");
+         boolean first = true;
+         for (TypeParameterDecl tp : funDecl.getTypeParameters()) {
+             Type t = typeBinding.get((TypeParameter)tp.getType());
+             if (first) first = false;
+             else buf.append(",");
+             if (t == null) {
+                 buf = null;
+                 break;
+             } else if (t.isBoundedType() && !((BoundedType)t).hasBoundType()) {
+                 buf = null;
+                 break;
+             } else {
+                 buf.append(JavaBackend.getQualifiedString(t));
+             }
+         }
+
+         if (buf != null) {
+             stream.print(buf.toString());
+             stream.print(">");
+         }*/
+        }
+
+        stream.print("apply");
+        JavaGeneratorHelper.generateArgs(stream,getParams(), d.getTypes());
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:767
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+
+        // Have to explicitly type the call due to a bug in the JastAdd Java
+        // compiler that generates wrong code otherwise.
+        FunctionDecl d = (FunctionDecl)getDecl();
+
+        if (d.getFunctionDef() instanceof BuiltinFunctionDef) {
+            DynamicJavaGeneratorHelper.generateBuiltInFnApp(stream,this);
+            return;
+        }
+
+        stream.print(JavaBackend.getQualifiedString(d) + ".");
+        Type declaredResultType = d.getTypeUse().getType();
+        if (d instanceof ParametricFunctionDecl) {
+            ParametricFunctionDecl funDecl = (ParametricFunctionDecl) d;
+            Map<TypeParameter, Type> typeBinding = getTypeParamBindingFromParamDecl(funDecl);
+
+            /*
+         StringBuffer buf = new StringBuffer();
+         buf.append("<");
+         boolean first = true;
+         for (TypeParameterDecl tp : funDecl.getTypeParameters()) {
+             Type t = typeBinding.get((TypeParameter)tp.getType());
+             if (first) first = false;
+             else buf.append(",");
+             if (t == null) {
+                 buf = null;
+                 break;
+             } else if (t.isBoundedType() && !((BoundedType)t).hasBoundType()) {
+                 buf = null;
+                 break;
+             } else {
+                 buf.append(JavaBackend.getQualifiedString(t));
+             }
+         }
+
+         if (buf != null) {
+             stream.print(buf.toString());
+             stream.print(">");
+         }*/
+        }
+
+        stream.print("apply");
+        DynamicJavaGeneratorHelper.generateArgs(stream,getParams(), d.getTypes());
+
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:407
+   */
+  public void generateMaude(PrintStream stream) {
+        boolean inlist = false;
+        FunctionDecl decl = (FunctionDecl)getDecl();
+        String fnName = decl.getModuleDecl().getName() + "." + decl.getName();
+        if (Constants.isFunctionalBreakPointFunctionName(fnName)) {
+            getParam(0).generateMaude(stream);
+            return;
+        }
+        stream.print("\"" + fnName + "\"( ");
+        MaudeCompilerHelper.emitParameterValueList(stream, getParams(),
+                                                   decl.getTypes());
+        if (getNumParam() > 0 && fnName.equals("ABS.StdLib.random")) {
+            // magic extra parameter for random()
+            stream.print(" :: \"num\"[0] ");
+        }
+        stream.print(") ");
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:424
+   */
+  public int numberOfRandom(Set<String> visitedFunctions) {
+        int result = 0;
+        String fnName = getDecl().getModuleDecl().getName() + "." + getName();
+        if (fnName.equals("ABS.StdLib.random")) {
+            result = 1;
+        } else {
+            for (PureExp param : getParams()) {
+                result += param.numberOfRandom(visitedFunctions);
+            }
+            if (!visitedFunctions.contains(fnName)) {
+                visitedFunctions.add(fnName);
+                FunctionDef def = ((FunctionDecl)getDecl()).getFunctionDef();
+                if (def instanceof ExpFunctionDef) {
+                    PureExp rhs = ((ExpFunctionDef)def).getRhs();
+                    result += rhs.numberOfRandom(visitedFunctions);
+                }
+                visitedFunctions.remove(fnName);
+            }
+        }
+        return result;
+    }
+  /**
+   * @aspect doPrettyPrinter
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prettyprint/PrettyPrinter.jadd:1035
+   */
+  public void doPrettyPrint(PrintWriter stream, ABSFormatter formatter) {
+        stream.print(getName());
+        stream.print("(");
+        getParamList().doPrettyPrint(stream, formatter, ",");
+        stream.print(")");
+    }
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:342
+   */
+  public void generateProlog(PrintStream s,ReachabilityInformation reachInfo){
+        s.print("apply(" + quote(getName()));
+        List<?> args = (List<?>) getChild(0); // ? = PureExp
+        int n = args.getNumChild();
+        if (n > 0){
+            s.print("(");
+            for (int i = 0; i < n; i++){
+                args.getChild(i).generateProlog(s,reachInfo);
+                if (i != n-1) s.print(",");
+            }
+            s.print(")");
+        }
+        s.print(")");
+    }
+  /**
+   * @aspect collectReachableCode
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/collectReachableCode.jadd:64
+   */
+  public void collectReachableCode(ReachabilityInformation reachInfo){
+        if(this.getDecl() instanceof FunctionDecl)
+            reachInfo.addReachability((FunctionDecl)this.getDecl());
+
+        super.collectReachableCode(reachInfo);
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:93
+   */
+  public FnApp parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:823
+   */
+  public void refined_TypeChecker_FnApp_typeCheck(SemanticErrorList e) {
+        Decl d = getDecl();
+        if (!d.isFunction()) {
+            e.add(new TypeError(this,ErrorMessage.FUNCTION_NOT_RESOLVABLE,getName()));
+        } else {
+            ((FunctionDecl)d).typeCheckParams(e, this);
+        }
+    }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:840
+   */
+  public Map<TypeParameter, Type> getTypeParamBindingFromParamDecl(ParametricFunctionDecl node) {
+        return getTypeParamBinding(this, node);
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:395
+   */
+  public java.util.List<Type> getTypesFromExp() { return TypeCheckerHelper.getTypes(getParams()); }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:410
+   */
+  public void typeCheckEqualParams(SemanticErrorList l, HasParams params) {
+        TypeCheckerHelper.typeCheckEqual(l, this, params.getTypes());
+    }
+  /**
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:413
+   */
+  public Map<TypeParameter, Type> getTypeParamBinding(ASTNode<?> node, HasTypes params) {
+        return params.getTypeParamBinding(node, getTypesFromExp());
+    }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public FnApp() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public FnApp(String p0, List<PureExp> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @declaredat ASTNode:18
+   */
+  public FnApp(beaver.Symbol p0, List<PureExp> p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:25
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:31
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:37
+   */
+  public void flushCache() {
+    super.flushCache();
+    isContextFunctional_visited = -1;
+    getFreeVars_visited = -1;
+    getFreeVars_computed = false;
+    getFreeVars_value = null;
+    getFields_FieldUseInfo_visited = null;
+    getFields_FieldUseInfo_values = null;
+    getDecl_visited = -1;
+    getDecl_computed = false;
+    getDecl_value = null;
+    getType_visited = -1;
+    getType_computed = false;
+    getType_value = null;
+    isContextImperative_visited = -1;
+    isContextImperative_computed = false;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:57
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:63
+   */
+  public FnApp clone() throws CloneNotSupportedException {
+    FnApp node = (FnApp) super.clone();
+    node.isContextFunctional_visited = -1;
+    node.getFreeVars_visited = -1;
+    node.getFreeVars_computed = false;
+    node.getFreeVars_value = null;
+    node.getFields_FieldUseInfo_visited = null;
+    node.getFields_FieldUseInfo_values = null;
+    node.getDecl_visited = -1;
+    node.getDecl_computed = false;
+    node.getDecl_value = null;
+    node.getType_visited = -1;
+    node.getType_computed = false;
+    node.getType_value = null;
+    node.isContextImperative_visited = -1;
+    node.isContextImperative_computed = false;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:86
+   */
+  public FnApp copy() {
+    try {
+      FnApp node = (FnApp) clone();
+      node.parent = null;
+      if(children != null) {
+        node.children = (ASTNode[]) children.clone();
+      }
+      return node;
+    } catch (CloneNotSupportedException e) {
+      throw new Error("Error: clone not supported for " + getClass().getName());
+    }
+  }
+  /**
+   * Create a deep copy of the AST subtree at this node.
+   * The copy is dangling, i.e. has no parent.
+   * @return dangling copy of the subtree at this node
+   * @apilevel low-level
+   * @declaredat ASTNode:104
+   */
+  public FnApp fullCopy() {
+    FnApp tree = (FnApp) copy();
+    if (children != null) {
+      for (int i = 0; i < children.length; ++i) {
+        ASTNode child = (ASTNode) children[i];
+        if(child != null) {
+          child = child.fullCopy();
+          tree.setChild(child, i);
+        }
+      }
+    }
+    return tree;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected String tokenString_Name;
+  /**
+   */
+  public int Namestart;
+  /**
+   */
+  public int Nameend;
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the Param list.
+   * @param list The new list node to be used as the Param list.
+   * @apilevel high-level
+   */
+  public void setParamList(List<PureExp> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the Param list.
+   * @return Number of children in the Param list.
+   * @apilevel high-level
+   */
+  public int getNumParam() {
+    return getParamList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Param list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Param list.
+   * @apilevel low-level
+   */
+  public int getNumParamNoTransform() {
+    return getParamListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Param list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Param list.
+   * @apilevel high-level
+   */
+  public PureExp getParam(int i) {
+    return (PureExp) getParamList().getChild(i);
+  }
+  /**
+   * Check whether the Param list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasParam() {
+    return getParamList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Param list.
+   * @param node The element to append to the Param list.
+   * @apilevel high-level
+   */
+  public void addParam(PureExp node) {
+    List<PureExp> list = (parent == null || state == null) ? getParamListNoTransform() : getParamList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addParamNoTransform(PureExp node) {
+    List<PureExp> list = getParamListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Param list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setParam(PureExp node, int i) {
+    List<PureExp> list = getParamList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Param list.
+   * @return The node representing the Param list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getParamList() {
+    List<PureExp> list = (List<PureExp>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Param list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Param list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getParamListNoTransform() {
+    return (List<PureExp>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the Param list.
+   * @return The node representing the Param list.
+   * @apilevel high-level
+   */
+  public List<PureExp> getParams() {
+    return getParamList();
+  }
+  /**
+   * Retrieves the Param list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Param list.
+   * @apilevel low-level
+   */
+  public List<PureExp> getParamsNoTransform() {
+    return getParamListNoTransform();
+  }
+  /**
+   * @aspect TypeCheckerExtension
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/TypeCheckerExtension.jadd:207
+   */
+    public void typeCheck(SemanticErrorList s) {
+        int size = s.size();
+        refined_TypeChecker_FnApp_typeCheck(s);
+        if (s.size() > size) return;
+        getModel().getTypeExt().checkFnApp(this);
+    }
+  /**
+   * @apilevel internal
+   */
+  protected int isContextFunctional_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect FnAppContext
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FnAppContext.jrag:13
+   */
+  public boolean isContextFunctional() {
+    ASTNode$State state = state();
+    if (isContextFunctional_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: isContextFunctional in class: org.jastadd.ast.AST.SynDecl");
+    }
+    isContextFunctional_visited = state().boundariesCrossed;
+    try {  return !isContextImperative();  }
+    finally {
+      isContextFunctional_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getFreeVars_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getFreeVars_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Set<String> getFreeVars_value;
+  /**
+   * @attribute syn
+   * @aspect VarUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FreeVars.jrag:50
+   */
+  public Set<String> getFreeVars() {
+    if(getFreeVars_computed) {
+      return getFreeVars_value;
+    }
+    ASTNode$State state = state();
+    if (getFreeVars_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getFreeVars in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFreeVars_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getFreeVars_value = getFreeVars_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getFreeVars_computed = true;
+    } else {
+    }
+
+    getFreeVars_visited = -1;
+    return getFreeVars_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Set<String> getFreeVars_compute() {
+  		HashSet<String> res = new HashSet<String>();
+  		for (PureExp e : getParams()) {
+  		   res.addAll(e.getFreeVars());
+  		}
+  		return res;
+  	}
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map getFields_FieldUseInfo_visited;
+  protected java.util.Map getFields_FieldUseInfo_values;
+  /**
+   * @attribute syn
+   * @aspect FieldUsage
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/FieldAccesses.jrag:124
+   */
+  public FieldUseInfo getFields(FieldUseInfo fui) {
+    Object _parameters = fui;
+    if(getFields_FieldUseInfo_visited == null) getFields_FieldUseInfo_visited = new java.util.HashMap(4);
+    if(getFields_FieldUseInfo_values == null) getFields_FieldUseInfo_values = new java.util.HashMap(4);
+    if(getFields_FieldUseInfo_values.containsKey(_parameters)) {
+      return (FieldUseInfo)getFields_FieldUseInfo_values.get(_parameters);
+    }
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(getFields_FieldUseInfo_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: getFields in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getFields_FieldUseInfo_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    FieldUseInfo getFields_FieldUseInfo_value = getFields_compute(fui);
+    if(isFinal && num == state().boundariesCrossed) {
+      getFields_FieldUseInfo_values.put(_parameters, getFields_FieldUseInfo_value);
+    } else {
+    }
+
+    getFields_FieldUseInfo_visited.remove(_parameters);
+    return getFields_FieldUseInfo_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private FieldUseInfo getFields_compute(FieldUseInfo fui) {
+  	    fui.merge(getParams());
+  		/* Add a hack for builtins, which can do whatever...#345 */
+  		if (getDecl() instanceof FunctionDecl) {
+  		  FunctionDecl d = (FunctionDecl)getDecl();
+  		  FunctionDef def = d.getFunctionDef();
+  		  fui.usesBuiltin |= def.usesBuiltin(fui.seenDefs);
+  		}
+  		return new FieldUseInfo(fui);
+  	}
+  /**
+   * @apilevel internal
+   */
+  protected int getDecl_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getDecl_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Decl getDecl_value;
+  /**
+   * @attribute syn
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:376
+   */
+  public Decl getDecl() {
+    if(getDecl_computed) {
+      return getDecl_value;
+    }
+    ASTNode$State state = state();
+    if (getDecl_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getDecl in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getDecl_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getDecl_value = getDecl_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getDecl_computed = true;
+    } else {
+    }
+
+    getDecl_visited = -1;
+    return getDecl_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Decl getDecl_compute() {  return lookup(new KindedName(Kind.FUN,getName()));  }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getType_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Type getType_value;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:251
+   */
+  public Type getType() {
+    if(getType_computed) {
+      return getType_value;
+    }
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getType_value = getType_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getType_computed = true;
+    } else {
+    }
+
+    getType_visited = -1;
+    return getType_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private Type getType_compute() {
+         Decl d = lookup(new KindedName(Kind.FUN,getName()));
+     	 
+     	 Type declaredResultType = d.getType();
+     	 if (d instanceof ParametricFunctionDecl) {
+     		 ParametricFunctionDecl funDecl = (ParametricFunctionDecl) d;
+     		 Map<TypeParameter, Type> typeBinding = getTypeParamBindingFromParamDecl(funDecl);
+     		 return declaredResultType.applyBinding(typeBinding);
+     	 } else {
+     		 return declaredResultType;
+     	 }
+      }
+  /**
+   * @attribute inh
+   * @aspect FnAppContext
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/FnAppContext.jrag:12
+   */
+  public boolean isContextImperative() {
+    if(isContextImperative_computed) {
+      return isContextImperative_value;
+    }
+    ASTNode$State state = state();
+    if (isContextImperative_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: isContextImperative in class: org.jastadd.ast.AST.InhDecl");
+    }
+    isContextImperative_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    isContextImperative_value = getParent().Define_boolean_isContextImperative(this, null);
+    if(isFinal && num == state().boundariesCrossed) {
+      isContextImperative_computed = true;
+    } else {
+    }
+
+    isContextImperative_visited = -1;
+    return isContextImperative_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int isContextImperative_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isContextImperative_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isContextImperative_value;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}

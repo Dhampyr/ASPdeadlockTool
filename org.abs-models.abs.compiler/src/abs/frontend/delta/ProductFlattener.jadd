@@ -1,0 +1,249 @@
+import java.util.Map;
+import abs.frontend.delta.*;
+import abs.common.*;
+
+aspect ProductFlattener {
+
+    /**************************************************************************
+     * Configure a product
+     * This is the top level method, which does the following:
+     * - find the features of a given product, 
+     * - find a valid sequence of associated deltas,
+     * - resolve original() calls,
+     * - apply deltas in sequence.
+     */
+    public void Model.flattenForProduct(String id) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod);
+    }
+    /**************************************************************************
+     * Apply delta to model without checking if the product is valid wrt the feature model
+     * i.e. apply each ModuleModifier to its corresponding class or interface
+     */
+    public void Model.flattenForProductUnsafe(String id) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod, false);
+    }
+    public void Model.flattenForProduct(Product prod) throws WrongProgramArgumentException,DeltaModellingException {
+        flattenForProduct(prod, true);
+    }
+    public void Model.flattenForProduct(String id, boolean check) throws WrongProgramArgumentException,DeltaModellingException {
+        Product prod = this.findProduct(id);
+        flattenForProduct(prod, check);
+    }
+
+    /**
+     * Refined with MTVL-check in CSP.jadd.
+     */
+    public void Model.flattenForProduct(Product prod, boolean check) throws WrongProgramArgumentException,DeltaModellingException {
+        if (verbose)
+            System.out.println("--- configuring product: " + prod.getName());
+
+        // find product line
+        ProductLine pl = getProductLine();
+        if (pl == null)
+            throw new DeltaModellingException("Model is missing a 'productline' definition");
+
+        // find/sort applicable delta IDs
+        Set<String> deltaids = pl.findApplicableDeltas(prod);
+        ArrayList<String> sorted_deltaids = pl.sortDeltas(deltaids);
+
+        // find corresponding DeltaDecls
+        ArrayList<DeltaDecl> deltas = findDeltas(sorted_deltaids);
+        
+        // substitute delta parameters
+        pl.substituteDeltaParams(deltas, prod);
+
+        // resolve original() calls
+        resolveOriginalCalls(deltas);
+
+        if (verbose) {
+            System.out.print("--- applying deltas to core");
+            for (DeltaDecl delta : deltas) {
+                print(" << " + delta.getName());
+            }
+            println(" .");
+        }
+
+        // apply the applicable deltas in the given order
+        applyDeltas(deltas);
+        
+        // remember which product was generated
+        productName = prod.getName();
+    }
+
+    /**************************************************************************
+     * Apply deltas to model
+     */
+    public void Model.applyDeltas(ArrayList<DeltaDecl> deltas) throws DeltaModellingException {
+        // TODO/FIXME: The following code is sort of hack-ish and slow. Find a better way
+        //             to flush the correct cache at the same time (or avoid flushing at all?)
+        for (DeltaDecl delta : deltas) {
+            this.applyDelta(delta);
+            for (CompilationUnit unit: this.getCompilationUnits())
+                for (ModuleDecl module: unit.getModuleDecls())
+                        module.flushCache();
+        }
+    }
+
+    /**************************************************************************
+    * apply each FunctionalModifier and ModuleModifier 
+    * to its corresponding class or interface
+    * 
+    * These "apply" methods are defined in "DeltaModifierApplicator.jadd"
+    */
+    public void Model.applyDelta(DeltaDecl delta) throws DeltaModellingException {
+        for (ModuleModifier mod : delta.getModuleModifiers()) {
+            //System.out.println("*** applying ModuleModifier " + mod);
+            mod.apply();
+        }
+    }
+
+    /**************************************************************************
+     * find a particular product given by its name
+     */
+    public Product Model.findProduct(String id) throws WrongProgramArgumentException {
+        for (CompilationUnit u : this.getCompilationUnits()) {
+            for (Product p : u.getProducts()) {
+                if (id.equals(p.getName()))
+                    return p;
+            }
+        }
+        throw new WrongProgramArgumentException("Product [" + id + "] is not declared");
+    }   
+
+    /**************************************************************************
+     * Evaluate each delta clause to find the applicable delta names
+     * i.e. test each application condition in the context of the features which are ON in the given product
+     */
+    public Set<String> ProductLine.findApplicableDeltas(Product prod) {
+
+        HashSet<String> deltaids = new HashSet<String>();
+
+        for (DeltaClause clause : getDeltaClauses()) {
+            if (clause.evaluateApplicationCondition(prod.getFeatures()))
+                deltaids.add(clause.getDeltaspec().getName());
+        }
+        return deltaids;
+    }
+
+    /**************************************************************************
+     * Evaluate both FROM and TO(WHEN) delta clauses to find the applicable delta names
+     * relevant for dynamic product reconfiguration
+     */
+    public Set<String> ProductLine.findApplicableDeltas(Product fromProd, Product toProd) {
+        
+        HashSet<String> deltaids = new HashSet<String>();
+        
+        for (DeltaClause clause : getDeltaClauses()) {
+            if (clause.evaluateFromApplicationCondition(fromProd.getFeatures()))
+                if (clause.evaluateApplicationCondition(toProd.getFeatures()))
+                    deltaids.add(clause.getDeltaspec().getName());
+        }
+        return deltaids;
+    }
+
+    /**************************************************************************
+     * Evaluate the application condition assciated with this DeltaClause
+     * in the context of the given list of features and attribute values
+     *
+     * TODO Support feature attributes
+     */
+    public boolean DeltaClause.evaluateApplicationCondition(List<Feature> onFeatures) {
+        // first, log the names of all onFeatures in a set, for easy lookup
+        HashSet<String> onFeatureIDs = new HashSet<String>();
+        for (Feature f : onFeatures)
+            onFeatureIDs.add(f.getName());
+        
+        if (hasAppCond())
+            return getAppCond().evaluate(onFeatureIDs);
+        else
+            return true;
+    }
+    
+    /**************************************************************************
+     * Evaluate the "from" application condition assciated with this DeltaClause 
+     * in the context of the given list of features and attribute values
+     * 
+     * "from" app conditions are only for dynamic product reconfiguration,
+     * where a running product is re-configured into another product.
+     * 
+     * TODO Support feature attributes
+     */
+    public boolean DeltaClause.evaluateFromApplicationCondition(List<Feature> onFeatures) {
+        // first, log the names of all onFeatures in a set, for easy lookup
+        HashSet<String> onFeatureIDs = new HashSet<String>();
+        for (Feature f : onFeatures)
+            onFeatureIDs.add(f.getName());
+        
+        if (hasFromAppCond())
+            return getFromAppCond().evaluate(onFeatureIDs);
+        else
+            return false;
+    }
+
+    /**************************************************************************
+     * Evaluate if the application condition holds for a given set of
+     * selected feature names.
+     */
+    public abstract boolean AppCond.evaluate(Set<String> features);
+    
+    public boolean AppCondAnd.evaluate(Set<String> features) {
+    	return getLeft().evaluate(features) && getRight().evaluate(features);
+    }
+    public boolean AppCondOr.evaluate(Set<String> features) {
+    	return getLeft().evaluate(features) || getRight().evaluate(features);
+    }
+    public boolean AppCondNot.evaluate(Set<String> features) {
+    	return !getAppCond().evaluate(features);
+    }
+    public boolean AppCondFeature.evaluate(Set<String> features) {
+    	return (features.contains(getName()));
+    }
+
+
+    /**************************************************************************
+     * Find DeltaDecls, given a list of delta names; keep order
+     */
+    public ArrayList<DeltaDecl> Model.findDeltas(java.util.List<String> deltaids) {
+        ArrayList<DeltaDecl> deltas = new ArrayList<DeltaDecl>();
+        for (String deltaid : deltaids) {
+            for (CompilationUnit u : this.getCompilationUnits()) {
+                for (DeltaDecl delta : u.getDeltaDecls()) {
+                    if (deltaid.equals(delta.getName())) {
+                        //System.out.println("$$$ found applicable DeltaDecl : " + deltaid);
+                        deltas.add(delta);
+                    }
+                }
+            }
+        }
+        return deltas;
+    }
+        
+
+    /**************************************************************************
+     * Sort Delta names according to a valid order of application defined by the product line
+     */
+    public ArrayList<String> ProductLine.sortDeltas(Set<String> deltaIDs) {
+        GraphTS g = new GraphTS(deltaIDs.toArray());
+        
+        for (DeltaClause clause : getDeltaClauses()) {
+            String deltaid = clause.getDeltaspec().getName();
+            if (deltaIDs.contains(deltaid)) {
+                for (DeltaID did : clause.getAfterDeltaIDs()) { // 'after' deltas
+                    String otherid = did.getName();
+                    if (deltaIDs.contains(otherid)) {
+                        try {
+                            g.addEdge(otherid, deltaid);
+                        } catch (VertexNotFoundException e) {
+                            assert false; // should never reach this point
+                        }
+                    }
+                }
+            }
+        }
+        g.sort(); // FIXME catch the case when sort fails -- use assert?
+        return g.getSortedElements();
+    }
+    
+}

@@ -1,0 +1,636 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:157
+ * @production Stmt : {@link ASTNode} ::= <span class="component">{@link Annotation}*</span>;
+
+ */
+public abstract class Stmt extends ASTNode<ASTNode> implements Cloneable {
+  /**
+   * Only for use by the AwaitAsyncCall-rewriting logic!
+   * @aspect GenerateCoreABS
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:57
+   */
+  protected java.util.List<AwaitAsyncCall> aacs = new LinkedList();
+  /**
+   * @aspect GenerateErlang
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/erlang/GenerateErlang.jadd:178
+   */
+  public void generateErlangCode(ErlangCodeStream ecs,Vars vars) {
+    throw new NotImplementedYetException(this);
+  }
+  /**
+   * @aspect GenerateJava
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/GenerateJava.jadd:387
+   */
+  public void generateJava(PrintStream stream) {
+        stream.println(JavaGeneratorHelper.getDebugString(this));
+    }
+  /**
+   * @aspect GenerateJavaDynamic_Core
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/java/codegeneration/dynamic/GenerateJava.jadd:438
+   */
+  public void generateJavaDynamic(PrintStream stream) {
+        stream.println(DynamicJavaGeneratorHelper.getDebugString(this));
+    }
+  /**
+   * @aspect GenerateMaude
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/maude/GenerateMaude.jadd:640
+   */
+  abstract public void generateMaude(PrintStream stream);
+  /**
+   * @aspect GenerateProlog
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/prolog/GenerateProlog.jadd:746
+   */
+  public void printContextInformation(PrintStream s){
+    	s.print("[");
+        if(this.getModuleDecl()!=null){
+    	    s.print("programLocation('" +this.getModuleDecl().getName()+"',"+ this.getLine( this.getStart())+","+this.getLine(this.getEnd())+")");
+    	}
+    	s.print("]");
+    }
+  /**
+   * @aspect SQL
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/Sql.jadd:56
+   */
+  public void collectErrors(SemanticErrorList c) {
+        super.collectErrors(c);
+        if (CompilerUtils.hasAnnotation(getAnnotations(), "SqlProc"))
+            c.add(new SemanticError(getAnnotations(), ErrorMessage.SQL_PROC_AT_INVALID_LOCATION, new String[0]));
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:213
+   */
+  public Stmt parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @aspect TypeChecker
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeChecker.jadd:524
+   */
+  public abstract void typeCheck(SemanticErrorList e);
+  /**
+   * @declaredat ASTNode:1
+   */
+  public Stmt() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+    setChild(new List(), 0);
+  }
+  /**
+   * @declaredat ASTNode:14
+   */
+  public Stmt(List<Annotation> p0) {
+    setChild(p0, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:20
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:26
+   */
+  public boolean mayHaveRewrite() {
+    return true;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:32
+   */
+  public void flushCache() {
+    super.flushCache();
+    getNodeAnnotations_visited = -1;
+    getContainedSqlExp_visited = -1;
+    getContainedSqlExp_computed = false;
+    getContainedSqlExp_value = null;
+    sqlStmtRewriteRequired_visited = -1;
+    sqlSqlStmtRewriteRequired_visited = -1;
+    getType_visited = -1;
+    lookupVarOrFieldName_String_boolean_visited = null;
+    getModel_visited = -1;
+    Stmt_getAACs_visited = -1;
+    Stmt_getAACs_computed = false;
+    Stmt_getAACs_value = null;
+        Stmt_getAACs_contributors = null;
+        collect_contributors_Stmt_getAACs = false;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:52
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+    Stmt_getAACs_visited = -1;
+    Stmt_getAACs_computed = false;
+    Stmt_getAACs_value = null;
+        Stmt_getAACs_contributors = null;
+        collect_contributors_Stmt_getAACs = false;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:63
+   */
+  public Stmt clone() throws CloneNotSupportedException {
+    Stmt node = (Stmt) super.clone();
+    node.getNodeAnnotations_visited = -1;
+    node.getContainedSqlExp_visited = -1;
+    node.getContainedSqlExp_computed = false;
+    node.getContainedSqlExp_value = null;
+    node.sqlStmtRewriteRequired_visited = -1;
+    node.sqlSqlStmtRewriteRequired_visited = -1;
+    node.getType_visited = -1;
+    node.lookupVarOrFieldName_String_boolean_visited = null;
+    node.getModel_visited = -1;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * Replaces the Annotation list.
+   * @param list The new list node to be used as the Annotation list.
+   * @apilevel high-level
+   */
+  public void setAnnotationList(List<Annotation> list) {
+    setChild(list, 0);
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * @return Number of children in the Annotation list.
+   * @apilevel high-level
+   */
+  public int getNumAnnotation() {
+    return getAnnotationList().getNumChild();
+  }
+  /**
+   * Retrieves the number of children in the Annotation list.
+   * Calling this method will not trigger rewrites.
+   * @return Number of children in the Annotation list.
+   * @apilevel low-level
+   */
+  public int getNumAnnotationNoTransform() {
+    return getAnnotationListNoTransform().getNumChildNoTransform();
+  }
+  /**
+   * Retrieves the element at index {@code i} in the Annotation list.
+   * @param i Index of the element to return.
+   * @return The element at position {@code i} in the Annotation list.
+   * @apilevel high-level
+   */
+  public Annotation getAnnotation(int i) {
+    return (Annotation) getAnnotationList().getChild(i);
+  }
+  /**
+   * Check whether the Annotation list has any children.
+   * @return {@code true} if it has at least one child, {@code false} otherwise.
+   * @apilevel high-level
+   */
+  public boolean hasAnnotation() {
+    return getAnnotationList().getNumChild() != 0;
+  }
+  /**
+   * Append an element to the Annotation list.
+   * @param node The element to append to the Annotation list.
+   * @apilevel high-level
+   */
+  public void addAnnotation(Annotation node) {
+    List<Annotation> list = (parent == null || state == null) ? getAnnotationListNoTransform() : getAnnotationList();
+    list.addChild(node);
+  }
+  /**
+   * @apilevel low-level
+   */
+  public void addAnnotationNoTransform(Annotation node) {
+    List<Annotation> list = getAnnotationListNoTransform();
+    list.addChild(node);
+  }
+  /**
+   * Replaces the Annotation list element at index {@code i} with the new node {@code node}.
+   * @param node The new node to replace the old list element.
+   * @param i The list index of the node to be replaced.
+   * @apilevel high-level
+   */
+  public void setAnnotation(Annotation node, int i) {
+    List<Annotation> list = getAnnotationList();
+    list.setChild(node, i);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotationList() {
+    List<Annotation> list = (List<Annotation>) getChild(0);
+    list.getNumChild();
+    return list;
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationListNoTransform() {
+    return (List<Annotation>) getChildNoTransform(0);
+  }
+  /**
+   * Retrieves the Annotation list.
+   * @return The node representing the Annotation list.
+   * @apilevel high-level
+   */
+  public List<Annotation> getAnnotations() {
+    return getAnnotationList();
+  }
+  /**
+   * Retrieves the Annotation list.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The node representing the Annotation list.
+   * @apilevel low-level
+   */
+  public List<Annotation> getAnnotationsNoTransform() {
+    return getAnnotationListNoTransform();
+  }
+  /**
+   * @aspect <NoAspect>
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:51
+   */
+    private boolean collect_contributors_Stmt_getAACs = false;
+  protected void collect_contributors_Stmt_getAACs() {
+    if(collect_contributors_Stmt_getAACs) return;
+    super.collect_contributors_Stmt_getAACs();
+    collect_contributors_Stmt_getAACs = true;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  protected int getNodeAnnotations_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlHelpers
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlHelpers.jadd:4
+   */
+  public List<Annotation> getNodeAnnotations() {
+    ASTNode$State state = state();
+    if (getNodeAnnotations_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getNodeAnnotations in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getNodeAnnotations_visited = state().boundariesCrossed;
+    try {  return getAnnotations();  }
+    finally {
+      getNodeAnnotations_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getContainedSqlExp_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean getContainedSqlExp_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected SqlExp getContainedSqlExp_value;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:9
+   */
+  public SqlExp getContainedSqlExp() {
+    if(getContainedSqlExp_computed) {
+      return getContainedSqlExp_value;
+    }
+    ASTNode$State state = state();
+    if (getContainedSqlExp_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getContainedSqlExp in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getContainedSqlExp_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    getContainedSqlExp_value = getContainedSqlExp_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      getContainedSqlExp_computed = true;
+    } else {
+    }
+
+    getContainedSqlExp_visited = -1;
+    return getContainedSqlExp_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private SqlExp getContainedSqlExp_compute() {  return null;  }
+  /**
+   * @apilevel internal
+   */
+  protected int sqlStmtRewriteRequired_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:629
+   */
+  public boolean sqlStmtRewriteRequired() {
+    ASTNode$State state = state();
+    if (sqlStmtRewriteRequired_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: sqlStmtRewriteRequired in class: org.jastadd.ast.AST.SynDecl");
+    }
+    sqlStmtRewriteRequired_visited = state().boundariesCrossed;
+    try {  return !(this instanceof SqlStmt || getParent() instanceof SqlStmt) &&
+    	   getContainedSqlExp() != null;  }
+    finally {
+      sqlStmtRewriteRequired_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int sqlSqlStmtRewriteRequired_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect SqlRewrites
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:637
+   */
+  public boolean sqlSqlStmtRewriteRequired() {
+    ASTNode$State state = state();
+    if (sqlSqlStmtRewriteRequired_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: sqlSqlStmtRewriteRequired in class: org.jastadd.ast.AST.SynDecl");
+    }
+    sqlSqlStmtRewriteRequired_visited = state().boundariesCrossed;
+    try {  return false;  }
+    finally {
+      sqlSqlStmtRewriteRequired_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:111
+   */
+  public Type getType() {
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    try {  return getModel().getUnitType();  }
+    finally {
+      getType_visited = -1;
+    }
+  }
+  /**
+   * @attribute inh
+   * @aspect VarResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/VarResolution.jrag:271
+   */
+  public VarOrFieldDecl lookupVarOrFieldName(String name, boolean fieldOnly) {
+    java.util.List _parameters = new java.util.ArrayList(2);
+    _parameters.add(name);
+    _parameters.add(Boolean.valueOf(fieldOnly));
+    if(lookupVarOrFieldName_String_boolean_visited == null) lookupVarOrFieldName_String_boolean_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookupVarOrFieldName_String_boolean_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookupVarOrFieldName in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookupVarOrFieldName_String_boolean_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    VarOrFieldDecl lookupVarOrFieldName_String_boolean_value = getParent().Define_VarOrFieldDecl_lookupVarOrFieldName(this, null, name, fieldOnly);
+
+    lookupVarOrFieldName_String_boolean_visited.remove(_parameters);
+    return lookupVarOrFieldName_String_boolean_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookupVarOrFieldName_String_boolean_visited;
+  /**
+   * @attribute inh
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:47
+   */
+  public Model getModel() {
+    ASTNode$State state = state();
+    if (getModel_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getModel in class: org.jastadd.ast.AST.InhDecl");
+    }
+    getModel_visited = state().boundariesCrossed;
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Model getModel_value = getParent().Define_Model_getModel(this, null);
+
+    getModel_visited = -1;
+    return getModel_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getModel_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    // Declared at @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:70
+    if (!(this instanceof Block) && Model.doAACrewrite
+              /* trigger DFS */ 
+              && getAACs().isEmpty() && !aacs.isEmpty()) {
+      state().duringGenerateCoreABS++;
+      ASTNode result = rewriteRule0();
+      state().duringGenerateCoreABS--;
+      return result;
+    }    // Declared at @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:633
+    if (sqlStmtRewriteRequired()) {
+      state().duringSqlRewrites++;
+      ASTNode result = rewriteRule1();
+      state().duringSqlRewrites--;
+      return result;
+    }    return super.rewriteTo();
+  }  /**
+   * @declaredat @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:70
+   * @apilevel internal
+   */  private RewriteBlock rewriteRule0() {
+    debugRewrite("Rewriting " + getClass().getName() + " using rule in /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd at line 70");
+{
+        RewriteBlock b = new RewriteBlock(new List(), new List());
+        // System.err.print("frob " + this);
+        for (AwaitAsyncCall aac : aacs) {
+            Access a = (Access)aac.getCallee().getType().lookupMethod(aac.getMethod()).getReturnType();
+            /* Rewriting is also triggered from the Eclipse editor, which AGAIN doesn't have the whole
+               view of the program and thus cannot resolve types. So just skip-if this is actually a
+               problem, a subsequent stage will like the type-checker will (hopefully) discover it. */
+            if (!a.getType().isUnknownType()) {
+              final TypeUse du = a.getType().toUse();
+              final String tmp = "tmp"+Integer.toString(aac.hashCode());
+              // TODO: The typechecker will assert that/if the name is free, but in freak chances it may not.
+              b.addStmt(new VarDeclStmt(new List(), new VarDecl(tmp,
+                   new ParametricDataTypeUse("Fut", new List(), new List().add(du)),
+                                                          new Opt(new AsyncCall(aac.getCallee(), aac.getMethod(), aac.getParamList()))
+                                                        )));
+              b.addStmt(new AwaitStmt(new List(), new ClaimGuard( new VarUse(tmp))));
+            }                                                 
+        }
+        aacs.clear(); // flush downstream rewrite info.
+        b.addStmt(this);
+        return b;
+      }  }
+  /**
+   * @declaredat @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag:633
+   * @apilevel internal
+   */  private SqlStmt rewriteRule1() {
+    debugRewrite("Rewriting " + getClass().getName() + " using rule in /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/sql/SqlRewrites.jrag at line 633");
+    return CompilerUtils.copyPosition(this, new SqlStmt(new List<Annotation>(), this));
+  }
+  /**
+   * @attribute coll
+   * @aspect GenerateCoreABS
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/backend/coreabs/GenerateCoreAbs.jadd:51
+   */
+  public Set<AwaitAsyncCall> getAACs() {
+    if(Stmt_getAACs_computed) {
+      return Stmt_getAACs_value;
+    }
+    ASTNode$State state = state();
+    if (Stmt_getAACs_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getAACs in class: org.jastadd.ast.AST.CollDecl");
+    }
+    Stmt_getAACs_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    Stmt_getAACs_value = getAACs_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      Stmt_getAACs_computed = true;
+    } else {
+    }
+
+    Stmt_getAACs_visited = -1;
+    return Stmt_getAACs_value;
+  }
+  java.util.Set Stmt_getAACs_contributors;
+
+  /**
+   * @apilevel internal
+   * @return the contributor set for getAACs
+   */
+  public java.util.Set Stmt_getAACs_contributors() {
+    if(Stmt_getAACs_contributors == null)
+      Stmt_getAACs_contributors  = new ASTNode$State.IdentityHashSet(4);
+    return Stmt_getAACs_contributors;
+  }
+
+  /**
+   * @apilevel internal
+   */
+  private Set<AwaitAsyncCall> getAACs_compute() {
+    ASTNode node = this;
+    while(node.getParent() != null && !(node instanceof Stmt)) {
+      node = node.getParent();
+    }
+    if(node == null) throw new RuntimeException("Trying to evaluate collection attribute in subtree not attached to main tree");
+    Stmt root = (Stmt) node;
+    root.collect_contributors_Stmt_getAACs();
+    Stmt_getAACs_value = new HashSet();
+    if(Stmt_getAACs_contributors != null)
+    for (java.util.Iterator iter = Stmt_getAACs_contributors.iterator(); iter.hasNext(); ) {
+      ASTNode contributor = (ASTNode) iter.next();
+      contributor.contributeTo_Stmt_Stmt_getAACs(Stmt_getAACs_value);
+    }
+    // TODO: disabled temporarily since collections may not be cached
+    //Stmt_getAACs_contributors = null;
+    return Stmt_getAACs_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int Stmt_getAACs_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean Stmt_getAACs_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected Set<AwaitAsyncCall> Stmt_getAACs_value;
+}

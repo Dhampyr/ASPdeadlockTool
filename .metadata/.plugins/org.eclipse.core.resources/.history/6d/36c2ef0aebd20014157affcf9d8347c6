@@ -1,0 +1,345 @@
+/* This file was generated with JastAdd2 (http://jastadd.org) version 2.1.4 */
+package abs.frontend.ast;
+
+import java.io.PrintStream;
+import beaver.Symbol;
+import java.io.*;
+import abs.frontend.ast.*;
+import abs.backend.erlang.*;
+import java.util.Iterator;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeInferrerExtension;
+import abs.frontend.typechecker.locationtypes.infer.LocationTypeVariable;
+import abs.frontend.typechecker.locationtypes.LocationType;
+import abs.backend.erlang.ErlUtil.Mask;
+import org.apache.commons.io.output.WriterOutputStream;
+import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import abs.backend.java.*;
+import abs.backend.java.codegeneration.*;
+import abs.backend.java.lib.runtime.*;
+import abs.backend.java.lib.expr.*;
+import abs.backend.java.lib.types.*;
+import abs.backend.java.codegeneration.dynamic.*;
+import abs.backend.java.codegeneration.JavaCode;
+import abs.backend.java.codegeneration.JavaCodeGenerationException;
+import java.util.Set;
+import java.util.TreeSet;
+import abs.backend.maude.MaudeCompiler;
+import abs.backend.maude.MaudeCompilerHelper;
+import java.io.PrintWriter;
+import abs.backend.prettyprint.*;
+import abs.backend.prolog.*;
+import static abs.backend.prolog.PrologBackend.fieldTransform;
+import static abs.backend.prolog.PrologBackend.initialToUpperCase;
+import static abs.backend.prolog.PrologBackend.varTransform;
+import static abs.backend.prolog.PrologBackend.strTransform;
+import static abs.backend.prolog.PrologBackend.quote;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.ArrayList;
+import abs.frontend.analyser.*;
+import abs.frontend.typechecker.*;
+import java.util.Collections;
+import java.util.Map;
+import abs.common.*;
+import abs.frontend.typechecker.Type;
+import abs.frontend.typechecker.DataTypeType;
+import abs.frontend.ast.InterfaceDecl;
+import java.util.HashMap;
+import abs.frontend.delta.*;
+import abs.frontend.parser.*;
+import abs.frontend.mtvl.ChocoSolver;
+import choco.Choco;
+import choco.kernel.model.constraints.Constraint;
+import choco.kernel.model.variables.integer.IntegerVariable;
+import choco.kernel.model.variables.integer.IntegerExpressionVariable;
+import abs.frontend.mtvl.Types;
+import abs.frontend.parser.ParserError;
+import java.util.*;
+import java.util.regex.*;
+import abs.frontend.tests.*;
+import abs.frontend.treecopy.ParseTreeCopyHelper;
+import abs.frontend.analyser.ErrorMessage;
+import abs.frontend.analyser.TypeError;
+import abs.frontend.typechecker.TypeCheckerHelper;
+import abs.frontend.typechecker.KindedName;
+import abs.frontend.typechecker.ResolvedName;
+import javax.annotation.CheckForNull;
+import abs.frontend.typechecker.KindedName.Kind;
+import java.util.Arrays;
+import abs.frontend.typechecker.ext.*;
+/**
+ * @ast node
+ * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/ast/ABS.ast:108
+ * @production TypedVarOrFieldDecl : {@link VarOrFieldDecl} ::= <span class="component">{@link Access}</span>;
+
+ */
+public abstract class TypedVarOrFieldDecl extends VarOrFieldDecl implements Cloneable {
+  /**
+   * @aspect Annotations
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/analyser/Annotations.jrag:3
+   */
+  public abstract List<Annotation> getAnnotations();
+  /**
+   * @aspect DumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/DumpTree.jadd:17
+   */
+  public void dumpTree(String indent, java.io.PrintStream pStream) {
+		pStream.println(indent + this.toString() + "\t\t" +  this.getName() + " : " 
+						+  (this.getAccess()));
+		String childIndent = indent + "  ";
+		for(int i = 0; i < getNumChild(); i++)
+			getChildNoTransform(i).dumpTree(childIndent, pStream);
+	}
+  /**
+   * @aspect MyDumpTree
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/tests/MyDumpTree.jadd:96
+   */
+  protected void printInfo(PrintStream stream)
+    {
+        stream.print(this.getName() + " : " + (this.getAccess()));
+    }
+  /**
+   * @aspect ParseTreeCopy
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/treecopy/ParseTreeCopy.jadd:222
+   */
+  public TypedVarOrFieldDecl parseTreeCopy() { return ParseTreeCopyHelper.parseTreeCopy(this); }
+  /**
+   * @declaredat ASTNode:1
+   */
+  public TypedVarOrFieldDecl() {
+    super();
+  }
+  /**
+   * Initializes the child array to the correct size.
+   * Initializes List and Opt nta children.
+   * @apilevel internal
+   * @ast method
+   * @declaredat ASTNode:10
+   */
+  public void init$Children() {
+    children = new ASTNode[1];
+  }
+  /**
+   * @declaredat ASTNode:13
+   */
+  public TypedVarOrFieldDecl(String p0, Access p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @declaredat ASTNode:17
+   */
+  public TypedVarOrFieldDecl(beaver.Symbol p0, Access p1) {
+    setName(p0);
+    setChild(p1, 0);
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:24
+   */
+  protected int numChildren() {
+    return 1;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:30
+   */
+  public boolean mayHaveRewrite() {
+    return false;
+  }
+  /**
+   * @apilevel low-level
+   * @declaredat ASTNode:36
+   */
+  public void flushCache() {
+    super.flushCache();
+    getType_visited = -1;
+    isFinal_visited = -1;
+    isFinal_computed = false;
+    lookup_KindedName_visited = null;
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:46
+   */
+  public void flushCollectionCache() {
+    super.flushCollectionCache();
+  }
+  /**
+   * @apilevel internal
+   * @declaredat ASTNode:52
+   */
+  public TypedVarOrFieldDecl clone() throws CloneNotSupportedException {
+    TypedVarOrFieldDecl node = (TypedVarOrFieldDecl) super.clone();
+    node.getType_visited = -1;
+    node.isFinal_visited = -1;
+    node.isFinal_computed = false;
+    node.lookup_KindedName_visited = null;
+    node.in$Circle(false);
+    node.is$Final(false);
+    return node;
+  }
+  /**
+   * Replaces the lexeme Name.
+   * @param value The new value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public void setName(String value) {
+    tokenString_Name = value;
+  }
+  /**
+   * JastAdd-internal setter for lexeme Name using the Beaver parser.
+   * @param symbol Symbol containing the new value for the lexeme Name
+   * @apilevel internal
+   */
+  public void setName(beaver.Symbol symbol) {
+    if(symbol.value != null && !(symbol.value instanceof String))
+    throw new UnsupportedOperationException("setName is only valid for String lexemes");
+    tokenString_Name = (String)symbol.value;
+    Namestart = symbol.getStart();
+    Nameend = symbol.getEnd();
+  }
+  /**
+   * Retrieves the value for the lexeme Name.
+   * @return The value for the lexeme Name.
+   * @apilevel high-level
+   */
+  public String getName() {
+    return tokenString_Name != null ? tokenString_Name : "";
+  }
+  /**
+   * Replaces the Access child.
+   * @param node The new node to replace the Access child.
+   * @apilevel high-level
+   */
+  public void setAccess(Access node) {
+    setChild(node, 0);
+  }
+  /**
+   * Retrieves the Access child.
+   * @return The current node used as the Access child.
+   * @apilevel high-level
+   */
+  public Access getAccess() {
+    return (Access) getChild(0);
+  }
+  /**
+   * Retrieves the Access child.
+   * <p><em>This method does not invoke AST transformations.</em></p>
+   * @return The current node used as the Access child.
+   * @apilevel low-level
+   */
+  public Access getAccessNoTransform() {
+    return (Access) getChildNoTransform(0);
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int getType_visited = -1;
+  /**
+   * @attribute syn
+   * @aspect Typing
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/Typing.jrag:100
+   */
+  public Type getType() {
+    ASTNode$State state = state();
+    if (getType_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: getType in class: org.jastadd.ast.AST.SynDecl");
+    }
+    getType_visited = state().boundariesCrossed;
+    try {  return getAccess().getType();  }
+    finally {
+      getType_visited = -1;
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  protected int isFinal_visited = -1;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isFinal_computed = false;
+  /**
+   * @apilevel internal
+   */
+  protected boolean isFinal_value;
+  /**
+   * @attribute syn
+   * @aspect FinalAnnotation
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/ext/FinalAnnotation.jrag:3
+   */
+  public boolean isFinal() {
+    if(isFinal_computed) {
+      return isFinal_value;
+    }
+    ASTNode$State state = state();
+    if (isFinal_visited == state().boundariesCrossed) {
+      throw new RuntimeException("Circular definition of attr: isFinal in class: org.jastadd.ast.AST.SynDecl");
+    }
+    isFinal_visited = state().boundariesCrossed;
+    int num = state.boundariesCrossed;
+    boolean isFinal = this.is$Final();
+    isFinal_value = isFinal_compute();
+    if(isFinal && num == state().boundariesCrossed) {
+      isFinal_computed = true;
+    } else {
+    }
+
+    isFinal_visited = -1;
+    return isFinal_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  private boolean isFinal_compute() {
+          for (Annotation an : getAnnotations()) {
+              if (an.getType().getQualifiedName().equals("ABS.StdLib.FinalAnnotation")) {
+                  return true;
+              }
+          }
+          return false;
+      }
+  /**
+   * @attribute inh
+   * @aspect TypeResolution
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:266
+   */
+  public Decl lookup(KindedName name) {
+    Object _parameters = name;
+    if(lookup_KindedName_visited == null) lookup_KindedName_visited = new java.util.HashMap(4);
+    ASTNode$State state = state();
+    if (Integer.valueOf(state().boundariesCrossed).equals(lookup_KindedName_visited.get(_parameters))) {
+      throw new RuntimeException("Circular definition of attr: lookup in class: org.jastadd.ast.AST.InhDecl");
+    }
+    lookup_KindedName_visited.put(_parameters, Integer.valueOf(state().boundariesCrossed));
+        if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+    Decl lookup_KindedName_value = getParent().Define_Decl_lookup(this, null, name);
+
+    lookup_KindedName_visited.remove(_parameters);
+    return lookup_KindedName_value;
+  }
+  /**
+   * @apilevel internal
+   */
+  protected java.util.Map lookup_KindedName_visited;
+  /**
+   * @declaredat /Users/vmastand/Documents/JavaProject/ABS/abstools/frontend/src/abs/frontend/typechecker/TypeResolution.jrag:268
+   * @apilevel internal
+   */
+  public Decl Define_Decl_lookup(ASTNode caller, ASTNode child, KindedName name) {
+    if (caller == getAccessNoTransform()) {
+      return lookup(name);
+    }
+    else {
+    if(getParent() == null) throw new RuntimeException("Trying to evaluate attribute in subtree not attached to main tree");
+      return getParent().Define_Decl_lookup(this, caller, name);
+    }
+  }
+  /**
+   * @apilevel internal
+   */
+  public ASTNode rewriteTo() {    return super.rewriteTo();
+  }}
