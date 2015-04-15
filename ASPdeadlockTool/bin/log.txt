@@ -54,4 +54,4 @@ checking with "ABS.Scheduler.Runtime.run"
 
 Possible Deadlock in Main:    false
 Current Version:              Fix Point 2.0
-Analysis Duration:            67ms
+Analysis Duration:            57ms

@@ -31,11 +31,18 @@ import com.gzoumix.semisolver.term.TermStructured;
 public class RecordPresent extends GenericStructuredTerm implements IRecord {
 
   public static String name = "RecordPresent";
+  public static boolean isActive;
 
   /* Constructors */
   public RecordPresent(List<Term> l) { super(name, l); }
   public RecordPresent(GroupName a, List<RecordField> fields) {
+	    super(name, new LinkedList<Term>());
+	    subterms.add(a);
+	    subterms.addAll(fields);
+	  }
+  public RecordPresent(boolean isActive,GroupName a, List<RecordField> fields) {
     super(name, new LinkedList<Term>());
+    this.isActive = isActive;
     subterms.add(a);
     subterms.addAll(fields);
   }
@@ -67,6 +74,9 @@ public class RecordPresent extends GenericStructuredTerm implements IRecord {
     }
     return res + "]";
   }
+  
+  public boolean getIsActive()
+  {return isActive;}
 
 }
 

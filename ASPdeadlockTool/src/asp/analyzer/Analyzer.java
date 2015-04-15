@@ -23,6 +23,7 @@ public class Analyzer {
 	public static final String logPath = "src/log.txt";
 	
 	public static void main(String[] args) throws Exception {
+		PrintStream stdout = System.out;
 		InputStream is = System.in;
 		is = new FileInputStream(args[0]);
 		
@@ -41,8 +42,9 @@ public class Analyzer {
 		System.setOut(new PrintStream(trad));
 		Translator.translate(parser,tree);
 		
-		FileOutputStream log = new FileOutputStream(logPath); 
-	    System.setOut(new PrintStream(log));
+		//FileOutputStream log = new FileOutputStream(logPath); 
+	    //System.setOut(new PrintStream(log));
+		System.setOut(stdout);
 		Tester.main(tradPath);
 	}
 }

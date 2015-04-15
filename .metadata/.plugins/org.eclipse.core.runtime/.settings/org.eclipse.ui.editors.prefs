@@ -1,2 +1,5 @@
 eclipse.preferences.version=1
+errorIndicationColor=249,0,84
 overviewRuler_migration=migrated_3.1
+spellingEnabled=false
+spellingEngine=org.eclipse.jdt.internal.ui.text.spelling.DefaultSpellingEngine

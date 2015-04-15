@@ -8,8 +8,7 @@ class CpxSched (CpxSched u) {
      else g = u.m2(y);
      if (g == 2) {h = y.m2(u); h = y.m2(u);} 
      else g = u.m2(y);
-     return g;
-  }
+     return g;}
   
   Int m2(CpxSched z) {
      Int h = 0;
@@ -22,11 +21,9 @@ class CpxSched (CpxSched u) {
      else {g = y.m2(y); g = y.m2(y);}
      h = z.m3();
      w = h + 1;
-     return w;
-   }
+     return w;}
    
    Int m3(){ return 10; }
-
 }
 
 { CpxSched x; 
