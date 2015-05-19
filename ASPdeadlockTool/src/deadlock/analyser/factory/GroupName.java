@@ -36,7 +36,6 @@ public GroupName(Variable v, boolean isFresh){
 
 public GroupName(Variable v) { super(v); }
 
- 
 
 }
 

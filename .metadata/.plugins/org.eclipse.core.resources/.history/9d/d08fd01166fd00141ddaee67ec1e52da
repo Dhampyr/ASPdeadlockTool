@@ -1,0 +1,21 @@
+/**
+ * Copyright (c) 2009-2011, The HATS Consortium. All rights reserved. 
+ * This file is licensed under the terms of the Modified BSD License.
+ */
+package deadlock.analyser.factory;
+
+import java.util.List;
+
+import com.gzoumix.semisolver.term.Term;
+
+public class ObjKindAct extends GenericStructuredTerm {
+
+    public static String name = "ObjKindAct";
+    
+    
+    public ObjKindAct(String name, List<Term> l) {
+        super(name, l);
+        // TODO Auto-generated constructor stub
+    }
+
+}

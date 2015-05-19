@@ -1,0 +1,17 @@
+package deadlock.analyser.factory;
+
+import java.util.List;
+
+import com.gzoumix.semisolver.term.Term;
+
+public class ObjKindAct extends GenericStructuredTerm{
+
+	public static String name = "KindAct";
+	
+	  public ObjKindAct(String name, List<Term> l) { super(name, l); }
+	  
+	  public ObjKindAct()
+
+
+
+}

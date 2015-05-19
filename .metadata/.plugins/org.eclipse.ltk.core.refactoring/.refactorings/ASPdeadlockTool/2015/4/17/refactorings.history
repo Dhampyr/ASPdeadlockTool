@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;deadlock.analyser.factory.RecordConstraint&apos; to &apos;RecordType&apos;&#x0A;- Original project: &apos;ASPdeadlockTool&apos;&#x0A;- Original element: &apos;deadlock.analyser.factory.RecordConstraint&apos;&#x0A;- Renamed element: &apos;deadlock.analyser.factory.RecordType&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;RecordConstraint&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;deadlock.analyser.factory{RecordConstraint.java[RecordConstraint" matchStrategy="1" name="RecordType" qualified="false" references="true" similarDeclarations="false" stamp="1429538831680" textual="false" version="1.0"/>
+</session>

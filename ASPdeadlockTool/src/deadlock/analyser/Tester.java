@@ -27,6 +27,7 @@ public class Tester extends Main {
             new Tester().compile(args);
         } catch (Exception e) {
             System.err.println("An error occurred during compilation: " + e.getMessage());
+            e.printStackTrace();
 
             if (Arrays.asList(args).contains("-debug")) {
                 e.printStackTrace();

@@ -21,4 +21,6 @@
 <fullyQualifiedTypeName name="deadlock.analyser.Analyser"/>
 <fullyQualifiedTypeName name="autodeploy.Tester"/>
 <fullyQualifiedTypeName name="deadlock.analyser.Tester"/>
+<fullyQualifiedTypeName name="java.util.Set"/>
+<fullyQualifiedTypeName name="com.gzoumix.semisolver.term.Term"/>
 </qualifiedTypeNameHistroy>

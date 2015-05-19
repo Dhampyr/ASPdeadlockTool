@@ -34,14 +34,9 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     RecordField res = new RecordField(name, r);
     return res;
   }
-  
-  public RecordPresent newRecordPresent(GroupName a, List<RecordField> fields){
-	    RecordPresent res = new RecordPresent(a, fields);
-	    return res;
-	  }
-  
-  public RecordPresent newRecordPresent(boolean isActive,GroupName a, List<RecordField> fields){
-    RecordPresent res = new RecordPresent(isActive,a, fields);
+
+  public RecordPresent newRecordPresent(ObjKind t, GroupName a, List<RecordField> fields){
+    RecordPresent res = new RecordPresent(t, a, fields);
     return res;
   }
 

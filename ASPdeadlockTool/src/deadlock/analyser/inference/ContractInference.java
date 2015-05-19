@@ -18,8 +18,11 @@ import java.util.Map;
 import java.util.Set;
 
 import choco.kernel.common.util.tools.ArrayUtils;
+
 import com.gzoumix.semisolver.constraint.Constraint;
 import com.gzoumix.semisolver.term.*;
+import com.gzoumix.semisolver.term.Variable;
+
 import deadlock.analyser.AnalyserLog;
 import deadlock.analyser.factory.*;
 import deadlock.analyser.generation.*;
@@ -69,7 +72,8 @@ public class ContractInference {
     for (FieldDecl f : cd.getFields()) {
       l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
     }
-    return _df.newRecordPresent(a, l);
+    ObjKindVar t = new ObjKindVar(new Variable());
+    return _df.newRecordPresent(t, a, l);
   }
      
   private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {
@@ -624,49 +628,49 @@ public class ContractInference {
     return new ResultInferenceStmt(contract, c, _env);
   }
 
-//  public ResultInferenceStmt typeInference(AwaitStmt astmt) {
-//    _log.logDebug("Contract Inference for the AwaitStmt");
-//    _log.beginIndent();
-//
-//    Contract contract;
-//    Constraint c = _df.newConstraint();
-//    GroupName aprime = _df.newGroupName();
-//
-//    // 1. First look if there is some annotation defined
-//    Iterator<Annotation> it = astmt.getAnnotations().iterator();
-//    if (it.hasNext()) {
-//      PureExp dep = it.next().getValue();
-//      ResultInferencePureExp resAnn = typeInferenceAsPure(dep);
-//      contract = _df.newContractAwait(astmt, aprime, _a);
-//
-//      _log.endIndent();
-//      _log.logDebug("AwaitStmt Annotation Finished");
-//      c.addEquation(new ASTNodeInformation(astmt), (IRecord)resAnn.getVariableType(), createInstance(dep.getType(), _cd, aprime));
-//      return new ResultInferenceStmt(contract, c, _env);
-//    } else {
-//      ResultInferencePureExp resGuard = typeInference(astmt.getGuard());
-//      _log.endIndent();
-//      _log.logDebug("AwaitStmt Sub-Expression Finished");
-//            
-//      if(resGuard.getVariableType() instanceof TypingEnvironmentVariableTypeFuture) {
-//        ITypingEnvironmentFutureType z = _env.getFuture((TypingEnvironmentVariableTypeFuture)resGuard.getVariableType());
-//        if(z instanceof TypingEnvironmentFutureTypeUntick) {
-//          _env.putFuture((TypingEnvironmentVariableTypeFuture)resGuard.getVariableType(), new TypingEnvironmentFutureTypeTick(z.getRecord()));
-//          c.addEquation(new ASTNodeInformation(astmt), z.getRecord(), _df.newRecordFuture(aprime, _df.newRecordVariable()));
-//          contract = _df.newContract(_df.newContractElementParallel(_df.newContractInvkA(astmt, ((TypingEnvironmentFutureTypeUntick) z).getContract(), new ContractElementAwait(astmt, _a, aprime)), _env.unsync(astmt)));
-//        } else {
-//          c.addEquation(new ASTNodeInformation(astmt), z.getRecord(), _df.newRecordFuture(aprime, _df.newRecordVariable()));
-//          contract = _df.newContractEmpty();
-//        }
-//      } else {
-//        // the guard in the await is not a future.
-//        // maybe a boolean or something else, in any case, we cannot manage it for now
-//        _log.logWarning("WARNING: the guard of the await statement is not a future. Assumed an empty contract");
-//        contract = _df.newContractEmpty();
-//      }
-//      return new ResultInferenceStmt(contract, c, _env);
-//    }
-//  }
+  public ResultInferenceStmt typeInference(AwaitStmt astmt) {
+    _log.logDebug("Contract Inference for the AwaitStmt");
+    _log.beginIndent();
+
+    Contract contract;
+    Constraint c = _df.newConstraint();
+    GroupName aprime = _df.newGroupName();
+
+    // 1. First look if there is some annotation defined
+    Iterator<Annotation> it = astmt.getAnnotations().iterator();
+    if (it.hasNext()) {
+      PureExp dep = it.next().getValue();
+      ResultInferencePureExp resAnn = typeInferenceAsPure(dep);
+      contract = _df.newContractAwait(astmt, aprime, _a);
+
+      _log.endIndent();
+      _log.logDebug("AwaitStmt Annotation Finished");
+      c.addEquation(new ASTNodeInformation(astmt), (IRecord)resAnn.getVariableType(), createInstance(dep.getType(), _cd, aprime));
+      return new ResultInferenceStmt(contract, c, _env);
+    } else {
+      ResultInferencePureExp resGuard = typeInference(astmt.getGuard());
+      _log.endIndent();
+      _log.logDebug("AwaitStmt Sub-Expression Finished");
+            
+      if(resGuard.getVariableType() instanceof TypingEnvironmentVariableTypeFuture) {
+        ITypingEnvironmentFutureType z = _env.getFuture((TypingEnvironmentVariableTypeFuture)resGuard.getVariableType());
+        if(z instanceof TypingEnvironmentFutureTypeUntick) {
+          _env.putFuture((TypingEnvironmentVariableTypeFuture)resGuard.getVariableType(), new TypingEnvironmentFutureTypeTick(z.getRecord()));
+          c.addEquation(new ASTNodeInformation(astmt), z.getRecord(), _df.newRecordFuture(aprime, _df.newRecordVariable()));
+          contract = _df.newContract(_df.newContractElementParallel(_df.newContractInvkA(astmt, ((TypingEnvironmentFutureTypeUntick) z).getContract(), new ContractElementAwait(astmt, _a, aprime)), _env.unsync(astmt)));
+        } else {
+          c.addEquation(new ASTNodeInformation(astmt), z.getRecord(), _df.newRecordFuture(aprime, _df.newRecordVariable()));
+          contract = _df.newContractEmpty();
+        }
+      } else {
+        // the guard in the await is not a future.
+        // maybe a boolean or something else, in any case, we cannot manage it for now
+        _log.logWarning("WARNING: the guard of the await statement is not a future. Assumed an empty contract");
+        contract = _df.newContractEmpty();
+      }
+      return new ResultInferenceStmt(contract, c, _env);
+    }
+  }
 
   public ResultInferenceStmt typeInference(SkipStmt skip) {
     return new ResultInferenceStmt( _df.newContractEmpty(), _df.newConstraint(), _env);
@@ -1090,16 +1094,16 @@ public class ContractInference {
     }
     // 1.3. Group Name
     GroupName aprime; // depends if the new object is in the same cog or not
-    /********/
-    boolean  isActive;
-    /*******/
-    if (!newExp.hasLocal()) { 
-    	isActive = true;
-    	aprime = _df.newGroupName(); }
-    else { 
-    	   isActive = false;
-    	   aprime = _a; }
-    IRecord r = _df.newRecordPresent(isActive,aprime, fields);
+    ObjKind t;
+    if (!newExp.hasLocal()) 
+    { aprime = _df.newGroupName();
+      t = new ObjKindAct();    
+    }
+    else 
+    { aprime = _a;
+      t = new ObjKindPas();
+    }
+    IRecord r = _df.newRecordPresent(t, aprime, fields);
 
     // 1.4. Calling the init of r
     MethodInterface miinit = _df.newMethodInterface(r, new LinkedList<IRecord>(), _df.newRecordVariable());

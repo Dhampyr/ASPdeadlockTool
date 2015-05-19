@@ -45,6 +45,6 @@ public class Analyzer {
 		//FileOutputStream log = new FileOutputStream(logPath); 
 	    //System.setOut(new PrintStream(log));
 		System.setOut(stdout);
-		Tester.main(tradPath);
+		Tester.main(tradPath,"-v");
 	}
 }
