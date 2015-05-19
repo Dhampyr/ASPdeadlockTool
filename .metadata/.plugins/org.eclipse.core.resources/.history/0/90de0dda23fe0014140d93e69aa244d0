@@ -10,10 +10,4 @@ public class ObjKindVar extends TermVariable implements ObjKind{
 
 	public ObjKindVar(Variable v) { super(v); }
 	
-	public String toString(){
-		String kind = "t.";
-		return kind;
-	}
-	
-	
 }

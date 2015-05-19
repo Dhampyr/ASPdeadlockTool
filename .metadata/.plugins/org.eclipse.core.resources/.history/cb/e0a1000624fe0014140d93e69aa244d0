@@ -58,8 +58,7 @@ public class RecordPresent extends GenericStructuredTerm implements IRecord {
   /* toString */
   public String toString(){
     Iterator<Term> i = subterms.iterator();
-    String res = (i.next().toString());
-    res = res + (i.next().toString()) + "[";
+    String res = (i.next().toString()) + "[";
     if(i.hasNext()) res = res + " ";
     while (i.hasNext()) {
       res = res + (i.next().toString());
