@@ -73,7 +73,8 @@ public class ContractInference {
       l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
     }
     ObjKindVar t = new ObjKindVar(new Variable());
-    return _df.newRecordPresent(t, a, l);
+//  return _df.newRecordPresent(t, a, l);
+    return _df.newRecordPresent(a, l);
   }
      
   private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {

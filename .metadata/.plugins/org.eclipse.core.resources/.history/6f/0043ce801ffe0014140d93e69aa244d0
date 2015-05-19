@@ -48,7 +48,8 @@ public class RecordPresent extends GenericStructuredTerm implements IRecord {
   
   public IRecord getField(String name) {
     IRecord res;
-    for(Term sub : subterms.subList(2, subterms.size())) {
+//    for(Term sub : subterms.subList(2, subterms.size())) {
+    for(Term sub : subterms.subList(1, subterms.size())) {
       res = ((RecordField)sub).getField(name);
       if(res != null) return res;
     }

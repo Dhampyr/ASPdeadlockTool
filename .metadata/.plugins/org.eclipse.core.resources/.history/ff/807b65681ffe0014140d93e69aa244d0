@@ -73,7 +73,8 @@ public class ContractInference {
       l.add(_df.newRecordField(f.getName(), _df.newRecordVariable())); // init expressions are managed in the analysis of the init block.
     }
     ObjKindVar t = new ObjKindVar(new Variable());
-    return _df.newRecordPresent(t, a, l);
+//  return _df.newRecordPresent(t, a, l);
+    return _df.newRecordPresent(a, l);
   }
      
   private RecordPresent createInstance(Type t, ClassDecl clthis, GroupName a) {
@@ -1097,13 +1098,14 @@ public class ContractInference {
     ObjKind t;
     if (!newExp.hasLocal()) 
     { aprime = _df.newGroupName();
-      t = new ObjKindAct();    
+      // t = new ObjKindAct();    
     }
     else 
     { aprime = _a;
-      t = new ObjKindPas();
+      // t = new ObjKindPas();
     }
-    IRecord r = _df.newRecordPresent(t, aprime, fields);
+//  IRecord r = _df.newRecordPresent(t, aprime, fields);
+    IRecord r = _df.newRecordPresent(aprime, fields);
 
     // 1.4. Calling the init of r
     MethodInterface miinit = _df.newMethodInterface(r, new LinkedList<IRecord>(), _df.newRecordVariable());

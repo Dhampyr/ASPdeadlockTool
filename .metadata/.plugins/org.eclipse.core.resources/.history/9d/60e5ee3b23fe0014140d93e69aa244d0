@@ -1,6 +1,5 @@
 package deadlock.analyser.factory;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.gzoumix.semisolver.term.Term;
@@ -10,7 +9,7 @@ public class ObjKindPas extends GenericStructuredTerm implements ObjKind {
 	public static String name = "ObjKindPas";
 	
 	public ObjKindPas() {
-		super(name, new LinkedList<Term>());
+		super(name, null);
 		// TODO Auto-generated constructor stub
 	}
 	
