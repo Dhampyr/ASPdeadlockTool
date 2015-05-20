@@ -162,8 +162,6 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
       else if(c.startsWith(RecordField.prefix)) { return new RecordField(c, l); }
       else if(c.equals(RecordFuture.name)) { return new RecordFuture(l); }
       else if(c.equals(RecordPresent.name)) { return new RecordPresent(l); }
-      else if(c.equals(ObjKindAct.name)) { return new ObjKindAct(); }
-      else if(c.equals(ObjKindPas.name)) { return new ObjKindPas(); }
       else {return super.newTerm(c, l); } // should never occur
   }
 

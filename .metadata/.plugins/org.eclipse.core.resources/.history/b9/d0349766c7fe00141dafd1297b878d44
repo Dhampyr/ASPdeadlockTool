@@ -14,15 +14,9 @@ public class ObjKindAct extends GenericStructuredTerm implements ObjKind {
 		// TODO Auto-generated constructor stub
 	}
 	
-//	public String toString(){
-//		String kind = "a.";
-//		return kind;
-//	}
-	
-	
-	@Override
-	public String toString() {
+	public String toString(){
 		String kind = "a.";
 		return kind;
 	}
+
 }

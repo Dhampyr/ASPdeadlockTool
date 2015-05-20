@@ -7,7 +7,7 @@ import com.gzoumix.semisolver.term.Term;
 
 public class ObjKindPas extends GenericStructuredTerm implements ObjKind {
 
-	public static String name = "ObjKindPas";
+	public static String name = "p";
 	
 	public ObjKindPas() {
 		super(name, new LinkedList<Term>());

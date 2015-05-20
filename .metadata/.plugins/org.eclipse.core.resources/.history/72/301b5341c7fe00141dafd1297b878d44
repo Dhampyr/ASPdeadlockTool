@@ -14,13 +14,7 @@ public class ObjKindPas extends GenericStructuredTerm implements ObjKind {
 		// TODO Auto-generated constructor stub
 	}
 	
-//	public String toString(){
-//		String kind = "p.";
-//		return kind;
-//	}
-	
-	@Override
-	public String toString() {
+	public String toString(){
 		String kind = "p.";
 		return kind;
 	}
