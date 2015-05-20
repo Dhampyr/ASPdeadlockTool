@@ -8,7 +8,7 @@ import com.gzoumix.semisolver.term.Variable;
 
 public class ObjKindVar extends TermVariable implements ObjKind{
 	
-//	public static String name = "ObjKindVar";
+	public static String name = "ObjKindVar";
 	
 	public ObjKindVar(Variable v) { super(v); }
 	

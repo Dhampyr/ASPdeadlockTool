@@ -64,11 +64,7 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     RecordVariable res = new RecordVariable(new Variable());
     return res;
   }
-  
-  public ObjKindVar newObjKindVar() {
-	    ObjKindVar res = new ObjKindVar(new Variable());
-	    return res;
-	  }
+
   
   
   /* 2. CONTRACTS */
@@ -146,7 +142,6 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
   public TermVariable freshTermVariableFromTerm(Term t) {
     if(t instanceof GroupName) { return newGroupName(); }
     else if(t instanceof IRecord) { return newRecordVariable(); }   
-    else if(t instanceof ObjKind) { return newObjKindVar(); }  
     else{ System.out.println("WHAT THE HELL !!!??? ->>" + t.getClass().toString()); return super.freshTermVariableFromTerm(t); }
   }
 
@@ -169,7 +164,8 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
       else if(c.equals(RecordPresent.name)) { return new RecordPresent(l); }
       else if(c.equals(ObjKindAct.name)) { return new ObjKindAct(); }
       else if(c.equals(ObjKindPas.name)) { return new ObjKindPas(); }
-      else {return super.newTerm(c, l); } // should never occur
+//      else if(c.equals(ObjKindVar.name)) { return new ObjKindVar((Variable) l.get(0)); }
+      else {System.out.println("WHAT THE F*** HELL !!!???" + c); return super.newTerm(c, l); } // should never occur
   }
 
   public Constraint newConstraint() {

@@ -22,7 +22,7 @@ public class ObjKindAct extends GenericStructuredTerm implements ObjKind {
 	
 	@Override
 	public String toString() {
-		String kind = "a.";
+		String kind = "a";
 		return kind;
 	}
 }

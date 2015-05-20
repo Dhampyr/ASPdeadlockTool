@@ -64,11 +64,7 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     RecordVariable res = new RecordVariable(new Variable());
     return res;
   }
-  
-  public ObjKindVar newObjKindVar() {
-	    ObjKindVar res = new ObjKindVar(new Variable());
-	    return res;
-	  }
+
   
   
   /* 2. CONTRACTS */
@@ -146,8 +142,7 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
   public TermVariable freshTermVariableFromTerm(Term t) {
     if(t instanceof GroupName) { return newGroupName(); }
     else if(t instanceof IRecord) { return newRecordVariable(); }   
-    else if(t instanceof ObjKind) { return newObjKindVar(); }  
-    else{ System.out.println("WHAT THE HELL !!!??? ->>" + t.getClass().toString()); return super.freshTermVariableFromTerm(t); }
+    else{ System.out.println("WHAT THE HELL !!!???"); return super.freshTermVariableFromTerm(t); }
   }
 
   public Term newTerm(String c, List<Term> l) {
