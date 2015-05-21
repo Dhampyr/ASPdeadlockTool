@@ -32,15 +32,20 @@ public class RecordFuture extends GenericStructuredTerm implements IRecord {
 
   /* Constructors */
   public RecordFuture(List<Term> l) { super(name, l); }
-  public  RecordFuture(GroupName a, IRecord r) {
-    super(name, new ArrayList<Term>(2));
+  public  RecordFuture(ObjKind t,GroupName a, RunningMethod m,IRecord r) {
+    super(name, new ArrayList<Term>(4));
+    subterms.add(t);
     subterms.add(a);
+    subterms.add(m);
     subterms.add(r);
   }
 
   /* Basic Get */
-  public GroupName getDepends() { return (GroupName)this.getSubTerms().get(0); }
-  public IRecord getRecord() { return (IRecord)this.getSubTerms().get(1); }
+  public ObjKind getObjKind() { return (ObjKind)this.getSubTerms().get(0); }
+  public GroupName getDepends() { return (GroupName)this.getSubTerms().get(1); }
+  public RunningMethod getMethod() { return (RunningMethod)this.getSubTerms().get(2); }
+  public IRecord getRecord() { return (IRecord)this.getSubTerms().get(3); }
+  
 
   /* toString */
   public String toString() {

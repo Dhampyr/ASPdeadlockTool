@@ -40,8 +40,8 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     return res;
   }
 
-  public RecordFuture newRecordFuture(GroupName a, IRecord r) {
-    RecordFuture res = new RecordFuture(a, r);
+  public RecordFuture newRecordFuture(ObjKind t, GroupName a, RunningMethod m, IRecord r) {
+    RecordFuture res = new RecordFuture(t, a, m, r);
     return res;
   }
 
@@ -70,6 +70,11 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
 	    return res;
 	  }
   
+  public RunningMethod newMethod(String name) {
+	  RunningMethod res = new RunningMethod(name);
+	  return res;
+	  }
+  
   
   /* 2. CONTRACTS */
 
@@ -87,9 +92,9 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     return new Contract(l);
   }
 
-  public Contract newContractGet(ASTNode n, GroupName a, GroupName b) {
+  public Contract newContractGet(ASTNode n, GroupName a, RunningMethod metOfA, GroupName b, RunningMethod metOfB) {
     List<Term> l = new LinkedList<Term>();
-    l.add(new ContractElementGet(n, a, b));
+    l.add(new ContractElementGet(n, a, metOfA, b, metOfB));
     return new Contract(l);
   }
 
@@ -111,9 +116,9 @@ public class Factory extends com.gzoumix.semisolver.factory.Factory {
     return new Contract(l);
   }
 
-  public Contract newContractInvkG(ASTNode n, ContractElementInvk i, ContractElementGet g) {
+  public Contract newContractInvkG(ASTNode n, ContractConst cc ,ContractElementInvk i, ContractElementGet g) {
     List<Term> l = new LinkedList<Term>();
-    l.add(new ContractElementInvkG(n, i, g));
+    l.add(new ContractElementInvkG(n, cc, i, g));
     return new Contract(l);
   }
 

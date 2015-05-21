@@ -32,23 +32,24 @@ import com.gzoumix.semisolver.term.Term;
 public class ContractElementInvkG extends ContractElement {
 
   public static String name = "ContractInvkG";
-
-
+  
   /* Constructors */
   public ContractElementInvkG(List<Term> l) { super(name, l); }
-  public ContractElementInvkG(ASTNode pos, ContractElementInvk ci, ContractElementGet ca) {
+  public ContractElementInvkG(ASTNode pos, ContractConst cc, ContractElementInvk ci, ContractElementGet ca) {
     super(pos, name, new ArrayList<Term>(2));
+    subterms.add(cc);
     subterms.add(ci);
     subterms.add(ca);
   }
 
   /* Basic Get */
-  public ContractElementInvk getInvk() { return (ContractElementInvk)this.getSubTerms().get(0); }
-  public ContractElementGet getGet() { return (ContractElementGet)this.getSubTerms().get(1); }
+  public ContractConst getConst() { return (ContractConst)this.getSubTerms().get(0); }
+  public ContractElementInvk getInvk() { return (ContractElementInvk)this.getSubTerms().get(1); }
+  public ContractElementGet getGet() { return (ContractElementGet)this.getSubTerms().get(2); }
 
   /* toString */
   public String toString() {
-    return (subterms.get(0).toString()) + "." + (subterms.get(1).toString());
+    return (subterms.get(0).toString() + "(" + subterms.get(1).toString()) + "." + (subterms.get(2).toString() + ")");
   }
 
 }

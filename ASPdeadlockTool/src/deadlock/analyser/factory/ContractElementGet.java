@@ -33,15 +33,20 @@ public class ContractElementGet extends ContractElement {
 
   /* Constructors */
   public ContractElementGet(List<Term> l) { super(name, l); }
-  public ContractElementGet(ASTNode pos, GroupName a, GroupName b){
-    super(pos, name, new ArrayList<Term>(2));
+  public ContractElementGet(ASTNode pos, GroupName a, RunningMethod metOfA, GroupName b, RunningMethod metOfB){
+    super(pos, name, new ArrayList<Term>(4));
     subterms.add(a);
+    subterms.add(metOfA);
     subterms.add(b);
+    subterms.add(metOfB);
   }
 
+  
   /* Basic Get */
   public GroupName whosWaiting() { return (GroupName)subterms.get(0); }
-  public GroupName whosWaited() { return (GroupName)subterms.get(1); }
+  public RunningMethod whosWaitingMethod() { return (RunningMethod)subterms.get(1); }
+  public GroupName whosWaited() { return (GroupName)subterms.get(2); }
+  public RunningMethod whosWaitedMethod() { return (RunningMethod)subterms.get(3); }
 
   /* toString */
   public String toString() {

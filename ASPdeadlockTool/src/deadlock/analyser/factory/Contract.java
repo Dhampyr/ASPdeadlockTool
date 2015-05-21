@@ -41,24 +41,24 @@ public class Contract extends GenericStructuredTerm {
   /* Basic Extension */
   public void add(Contract c) { subterms.addAll(c.subterms); }
 
-  public void fusion(Contract c) {
-    if(c.subterms.isEmpty()) { return; }
-    if(this.subterms.isEmpty()) { this.add(c); return; }
-    
-    Term end = this.subterms.get(this.subterms.size() -1);
-    Term first = c.subterms.get(0);
-    Term res = null;
-    if(end instanceof ContractElementInvk) {
-      if(first instanceof ContractElementAwait) {
-       res = new ContractElementInvkA(((ContractElementInvk)end).getPosition(), (ContractElementInvk)end, (ContractElementAwait)first);
-      } else if(first instanceof ContractElementGet) {
-       res = new ContractElementInvkG(((ContractElementInvk)end).getPosition(), (ContractElementInvk)end, (ContractElementGet)first);      
-      } }
-    if(res != null) {
-      this.subterms.set(this.subterms.size() - 1, res);
-      this.subterms.addAll(c.subterms.subList(1, c.subterms.size()));
-    } else { this.add(c); }
-  }
+//  public void fusion(Contract c) {
+//    if(c.subterms.isEmpty()) { return; }
+//    if(this.subterms.isEmpty()) { this.add(c); return; }
+//    
+//    Term end = this.subterms.get(this.subterms.size() -1);
+//    Term first = c.subterms.get(0);
+//    Term res = null;
+//    if(end instanceof ContractElementInvk) {
+//      if(first instanceof ContractElementAwait) {
+//       res = new ContractElementInvkA(((ContractElementInvk)end).getPosition(), (ContractElementInvk)end, (ContractElementAwait)first);
+//      } else if(first instanceof ContractElementGet) {
+//       res = new ContractElementInvkG(((ContractElementInvk)end).getPosition(), ,(ContractElementInvk)end, (ContractElementGet)first);      
+//      } }
+//    if(res != null) {
+//      this.subterms.set(this.subterms.size() - 1, res);
+//      this.subterms.addAll(c.subterms.subList(1, c.subterms.size()));
+//    } else { this.add(c); }
+//  }
 
   // TODO: remove because uselless now.
 /*  public void clean() { // remove extra dependences
