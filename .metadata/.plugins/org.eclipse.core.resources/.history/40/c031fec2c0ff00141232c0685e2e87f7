@@ -496,9 +496,6 @@ public class ContractInference {
     return new ResultInferenceStmt(_df.newContractEmpty(), _df.newConstraint(), _env);
   }
 
-  /*
-   *  Empty contract for not handle expressions ?????????
-   */
   public ResultInferenceEffExp typeInference(Exp e) {
     Method m = getInferenceMethod(e.getClass(), Exp.class);
 
@@ -518,8 +515,7 @@ public class ContractInference {
 
   
   /*
-   *  Empty contract for not handle expressions ?????????
-   *  T-Val - T-Value
+   *  T-Val
    */
   public ResultInferencePureExp typeInferenceAsPure(PureExp exp) {
     Method m = getInferenceMethod("typeInferenceAsPure", exp.getClass(), PureExp.class);
@@ -556,15 +552,11 @@ public class ContractInference {
       } catch (InvocationTargetException e) {
         e.printStackTrace();
       }
-    ResultInferencePureExp resPure = typeInferenceAsPure(pexp);
-    return new ResultInferenceEffExp(resPure.getVariableType(), _df.newContractEmpty(), _df.newConstraint(), _env);
+    ResultInferenceEffExp resPure = sync(pexp);
+    return resPure;
+//    return new ResultInferenceEffExp(resPure.getVariableType(), _df.newContractEmpty(), _df.newConstraint(), _env);
   }
 
-  
-  /*
-   *  Empty contract for not handle expressions ?????????
-   *  T-Val - T-Value
-   */
   public ResultInferencePureExp typeInference(Guard g) {
     Method m = getInferenceMethod(g.getClass(), Guard.class);
 
@@ -782,8 +774,10 @@ public class ContractInference {
     _log.logDebug("Contract Inference for the 'this' PureExp");
     return new ResultInferencePureExp(_df, _env.getVariableRecord(_this));
   }
+
   
   //Should be T-Value and T-Field
+  
   public ResultInferencePureExp typeInferenceAsPure(VarOrFieldUse var) {
     _log.logDebug("Contract Inference for the VarOrFieldUse");
     return new ResultInferencePureExp(_df, _env.getVariable(var.getName()));
@@ -982,7 +976,7 @@ public class ContractInference {
     }
   }
 
-  public ResultInferenceEffExp typeInference(GetExp exp) {
+  public ResultInferenceEffExp sync(PureExp exp) {
     _log.logDebug("Contract Inference for a GetExp");
     _log.beginIndent();
 
