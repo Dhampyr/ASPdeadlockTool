@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="typeInferenceAsPure" key="selection"/>
+		<item value="Paral" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wrap"/>
-		<item value="true" key="wholeword"/>
+		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="typeInferenceAsPure"/>
-			<item value="typeInferenceAsPure("/>
-			<item value="typeInferenceAsPure(Future"/>
-			<item value="typeinference"/>
-			<item value="typeinferenceas"/>
-			<item value="***"/>
-			<item value="-&gt;&gt;"/>
-			<item value="newRecordPresent"/>
+			<item value="paral"/>
+			<item value="parall"/>
+			<item value="figli"/>
+			<item value="h+"/>
+			<item value="initconfig"/>
+			<item value="numero"/>
+			<item value="_env.put"/>
+			<item value="_env.add"/>
 		</list>
 		<list key="replacehistory">
 			<item value="environment"/>

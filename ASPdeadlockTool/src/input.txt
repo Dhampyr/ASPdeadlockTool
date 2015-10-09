@@ -18,7 +18,8 @@ class CpxSched (CpxSched u) {
      
      y = new CpxSched(null);
      
-     if ((g == 1) && (h == 5)) {h = y.m2(u); h = y.m2(u);} 
+     if ((g == 1) && (h == 5)) 
+     {h = y.m2(u); h = y.m2(u);} 
      if (g == 2) {h = y.m2(u); h = y.m2(u);} 
      else {g = y.m2(y); g = y.m2(y);}
      h = z.m3();

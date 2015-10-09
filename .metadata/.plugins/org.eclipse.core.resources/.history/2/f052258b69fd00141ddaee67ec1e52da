@@ -1,9 +1,0 @@
-package deadlock.analyser.factory;
-
-public class ObjKindAct extends GenericStructuredTerm implements ObjKind {
-
-	  public static String name = "ObjKindAct";
-	  
-	  
-
-}
